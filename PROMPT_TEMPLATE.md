@@ -11,7 +11,7 @@ I'm building a visual knowledge graph. Please generate all nodes for the topic "
 
 Requirements:
 
-1. Generate 8–15 nodes covering the key concepts, tools, or entities related to the topic.
+1. Generate as many nodes as needed to thoroughly cover the key concepts, tools, or entities related to the topic. Don't limit yourself — include all important items.
 2. Output all nodes as ONE JSON array (not separate objects).
 3. Every node must follow this schema:
 
@@ -57,7 +57,7 @@ Please generate the nodes now.
 
 要求：
 
-1. 生成 8–15 个节点，覆盖该主题下的关键概念、工具或实体。
+1. 生成足够多的节点来全面覆盖该主题下的关键概念、工具或实体，不要限制数量，重要的内容都应该包含进来。
 2. 将所有节点输出为一个 JSON 数组（不是单独的对象）。
 3. 每个节点必须遵循以下格式：
 
