@@ -1,0 +1,7 @@
+{
+  "id": "typescript",
+  "label": "TypeScript",
+  "description": "Typed superset of JavaScript that compiles to plain JS.",
+  "tags": ["tooling", "language"],
+  "links": []
+}
