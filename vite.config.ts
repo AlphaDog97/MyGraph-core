@@ -88,6 +88,6 @@ function copyGraphDataPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), graphDataPlugin(), copyGraphDataPlugin()],
-  base: "/MyGraph/",
-  publicDir: false,
+  base: "/",
+  publicDir: "public",
 });
