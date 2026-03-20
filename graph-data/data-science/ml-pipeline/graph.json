@@ -1,0 +1,58 @@
+[
+  {
+    "id": "python",
+    "label": "Python",
+    "description": "General-purpose programming language popular in data science.",
+    "tags": ["language", "core"],
+    "links": [
+      { "target": "pandas", "type": "uses", "label": "data handling with" },
+      { "target": "scikit-learn", "type": "uses", "label": "modeling with" },
+      { "target": "jupyter", "type": "uses", "label": "explored in" }
+    ]
+  },
+  {
+    "id": "pandas",
+    "label": "Pandas",
+    "description": "Data manipulation and analysis library for tabular data.",
+    "tags": ["data-processing", "library"],
+    "links": [
+      { "target": "numpy", "type": "depends-on", "label": "built on" }
+    ]
+  },
+  {
+    "id": "numpy",
+    "label": "NumPy",
+    "description": "Fundamental package for numerical computing in Python.",
+    "tags": ["data-processing", "core"],
+    "links": []
+  },
+  {
+    "id": "scikit-learn",
+    "label": "Scikit-learn",
+    "description": "Machine learning library with classification, regression, and clustering.",
+    "tags": ["ml", "library"],
+    "links": [
+      { "target": "numpy", "type": "depends-on", "label": "built on" },
+      { "target": "pandas", "type": "used-with", "label": "takes data from" }
+    ]
+  },
+  {
+    "id": "jupyter",
+    "label": "Jupyter Notebook",
+    "description": "Interactive computing environment for data exploration.",
+    "tags": ["tooling", "exploration"],
+    "links": [
+      { "target": "pandas", "type": "used-with", "label": "displays data from" },
+      { "target": "matplotlib", "type": "used-with", "label": "renders plots with" }
+    ]
+  },
+  {
+    "id": "matplotlib",
+    "label": "Matplotlib",
+    "description": "Comprehensive plotting library for static and interactive visualizations.",
+    "tags": ["visualization", "library"],
+    "links": [
+      { "target": "numpy", "type": "depends-on", "label": "operates on" }
+    ]
+  }
+]

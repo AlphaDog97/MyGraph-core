@@ -1,0 +1,45 @@
+[
+  {
+    "id": "react",
+    "label": "React",
+    "description": "UI library for building component-driven interfaces.",
+    "tags": ["frontend", "ui-framework"],
+    "links": [
+      { "target": "vite", "type": "used-with", "label": "bundled by" },
+      { "target": "cytoscape", "type": "renders", "label": "visualizes with" },
+      { "target": "typescript", "type": "used-with", "label": "typed with" }
+    ]
+  },
+  {
+    "id": "vite",
+    "label": "Vite",
+    "description": "Next-generation frontend build tool with lightning-fast HMR.",
+    "tags": ["tooling", "build"],
+    "links": [
+      { "target": "typescript", "type": "supports", "label": "compiles" }
+    ]
+  },
+  {
+    "id": "cytoscape",
+    "label": "Cytoscape.js",
+    "description": "Graph theory library for analysis and visualisation.",
+    "tags": ["visualization", "frontend"],
+    "links": []
+  },
+  {
+    "id": "typescript",
+    "label": "TypeScript",
+    "description": "Typed superset of JavaScript that compiles to plain JS.",
+    "tags": ["tooling", "language"],
+    "links": []
+  },
+  {
+    "id": "github-pages",
+    "label": "GitHub Pages",
+    "description": "Static site hosting directly from a GitHub repository.",
+    "tags": ["hosting", "deployment"],
+    "links": [
+      { "target": "vite", "type": "deploys", "label": "deploys output of" }
+    ]
+  }
+]
