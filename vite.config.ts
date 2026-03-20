@@ -3,16 +3,63 @@ import react from "@vitejs/plugin-react";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+function labelFromId(id: string): string {
+  return id
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+interface ManifestGraph {
+  id: string;
+  label: string;
+}
+interface ManifestCategory {
+  id: string;
+  label: string;
+  graphs: ManifestGraph[];
+}
+interface Manifest {
+  categories: ManifestCategory[];
+}
+
 function graphDataPlugin(): Plugin {
   const graphDir = path.resolve(__dirname, "graph-data");
-  const nodesDir = path.join(graphDir, "nodes");
 
-  function generateManifest(): string[] {
-    if (!fs.existsSync(nodesDir)) return [];
-    return fs
-      .readdirSync(nodesDir)
-      .filter((f) => f.endsWith(".json"))
-      .sort();
+  function generateManifest(): Manifest {
+    const categories: ManifestCategory[] = [];
+    if (!fs.existsSync(graphDir)) return { categories };
+
+    for (const catEntry of fs
+      .readdirSync(graphDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .sort((a, b) => a.name.localeCompare(b.name))) {
+      const catDir = path.join(graphDir, catEntry.name);
+      const graphs: ManifestGraph[] = [];
+
+      for (const graphEntry of fs
+        .readdirSync(catDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .sort((a, b) => a.name.localeCompare(b.name))) {
+        const graphFile = path.join(catDir, graphEntry.name, "graph.json");
+        if (fs.existsSync(graphFile)) {
+          graphs.push({
+            id: graphEntry.name,
+            label: labelFromId(graphEntry.name),
+          });
+        }
+      }
+
+      if (graphs.length > 0) {
+        categories.push({
+          id: catEntry.name,
+          label: labelFromId(catEntry.name),
+          graphs,
+        });
+      }
+    }
+
+    return { categories };
   }
 
   function writeManifest() {
@@ -61,27 +108,25 @@ function copyGraphDataPlugin(): Plugin {
     apply: "build",
     generateBundle() {
       const graphDir = path.resolve(__dirname, "graph-data");
-      const nodesDir = path.join(graphDir, "nodes");
+      if (!fs.existsSync(graphDir)) return;
 
-      if (!fs.existsSync(nodesDir)) return;
+      const walk = (dir: string, rel: string) => {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const full = path.join(dir, entry.name);
+          const entryRel = rel ? `${rel}/${entry.name}` : entry.name;
+          if (entry.isDirectory()) {
+            walk(full, entryRel);
+          } else {
+            this.emitFile({
+              type: "asset",
+              fileName: `graph-data/${entryRel}`,
+              source: fs.readFileSync(full, "utf-8"),
+            });
+          }
+        }
+      };
 
-      const manifestPath = path.join(graphDir, "manifest.json");
-      if (fs.existsSync(manifestPath)) {
-        this.emitFile({
-          type: "asset",
-          fileName: "graph-data/manifest.json",
-          source: fs.readFileSync(manifestPath, "utf-8"),
-        });
-      }
-
-      for (const file of fs.readdirSync(nodesDir)) {
-        if (!file.endsWith(".json")) continue;
-        this.emitFile({
-          type: "asset",
-          fileName: `graph-data/nodes/${file}`,
-          source: fs.readFileSync(path.join(nodesDir, file), "utf-8"),
-        });
-      }
+      walk(graphDir, "");
     },
   };
 }

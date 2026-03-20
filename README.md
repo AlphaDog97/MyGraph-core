@@ -1,6 +1,6 @@
 # MyGraph – Visual Knowledge Graph
 
-An interactive, static knowledge-graph explorer built with React, Vite, and Cytoscape.js. Add structured JSON files, deploy to GitHub Pages, and browse your knowledge graph in the browser.
+An interactive, static knowledge-graph explorer built with React, Vite, and Cytoscape.js. Organize graphs into categories, deploy to GitHub Pages, and browse your knowledge graphs in the browser.
 
 ## Quick start
 
@@ -11,9 +11,49 @@ npm run dev
 
 Open the URL printed in the terminal (usually `http://localhost:5173/MyGraph/`).
 
-## Adding nodes
+## Folder structure
 
-Place one JSON file per node in `graph-data/nodes/`. The file name is not significant; the `id` field inside the JSON is what matters.
+```
+graph-data/
+├── web-development/               ← category folder
+│   ├── frontend-stack/            ← graph folder
+│   │   └── graph.json             ← all nodes for this graph
+│   └── backend-stack/
+│       └── graph.json
+└── data-science/                  ← another category
+    └── ml-pipeline/
+        └── graph.json
+```
+
+- Each **category** is a top-level folder inside `graph-data/`.
+- Each **graph** is a subfolder within a category, containing a single `graph.json`.
+- `graph.json` holds a **JSON array** with all nodes for that graph.
+- `manifest.json` is generated automatically at build time — do not edit it manually.
+
+## Graph file format
+
+Each `graph.json` is a JSON array of node objects:
+
+```json
+[
+  {
+    "id": "react",
+    "label": "React",
+    "description": "UI library for building component-driven interfaces.",
+    "tags": ["frontend", "ui-framework"],
+    "links": [
+      { "target": "vite", "type": "used-with", "label": "bundled by" }
+    ]
+  },
+  {
+    "id": "vite",
+    "label": "Vite",
+    "description": "Next-generation frontend build tool.",
+    "tags": ["tooling", "build"],
+    "links": []
+  }
+]
+```
 
 ### Required fields
 
@@ -27,7 +67,7 @@ Place one JSON file per node in `graph-data/nodes/`. The file name is not signif
 
 | Field         | Type       | Description                              |
 | ------------- | ---------- | ---------------------------------------- |
-| `description` | `string`   | Short explanatory text (future use).     |
+| `description` | `string`   | Short explanatory text.                  |
 | `links`       | `object[]` | Outbound relationship declarations.      |
 
 ### Link object fields
@@ -38,62 +78,48 @@ Place one JSON file per node in `graph-data/nodes/`. The file name is not signif
 | `type`   | `string` | yes      | Machine-readable relation kind.   |
 | `label`  | `string` | no       | Human-readable edge label.        |
 
-### Example node file
+Node IDs must be unique within each `graph.json`. They do not need to be unique across different graphs.
 
-```json
-{
-  "id": "react",
-  "label": "React",
-  "description": "UI library for building component-driven interfaces.",
-  "tags": ["frontend", "ui-framework"],
-  "links": [
-    {
-      "target": "vite",
-      "type": "used-with",
-      "label": "bundled by"
-    }
-  ]
-}
-```
+## UI features
 
-## Multi-tag nodes
+### Category and graph navigation
 
-Nodes can carry multiple tags. The order of tags in the `tags` array matters for color resolution: the first tag with a user-assigned color determines the node's border color. All tags remain searchable regardless of color assignment.
+Use the dropdowns in the toolbar to switch between categories and graphs. The app remembers your last selection across page refreshes.
 
-## Runtime tag color editing
+### Graph management
 
-Click **Edit tag colors** in the toolbar to open the tag color editor. Pick a color for any discovered tag. Changes update the graph and legend immediately.
+Click the **⋯** button next to the graph selector to:
 
-- Tag colors are stored in browser `localStorage`, so they persist across refreshes on the same device/browser.
-- Clearing a tag's color reverts nodes (that relied on that tag) to the default gray border.
-- Cross-device sync is not supported.
+- **Move to category** — downloads `graph.json` and shows instructions for moving the folder.
+- **Delete graph** — removes the graph from the current view and shows instructions for deleting the folder from the repository.
 
-### Accepted color examples
+Since this is a static app, these operations provide guidance and file downloads rather than modifying files directly. Commit and redeploy to make changes permanent.
 
-The editor provides preset color swatches. Custom hex input is not included in the MVP.
+### Node detail panel
 
-## Default node styling
+Click any node to open a side panel showing its details. You can edit the label, description, tags, and links. The **Save** button downloads an updated `graph.json` with your changes and updates the graph in-memory.
 
-| Condition                         | Fill  | Border       |
-| --------------------------------- | ----- | ------------ |
-| No tag has a chosen color         | white | medium gray  |
-| At least one tag has a color      | white | that color   |
+### Tag color editing
 
-Border color is resolved by scanning the node's `tags` array in order and using the first tag that currently has a user-assigned color.
+Click **Edit tag colors** to assign colors to tags. Colors are stored in browser `localStorage` and persist across refreshes. The first tag (in array order) with an assigned color determines the node's border color.
 
-## Search
+### Search
 
-Type in the search bar (or press `/`) to filter nodes. Search matches against `id`, `label`, and `tags` using case-insensitive substring matching. Matched nodes are highlighted; non-matching nodes and edges are dimmed. Press `Escape` or clear the field to reset.
+Type in the search bar (or press `/`) to filter nodes. Search matches `id`, `label`, and `tags` using case-insensitive substring matching. Press `Escape` to clear.
+
+## Generating content with AI
+
+See `PROMPT_TEMPLATE.md` for ready-to-use prompts (English and Chinese) that you can send to any AI model to generate a `graph.json` for your topic.
 
 ## Deploying to GitHub Pages
 
 1. Push your changes to `main`.
-2. The included GitHub Actions workflow (`.github/workflows/deploy.yml`) builds the site and deploys it to GitHub Pages automatically.
-3. Enable **Pages** in your repository settings (Settings → Pages → Source: GitHub Actions).
+2. The included GitHub Actions workflow builds and deploys automatically.
+3. Enable **Pages** in repository settings (Settings → Pages → Source: GitHub Actions).
 
 ## What happens when validation fails
 
-If any node file contains invalid JSON, is missing required fields, or contains duplicate IDs, the app shows a readable on-screen error summary listing every problem. Fix the source files and redeploy.
+If a `graph.json` contains invalid JSON, is missing required fields, or has duplicate IDs, the app shows a readable on-screen error summary. Fix the file and redeploy.
 
 ## Building for production
 
@@ -101,23 +127,8 @@ If any node file contains invalid JSON, is missing required fields, or contains 
 npm run build
 ```
 
-The output is in `dist/` and can be served by any static file host.
-
-## Visual design
-
-The app aims for a clean, minimal, premium interface:
-
-- Inter typeface with clear hierarchy
-- Glassmorphic toolbar and legend panels
-- Subtle animations for panel transitions, hover, and focus states
-- Reduced-motion support where practical
-- Graph canvas as the visual focal point
+Output is in `dist/`.
 
 ## LeanSpec
 
-This repository uses LeanSpec to capture non-trivial work as lightweight specs. See `specs/` for details.
-
-```bash
-lean-spec list        # list existing specs
-lean-spec validate    # validate spec structure
-```
+This repository uses LeanSpec for spec-driven development. See `specs/` for details.

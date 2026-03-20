@@ -1,7 +1,0 @@
-{
-  "id": "cytoscape",
-  "label": "Cytoscape.js",
-  "description": "Graph theory library for analysis and visualisation.",
-  "tags": ["visualization", "frontend"],
-  "links": []
-}

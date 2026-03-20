@@ -1,54 +1,61 @@
 import {
+  Manifest,
   KnowledgeNode,
   KnowledgeEdge,
   KnowledgeGraph,
   TagColorAssignment,
 } from "../domain/types";
 
-const NODE_MANIFEST_URL = `${import.meta.env.BASE_URL}graph-data/manifest.json`;
+const BASE = import.meta.env.BASE_URL;
 
-/**
- * Load all node JSON files listed in the build-time manifest,
- * validate them, and produce a KnowledgeGraph.
- */
-export async function loadKnowledgeGraph(): Promise<KnowledgeGraph> {
-  const manifestRes = await fetch(NODE_MANIFEST_URL);
-  if (!manifestRes.ok) {
+export async function loadManifest(): Promise<Manifest> {
+  const res = await fetch(`${BASE}graph-data/manifest.json`);
+  if (!res.ok) {
     throw new Error(
-      `Failed to load node manifest (${manifestRes.status}). ` +
+      `Failed to load manifest (${res.status}). ` +
         `Make sure graph-data/manifest.json exists.`
     );
   }
+  return res.json();
+}
 
-  const fileNames: string[] = await manifestRes.json();
+export async function loadGraphData(
+  categoryId: string,
+  graphId: string
+): Promise<KnowledgeGraph> {
+  const url = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Failed to load graph (${res.status}): ${categoryId}/${graphId}`
+    );
+  }
+
+  let rawArray: unknown;
+  try {
+    rawArray = await res.json();
+  } catch {
+    throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
+  }
+
+  if (!Array.isArray(rawArray)) {
+    throw new Error(
+      `${categoryId}/${graphId}/graph.json must be a JSON array of nodes.`
+    );
+  }
+
   const warnings: string[] = [];
   const nodes: KnowledgeNode[] = [];
   const seenIds = new Set<string>();
 
-  for (const fileName of fileNames) {
-    const url = `${import.meta.env.BASE_URL}graph-data/nodes/${fileName}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      warnings.push(`Could not load ${fileName}: HTTP ${res.status}`);
-      continue;
-    }
-
-    let raw: unknown;
-    try {
-      raw = await res.json();
-    } catch {
-      warnings.push(`${fileName}: invalid JSON.`);
-      continue;
-    }
-
-    const result = KnowledgeNode.validate(raw);
+  for (let i = 0; i < rawArray.length; i++) {
+    const result = KnowledgeNode.validate(rawArray[i]);
     if (!result.ok) {
-      warnings.push(`${fileName}: ${result.error}`);
+      warnings.push(`Node [${i}]: ${result.error}`);
       continue;
     }
-
     if (seenIds.has(result.value.id)) {
-      warnings.push(`${fileName}: duplicate node id '${result.value.id}'.`);
+      warnings.push(`Node [${i}]: duplicate id '${result.value.id}'.`);
       continue;
     }
     seenIds.add(result.value.id);
@@ -56,9 +63,7 @@ export async function loadKnowledgeGraph(): Promise<KnowledgeGraph> {
   }
 
   if (nodes.length === 0 && warnings.length > 0) {
-    throw new Error(
-      "No valid nodes loaded.\n" + warnings.join("\n")
-    );
+    throw new Error("No valid nodes loaded.\n" + warnings.join("\n"));
   }
 
   const edges: KnowledgeEdge[] = [];
@@ -93,7 +98,6 @@ export async function loadKnowledgeGraph(): Promise<KnowledgeGraph> {
   };
 }
 
-/** Convert a KnowledgeGraph into Cytoscape ElementDefinition[] */
 export function toCytoscapeElements(
   graph: KnowledgeGraph,
   tagColors: TagColorAssignment

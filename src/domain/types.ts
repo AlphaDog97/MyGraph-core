@@ -1,4 +1,20 @@
-/** Raw JSON shape for a single node file in graph-data/nodes/ */
+/** Manifest describing all categories and graphs in graph-data/ */
+export interface Manifest {
+  categories: ManifestCategory[];
+}
+
+export interface ManifestCategory {
+  id: string;
+  label: string;
+  graphs: ManifestGraph[];
+}
+
+export interface ManifestGraph {
+  id: string;
+  label: string;
+}
+
+/** Raw JSON shape for a single node inside a graph.json array */
 export interface KnowledgeNodeFile {
   id: string;
   label: string;
@@ -7,7 +23,7 @@ export interface KnowledgeNodeFile {
   links?: KnowledgeLinkFile[];
 }
 
-/** Raw outbound link declaration inside a node file */
+/** Raw outbound link declaration inside a node */
 export interface KnowledgeLinkFile {
   target: string;
   type: string;
@@ -49,10 +65,9 @@ export class KnowledgeNode {
     this.links = raw.links ?? [];
   }
 
-  /** Validate that all required fields are present and well-formed */
   static validate(raw: unknown): { ok: true; value: KnowledgeNodeFile } | { ok: false; error: string } {
     if (typeof raw !== "object" || raw === null) {
-      return { ok: false, error: "Node file must be a JSON object." };
+      return { ok: false, error: "Node must be a JSON object." };
     }
     const obj = raw as Record<string, unknown>;
 
@@ -90,7 +105,6 @@ export class KnowledgeNode {
     return { ok: true, value: obj as unknown as KnowledgeNodeFile };
   }
 
-  /** Resolve border color from tag-color assignments (first matching tag wins) */
   resolveBorderColor(tagColors: TagColorAssignment): string {
     for (const tag of this.tags) {
       const color = tagColors[tag];
@@ -99,12 +113,10 @@ export class KnowledgeNode {
     return "#b0b0b0";
   }
 
-  /** Produce a search-indexable string */
   searchText(): string {
     return [this.id, this.label, ...this.tags].join(" ").toLowerCase();
   }
 
-  /** Convert to Cytoscape node data */
   toCytoscapeNode(tagColors: TagColorAssignment): cytoscape.ElementDefinition {
     return {
       data: {
