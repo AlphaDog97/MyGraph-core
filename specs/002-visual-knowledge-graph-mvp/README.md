@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in-progress
 created: '2026-03-20'
 tags:
   - frontend
@@ -12,7 +12,7 @@ created_at: '2026-03-20T01:10:15+00:00'
 
 # Visual Knowledge Graph MVP
 
-> **Status**: draft · **Priority**: high · **Created**: 2026-03-20
+> **Status**: in-progress · **Priority**: high · **Created**: 2026-03-20
 
 ## Overview
 
@@ -377,28 +377,28 @@ so future iterations do not regress into a purely utilitarian interface.
 
 ## Plan
 
-- [ ] Scaffold a React + Vite application suitable for GitHub Pages deployment.
-- [ ] Add Cytoscape.js and create the base graph rendering component.
-- [ ] Define TypeScript node and edge models, including a `KnowledgeNode` class
+- [x] Scaffold a React + Vite application suitable for GitHub Pages deployment.
+- [x] Add Cytoscape.js and create the base graph rendering component.
+- [x] Define TypeScript node and edge models, including a `KnowledgeNode` class
       for validation and normalization.
-- [ ] Implement loading of `graph-data/nodes/*.json` and transformation into
+- [x] Implement loading of `graph-data/nodes/*.json` and transformation into
       Cytoscape elements.
-- [ ] Implement validation and a readable error state for invalid datasets.
-- [ ] Implement runtime tag discovery from loaded nodes.
-- [ ] Implement a tag color editor UI, local persistence, and a visible legend.
-- [ ] Implement node border-color resolution based on user-selected tag colors.
-- [ ] Define and implement a minimal premium visual system for layout, surfaces,
+- [x] Implement validation and a readable error state for invalid datasets.
+- [x] Implement runtime tag discovery from loaded nodes.
+- [x] Implement a tag color editor UI, local persistence, and a visible legend.
+- [x] Implement node border-color resolution based on user-selected tag colors.
+- [x] Define and implement a minimal premium visual system for layout, surfaces,
       typography, and controls.
-- [ ] Add subtle motion for panel transitions, focus states, hover states, and
+- [x] Add subtle motion for panel transitions, focus states, hover states, and
       graph viewport actions.
-- [ ] Add search, highlight/dim behavior, and reset/fit controls.
-- [ ] Add sample graph data and contributor documentation for the folder format.
-- [ ] Configure GitHub Actions deployment to GitHub Pages.
+- [x] Add search, highlight/dim behavior, and reset/fit controls.
+- [x] Add sample graph data and contributor documentation for the folder format.
+- [x] Configure GitHub Actions deployment to GitHub Pages.
 
 ## Test
 
-- [ ] Add at least 3 sample node files with cross-links and multiple tags.
-- [ ] Run the local build successfully with the sample dataset.
+- [x] Add at least 3 sample node files with cross-links and multiple tags.
+- [x] Run the local build successfully with the sample dataset.
 - [ ] Confirm the rendered graph shows all nodes and edges from the source
       folder.
 - [ ] Confirm nodes with multiple tags load successfully and remain searchable by
