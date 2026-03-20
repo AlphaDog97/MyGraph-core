@@ -1,0 +1,13 @@
+{
+  "id": "github-pages",
+  "label": "GitHub Pages",
+  "description": "Static site hosting directly from a GitHub repository.",
+  "tags": ["hosting", "deployment"],
+  "links": [
+    {
+      "target": "vite",
+      "type": "deploys",
+      "label": "deploys output of"
+    }
+  ]
+}

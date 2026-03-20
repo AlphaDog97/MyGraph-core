@@ -1,0 +1,13 @@
+{
+  "id": "vite",
+  "label": "Vite",
+  "description": "Next-generation frontend build tool with lightning-fast HMR.",
+  "tags": ["tooling", "build"],
+  "links": [
+    {
+      "target": "typescript",
+      "type": "supports",
+      "label": "compiles"
+    }
+  ]
+}
