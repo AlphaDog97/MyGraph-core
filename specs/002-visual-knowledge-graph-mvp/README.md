@@ -40,6 +40,7 @@ legend so the graph remains understandable as content grows.
 - Keep the authoring workflow file-based and easy to understand.
 - Keep the runtime fully static so it works on GitHub Pages without a backend.
 - Make node styling predictable, including user-controlled tag color mapping.
+- Deliver a minimal, refined interface that feels modern, premium, and calm.
 - Define a clear node model in TypeScript so the file format and rendered graph
   stay aligned.
 
@@ -193,6 +194,66 @@ Legend behavior:
 This approach keeps the source data simple while allowing viewers to customize
 how tag categories are emphasized.
 
+### Visual design direction
+
+The MVP should not feel like a raw developer tool. It should feel clean,
+intentional, and comfortable to explore for a longer period of time.
+
+Recommended visual direction:
+
+- minimalist layout with generous whitespace and a strong content hierarchy,
+- restrained color palette so graph border colors remain the main accents,
+- soft surface separation for panels, controls, and overlays,
+- polished typography with clear contrast and readable spacing,
+- low-noise chrome so the graph canvas stays visually dominant,
+- consistent rounded corners, shadows, and border treatments across controls.
+
+Recommended app-shell treatment:
+
+- full-height single-page layout,
+- a calm neutral background rather than a harsh pure-black or pure-white screen,
+- a floating or lightly elevated control area for search, reset, and edit
+  actions,
+- a legend and editor panel that feel lightweight and integrated rather than
+  heavy enterprise sidebars.
+
+Recommended component tone:
+
+- buttons should look refined and tactile without appearing flashy,
+- search input should feel prominent and pleasant to use,
+- panels should read as modern utility surfaces rather than dense forms,
+- empty, loading, and error states should stay visually polished and not break
+  the premium feel.
+
+### Motion and interaction quality
+
+Animation should support clarity and comfort, not distract from the graph.
+
+Recommended motion principles:
+
+- use subtle easing for panel open/close, hover, focus, and state transitions,
+- keep animations short and smooth rather than dramatic,
+- animate opacity, transform, shadow, and border-color changes where helpful,
+- avoid jittery or repeated motion that competes with graph interaction,
+- keep graph updates responsive when tag colors or search state change.
+
+Expected interaction polish:
+
+- search focus should feel immediate and polished,
+- opening the tag editor should feel smooth and lightweight,
+- color changes should update node borders and legend swatches with a gentle
+  transition,
+- hover and selected states should feel clear but understated,
+- reset/fit actions should use Cytoscape transitions that feel controlled rather
+  than abrupt.
+
+Accessibility and comfort requirements:
+
+- respect reduced-motion preferences where practical,
+- ensure animation never blocks interaction,
+- avoid long transitions that make the interface feel sluggish,
+- preserve readability and contrast while pursuing a premium visual style.
+
 ### Data loading and transformation flow
 
 1. Collect all files from `graph-data/nodes/*.json`.
@@ -265,6 +326,9 @@ Optional detail sidebars, editing UIs, filtering by relation type, and rich
 tooltips are explicitly out of scope for this MVP unless they become necessary
 to complete the basic authoring-to-Pages flow.
 
+Even within this small scope, the page should present as a cohesive premium UI
+rather than a bare demo screen.
+
 ### GitHub Pages compatibility
 
 The project must build as a static site and deploy cleanly to GitHub Pages.
@@ -297,6 +361,9 @@ Also include author documentation that explains:
 - how to publish to GitHub Pages,
 - what happens when validation fails.
 
+Implementation-facing documentation should also capture the intended visual tone
+so future iterations do not regress into a purely utilitarian interface.
+
 ### Out of scope
 
 - in-browser graph editing
@@ -320,6 +387,10 @@ Also include author documentation that explains:
 - [ ] Implement runtime tag discovery from loaded nodes.
 - [ ] Implement a tag color editor UI, local persistence, and a visible legend.
 - [ ] Implement node border-color resolution based on user-selected tag colors.
+- [ ] Define and implement a minimal premium visual system for layout, surfaces,
+      typography, and controls.
+- [ ] Add subtle motion for panel transitions, focus states, hover states, and
+      graph viewport actions.
 - [ ] Add search, highlight/dim behavior, and reset/fit controls.
 - [ ] Add sample graph data and contributor documentation for the folder format.
 - [ ] Configure GitHub Actions deployment to GitHub Pages.
@@ -340,6 +411,11 @@ Also include author documentation that explains:
 - [ ] Confirm nodes render with white fill and gray border when no relevant tag
       color has been chosen.
 - [ ] Confirm chosen tag colors persist across page refresh in the same browser.
+- [ ] Confirm the page presents a clean, minimal, visually consistent interface.
+- [ ] Confirm panel open/close, hover, focus, and color-change transitions feel
+      smooth and non-jarring.
+- [ ] Confirm reduced-motion handling avoids unnecessary animation where
+      practical.
 - [ ] Confirm zoom, pan, and reset/fit controls work in the browser.
 - [ ] Confirm search matches node `label`, `id`, and `tags`.
 - [ ] Confirm an invalid dataset produces a visible validation error instead of
@@ -366,6 +442,9 @@ Please review these decisions before implementation:
    a chosen color.
 8. Keep the MVP as a single static page with search plus a lightweight tag color
    editing UI.
-9. Make invalid data block rendering with a readable error state.
-10. Limit MVP search to case-insensitive substring matches on `label`, `id`, and
-   `tags`.
+9. Aim for a minimal premium UI with subtle animation and polished interactions,
+   rather than a bare functional prototype.
+10. Respect reduced-motion preferences while keeping default interactions smooth.
+11. Make invalid data block rendering with a readable error state.
+12. Limit MVP search to case-insensitive substring matches on `label`, `id`, and
+    `tags`.
