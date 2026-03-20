@@ -30,8 +30,8 @@ The MVP is successful when a contributor can:
 
 This spec focuses on the first end-to-end authoring and publishing flow. It does
 not try to solve advanced graph editing, collaboration, or large-scale dataset
-performance yet, but it does include tag-based coloring and a visible legend so
-the graph remains understandable as content grows.
+performance yet, but it does include runtime tag-based styling and a visible
+legend so the graph remains understandable as content grows.
 
 ## Design
 
@@ -39,7 +39,7 @@ the graph remains understandable as content grows.
 
 - Keep the authoring workflow file-based and easy to understand.
 - Keep the runtime fully static so it works on GitHub Pages without a backend.
-- Make node styling predictable, including per-node color.
+- Make node styling predictable, including user-controlled tag color mapping.
 - Define a clear node model in TypeScript so the file format and rendered graph
   stay aligned.
 
@@ -48,7 +48,6 @@ the graph remains understandable as content grows.
 ```text
 /
 ├── graph-data/
-│   ├── config.json
 │   └── nodes/
 │       ├── react.json
 │       ├── vite.json
@@ -62,45 +61,28 @@ the graph remains understandable as content grows.
 ```
 
 - `graph-data/nodes/` is the user-managed source folder for the knowledge graph.
-- `graph-data/config.json` stores shared graph settings for the MVP, especially
-  tag definitions and tag colors.
 - Each file represents one node and can declare outbound relationships.
 - The app loads all node files at build time or startup, validates them, and
   transforms them into Cytoscape element definitions.
 
-### Proposed graph config format
+### Runtime tag color editor
 
-Use one shared JSON config file to define tag metadata and the legend.
+Do not require a repository-level tag color config file for the MVP. Instead,
+the app should discover all tags present in the loaded node data and let the
+viewer control how those tags are colored from the UI.
 
-Example:
+Editor behavior:
 
-```json
-{
-  "tags": {
-    "frontend": {
-      "label": "Frontend",
-      "color": "#3b82f6"
-    },
-    "tooling": {
-      "label": "Tooling",
-      "color": "#8b5cf6"
-    },
-    "visualization": {
-      "label": "Visualization",
-      "color": "#10b981"
-    }
-  },
-  "defaultNodeColor": "#94a3b8"
-}
-```
+- provide an explicit `Edit tag colors` button in the app shell,
+- open a lightweight panel or modal listing all discovered tags,
+- allow the user to pick a display color for each tag,
+- allow clearing a tag color back to the default unassigned state,
+- update the graph and legend immediately when a color changes,
+- persist the user's tag-color choices in browser storage so GitHub Pages users
+  keep their selections across refreshes on the same device/browser.
 
-Config responsibilities:
-
-- define the list of supported tags for the dataset,
-- define the display label and color for each tag,
-- provide a default fallback node color when neither tags nor node override
-  colors resolve cleanly,
-- power the on-screen legend.
+Because the app is static and backend-free, browser-local persistence is enough
+for the MVP. Cross-device sync is out of scope.
 
 ### Proposed node file format
 
@@ -113,7 +95,6 @@ Example:
 {
   "id": "react",
   "label": "React",
-  "color": "#61dafb",
   "description": "UI library for building component-driven interfaces.",
   "tags": ["frontend", "visualization"],
   "links": [
@@ -139,17 +120,14 @@ Required fields:
 
 Optional fields:
 
-- `color`: node-specific override color, preferably hex or other CSS-valid color
-  string
 - `description`: short explanatory text for future detail panels or search
 - `links`: outbound relationship declarations
 
 Tag rules:
 
 - nodes may carry multiple tags,
-- every tag used by a node should be declared in `graph-data/config.json`,
-- the first tag in the node's `tags` array is the default visual tag for color
-  resolution when no node-specific `color` override is present,
+- tags are discovered directly from the loaded node files,
+- the order of tags in the node's `tags` array matters for color resolution,
 - additional tags remain searchable and available for future filtering.
 
 Relationship fields:
@@ -165,8 +143,8 @@ the renderer.
 
 Proposed shape:
 
-- `GraphConfigFile`: raw shared config loaded from `graph-data/config.json`
-- `TagDefinition`: normalized tag metadata with label and color
+- `TagRegistry`: derived list of unique tags discovered from loaded nodes
+- `TagColorAssignment`: runtime UI state that maps tag IDs to chosen colors
 - `KnowledgeNodeFile`: raw data loaded from JSON
 - `KnowledgeLinkFile`: raw outbound link data
 - `KnowledgeNode`: validated runtime class or factory-backed model
@@ -179,7 +157,8 @@ The `KnowledgeNode` class should own:
 - required field validation,
 - default normalization for optional fields,
 - tag normalization and duplicate tag cleanup,
-- effective color resolution,
+- helper methods for resolving effective border color from external tag-color
+  state,
 - helper methods for search indexing,
 - conversion into Cytoscape node data.
 
@@ -187,38 +166,44 @@ This keeps the file format stable while giving the UI a reliable internal API.
 
 ### Tag color resolution and legend behavior
 
-The MVP needs one predictable rule for deciding each node's displayed color.
+The MVP needs one predictable rule for deciding each node's displayed style.
 
-Recommended precedence:
+Default node style:
 
-1. if the node defines `color`, use it as an explicit override,
-2. else if the node has at least one tag and that tag exists in the shared tag
-   config, use the first tag's configured color,
-3. else use `defaultNodeColor` from `graph-data/config.json`.
+- white fill,
+- medium gray border when no matching tag color has been chosen,
+- border color determined by runtime tag-color assignment when available.
+
+Recommended border-color resolution:
+
+1. inspect the node's `tags` array in order,
+2. use the first tag that currently has a user-assigned color,
+3. if none of the node's tags have a chosen color, render the node with a gray
+   border.
 
 Legend behavior:
 
 - render a visible legend panel in the app shell,
-- show every configured tag with its color swatch and human-readable label,
-- make it clear that legend colors are tag colors, not necessarily unique node
-  identities,
-- keep legend generation data-driven from `graph-data/config.json`.
+- show every discovered tag with its current color swatch,
+- show unassigned tags in the default gray state,
+- make it clear that legend colors describe node border styling by tag,
+- keep legend generation data-driven from the loaded dataset and runtime
+  tag-color state.
 
-This approach allows consistent category coloring while still supporting special
-node-level overrides when needed.
+This approach keeps the source data simple while allowing viewers to customize
+how tag categories are emphasized.
 
 ### Data loading and transformation flow
 
-1. Load and parse `graph-data/config.json`.
-2. Validate tag definitions and default color settings.
-3. Collect all files from `graph-data/nodes/*.json`.
-4. Parse each file into `KnowledgeNodeFile`.
-5. Validate required fields and enforce unique node IDs.
-6. Convert raw files into `KnowledgeNode` instances.
-7. Expand each node's `links` into normalized `KnowledgeEdge` instances.
-8. Verify that edge targets reference existing nodes.
-9. Resolve each node's effective display color from node override, tag config,
-   or fallback color.
+1. Collect all files from `graph-data/nodes/*.json`.
+2. Parse each file into `KnowledgeNodeFile`.
+3. Validate required fields and enforce unique node IDs.
+4. Convert raw files into `KnowledgeNode` instances.
+5. Expand each node's `links` into normalized `KnowledgeEdge` instances.
+6. Verify that edge targets reference existing nodes.
+7. Discover the unique set of tags present in the loaded nodes.
+8. Initialize tag-color UI state from browser storage or empty defaults.
+9. Resolve each node's effective border color from the current tag-color state.
 10. Convert nodes and edges into Cytoscape element definitions.
 11. Render the graph, or show a clear validation error state if the dataset is
    invalid.
@@ -236,8 +221,10 @@ MVP behaviors:
 - render all valid nodes and edges on initial load,
 - support mouse/touch zoom and pan,
 - include a reset-view action that returns to a sensible default fit,
-- apply each node's resolved display color,
-- show a legend for configured tag colors,
+- render nodes as white-filled shapes with bordered outlines,
+- apply each node's resolved border color,
+- show a legend for discovered tags and their current colors,
+- include an edit action for changing tag colors at runtime,
 - show node labels by default,
 - use one general-purpose automatic layout suitable for small-to-medium graphs.
 
@@ -267,6 +254,8 @@ The first version only needs a focused single-page experience:
 
 - graph canvas,
 - search input,
+- edit tag colors button,
+- tag color editor panel or modal,
 - tag color legend,
 - reset/fit controls,
 - loading state,
@@ -298,11 +287,12 @@ something useful immediately after setup.
 
 Also include author documentation that explains:
 
-- how `graph-data/config.json` defines tag colors and the legend,
 - where to place node files,
 - required and optional fields,
 - how multi-tag nodes work,
-- accepted node and tag color format examples,
+- how runtime tag color editing works,
+- default node styling when no tag color is chosen,
+- accepted color input examples in the editor,
 - how links are declared,
 - how to publish to GitHub Pages,
 - what happens when validation fails.
@@ -322,31 +312,34 @@ Also include author documentation that explains:
 
 - [ ] Scaffold a React + Vite application suitable for GitHub Pages deployment.
 - [ ] Add Cytoscape.js and create the base graph rendering component.
-- [ ] Define shared tag config loading, including tag labels, colors, and
-      fallback color behavior.
 - [ ] Define TypeScript node and edge models, including a `KnowledgeNode` class
       for validation and normalization.
 - [ ] Implement loading of `graph-data/nodes/*.json` and transformation into
       Cytoscape elements.
 - [ ] Implement validation and a readable error state for invalid datasets.
-- [ ] Implement tag-based color resolution and a visible legend component.
+- [ ] Implement runtime tag discovery from loaded nodes.
+- [ ] Implement a tag color editor UI, local persistence, and a visible legend.
+- [ ] Implement node border-color resolution based on user-selected tag colors.
 - [ ] Add search, highlight/dim behavior, and reset/fit controls.
 - [ ] Add sample graph data and contributor documentation for the folder format.
 - [ ] Configure GitHub Actions deployment to GitHub Pages.
 
 ## Test
 
-- [ ] Add `graph-data/config.json` with multiple tag definitions and colors.
-- [ ] Add at least 3 sample node files with cross-links, multiple tags, and at
-      least one node-level color override.
+- [ ] Add at least 3 sample node files with cross-links and multiple tags.
 - [ ] Run the local build successfully with the sample dataset.
 - [ ] Confirm the rendered graph shows all nodes and edges from the source
       folder.
 - [ ] Confirm nodes with multiple tags load successfully and remain searchable by
       each tag.
-- [ ] Confirm legend entries match configured tag labels and colors.
-- [ ] Confirm node color precedence works as specified: node override first,
-      first tag color second, default fallback last.
+- [ ] Confirm the editor lists all discovered tags from the loaded dataset.
+- [ ] Confirm choosing a color for a tag updates the legend and node border
+      colors immediately.
+- [ ] Confirm node style precedence works as specified: first color-assigned tag
+      in `tags` order wins, otherwise gray border fallback.
+- [ ] Confirm nodes render with white fill and gray border when no relevant tag
+      color has been chosen.
+- [ ] Confirm chosen tag colors persist across page refresh in the same browser.
 - [ ] Confirm zoom, pan, and reset/fit controls work in the browser.
 - [ ] Confirm search matches node `label`, `id`, and `tags`.
 - [ ] Confirm an invalid dataset produces a visible validation error instead of
@@ -360,15 +353,19 @@ Also include author documentation that explains:
 
 Please review these decisions before implementation:
 
-1. Use `graph-data/config.json` plus `graph-data/nodes/*.json` as the initial
-   authoring format.
+1. Use only `graph-data/nodes/*.json` as the initial authoring format.
 2. Treat each file as one node and declare edges through that node's `links`.
 3. Require that nodes support multiple tags through a `tags` array.
-4. Use shared tag color definitions for the legend, with optional node-level
-   color overrides.
-5. Resolve node color in this order: node override -> first configured tag color
-   -> default fallback color.
-6. Keep the MVP as a single static page without editing features.
-7. Make invalid data block rendering with a readable error state.
-8. Limit MVP search to case-insensitive substring matches on `label`, `id`, and
+4. Discover tags from loaded node data instead of maintaining a repository-level
+   tag color config.
+5. Let users assign colors through an in-page editor, with browser-local
+   persistence.
+6. Render all nodes with white fill; use gray border by default and the chosen
+   tag color as the border when assigned.
+7. Resolve node border color by the first tag in `tags` order that currently has
+   a chosen color.
+8. Keep the MVP as a single static page with search plus a lightweight tag color
+   editing UI.
+9. Make invalid data block rendering with a readable error state.
+10. Limit MVP search to case-insensitive substring matches on `label`, `id`, and
    `tags`.
