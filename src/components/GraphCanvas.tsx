@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import cytoscape, { Core } from "cytoscape";
-import { KnowledgeGraph, TagColorAssignment } from "../domain/types";
+import { KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
 
 interface Props {
@@ -8,17 +8,85 @@ interface Props {
   tagColors: TagColorAssignment;
   searchQuery: string;
   cyRef: React.MutableRefObject<Core | null>;
+  onNodeSelect: (node: KnowledgeNode | null) => void;
 }
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildStyles(noMotion: boolean): any[] {
+  return [
+    {
+      selector: "node",
+      style: {
+        shape: "roundrectangle",
+        label: "data(label)",
+        "background-color": "#ffffff",
+        "border-width": 3,
+        "border-color": "data(borderColor)",
+        "text-valign": "center",
+        "text-halign": "center",
+        "font-family": "Inter, system-ui, sans-serif",
+        "font-size": "13px",
+        "font-weight": 500,
+        color: "#2d3748",
+        "text-outline-color": "#ffffff",
+        "text-outline-width": 2,
+        width: "label",
+        height: 36,
+        padding: 14,
+        "text-wrap": "none",
+        "overlay-padding": 4,
+        "transition-property": "border-color, opacity, background-color",
+        "transition-duration": noMotion ? 0 : 250,
+      } as unknown as cytoscape.Css.Node,
+    },
+    {
+      selector: "edge",
+      style: {
+        width: 1.5,
+        "line-color": "#cbd5e0",
+        "target-arrow-color": "#cbd5e0",
+        "target-arrow-shape": "triangle",
+        "curve-style": "bezier",
+        label: "data(label)",
+        "font-family": "Inter, system-ui, sans-serif",
+        "font-size": "10px",
+        color: "#a0aec0",
+        "text-rotation": "autorotate",
+        "text-outline-color": "#f7f8fa",
+        "text-outline-width": 2,
+        "transition-property": "opacity, line-color",
+        "transition-duration": noMotion ? 0 : 250,
+      } as unknown as cytoscape.Css.Edge,
+    },
+    {
+      selector: "node.dimmed",
+      style: { opacity: 0.15 },
+    },
+    {
+      selector: "edge.dimmed",
+      style: { opacity: 0.08 },
+    },
+    {
+      selector: "node.highlighted",
+      style: { "border-width": 5, "font-weight": 600 },
+    },
+    {
+      selector: "node.selected-node",
+      style: { "border-width": 4, "background-color": "#f7fafc", "font-weight": 600 },
+    },
+  ];
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
   searchQuery,
   cyRef,
+  onNodeSelect,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -32,65 +100,7 @@ export default function GraphCanvas({
     const cy = cytoscape({
       container: containerRef.current,
       elements,
-      style: [
-        {
-          selector: "node",
-          style: {
-            label: "data(label)",
-            "background-color": "#ffffff",
-            "border-width": 3,
-            "border-color": "data(borderColor)" as string,
-            "text-valign": "center",
-            "text-halign": "center",
-            "font-family": "Inter, system-ui, sans-serif",
-            "font-size": "13px",
-            "font-weight": 500,
-            color: "#2d3748",
-            "text-outline-color": "#ffffff",
-            "text-outline-width": 2,
-            width: 60,
-            height: 60,
-            "overlay-padding": "4px" as unknown as number,
-            "transition-property":
-              "border-color, opacity, background-color" as unknown as string,
-            "transition-duration": noMotion ? 0 : 250,
-          },
-        },
-        {
-          selector: "edge",
-          style: {
-            width: 1.5,
-            "line-color": "#cbd5e0",
-            "target-arrow-color": "#cbd5e0",
-            "target-arrow-shape": "triangle",
-            "curve-style": "bezier",
-            label: "data(label)" as string,
-            "font-family": "Inter, system-ui, sans-serif",
-            "font-size": "10px",
-            color: "#a0aec0",
-            "text-rotation": "autorotate",
-            "text-outline-color": "#f7f8fa",
-            "text-outline-width": 2,
-            "transition-property": "opacity, line-color" as unknown as string,
-            "transition-duration": noMotion ? 0 : 250,
-          },
-        },
-        {
-          selector: "node.dimmed",
-          style: { opacity: 0.15 },
-        },
-        {
-          selector: "edge.dimmed",
-          style: { opacity: 0.08 },
-        },
-        {
-          selector: "node.highlighted",
-          style: {
-            "border-width": 5,
-            "font-weight": 600,
-          },
-        },
-      ],
+      style: buildStyles(noMotion),
       layout: {
         name: "cose",
         animate: !noMotion,
@@ -103,8 +113,25 @@ export default function GraphCanvas({
       maxZoom: 4,
     });
 
+    cy.on("tap", "node", (evt) => {
+      const nodeId = evt.target.id();
+      const kn = graph.nodes.find((n) => n.id === nodeId);
+      if (kn) {
+        cy.nodes().removeClass("selected-node");
+        evt.target.addClass("selected-node");
+        onNodeSelect(kn);
+      }
+    });
+
+    cy.on("tap", (evt) => {
+      if (evt.target === cy) {
+        cy.nodes().removeClass("selected-node");
+        onNodeSelect(null);
+      }
+    });
+
     cyRef.current = cy;
-  }, [graph, tagColors, cyRef]);
+  }, [graph, tagColors, cyRef, onNodeSelect]);
 
   useEffect(() => {
     initCy();

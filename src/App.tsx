@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Core } from "cytoscape";
-import { KnowledgeGraph, TagColorAssignment } from "./domain/types";
+import {
+  KnowledgeNode,
+  KnowledgeNodeFile,
+  KnowledgeGraph,
+  TagColorAssignment,
+} from "./domain/types";
 import { loadKnowledgeGraph } from "./data/loader";
 import { loadTagColors, saveTagColors } from "./data/tagStorage";
 import GraphCanvas from "./components/GraphCanvas";
 import SearchBar from "./components/SearchBar";
 import TagLegend from "./components/TagLegend";
 import TagColorEditor from "./components/TagColorEditor";
+import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 
 type LoadState =
@@ -23,6 +29,7 @@ export default function App() {
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const cyRef = useRef<Core | null>(null);
 
   useEffect(() => {
@@ -55,6 +62,71 @@ export default function App() {
       duration: prefersReducedMotion() ? 0 : 400,
     });
   }, []);
+
+  const handleNodeSelect = useCallback((node: KnowledgeNode | null) => {
+    setSelectedNode(node);
+  }, []);
+
+  const handleNodeSave = useCallback(
+    (updated: KnowledgeNodeFile) => {
+      const json = JSON.stringify(updated, null, 2);
+      const blob = new Blob([json + "\n"], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${updated.id}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      if (loadState.status === "ready") {
+        const newNode = new KnowledgeNode(updated);
+        const newNodes = loadState.graph.nodes.map((n) =>
+          n.id === updated.id ? newNode : n
+        );
+
+        const tagSet = new Set<string>();
+        for (const n of newNodes) {
+          for (const t of n.tags) tagSet.add(t);
+        }
+
+        const seenIds = new Set(newNodes.map((n) => n.id));
+        const warnings: string[] = [];
+        const edges = newNodes.flatMap((n) =>
+          n.links
+            .filter((l) => {
+              if (!seenIds.has(l.target)) {
+                warnings.push(
+                  `Node '${n.id}': link target '${l.target}' does not exist.`
+                );
+                return false;
+              }
+              return true;
+            })
+            .map((l) => ({
+              id: `${n.id}--${l.type}--${l.target}`,
+              source: n.id,
+              target: l.target,
+              type: l.type,
+              label: l.label ?? l.type,
+            }))
+        );
+
+        setLoadState({
+          status: "ready",
+          graph: {
+            nodes: newNodes,
+            edges,
+            tags: [...tagSet].sort(),
+            warnings,
+          },
+        });
+        setSelectedNode(newNode);
+      }
+    },
+    [loadState]
+  );
 
   if (loadState.status === "loading") {
     return (
@@ -89,13 +161,30 @@ export default function App() {
       </div>
 
       <div className="graph-area">
-        <GraphCanvas
-          graph={graph}
-          tagColors={tagColors}
-          searchQuery={searchQuery}
-          cyRef={cyRef}
-        />
+        <div
+          className={`graph-canvas-wrapper${selectedNode ? " with-panel" : ""}`}
+        >
+          <GraphCanvas
+            graph={graph}
+            tagColors={tagColors}
+            searchQuery={searchQuery}
+            cyRef={cyRef}
+            onNodeSelect={handleNodeSelect}
+          />
+        </div>
         <TagLegend tags={graph.tags} tagColors={tagColors} />
+
+        {selectedNode && (
+          <NodeDetailPanel
+            node={selectedNode}
+            allNodeIds={graph.nodes.map((n) => n.id)}
+            onClose={() => {
+              setSelectedNode(null);
+              cyRef.current?.nodes().removeClass("selected-node");
+            }}
+            onSave={handleNodeSave}
+          />
+        )}
       </div>
 
       {graph.warnings.length > 0 && (
