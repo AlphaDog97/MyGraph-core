@@ -14,6 +14,11 @@ import {
   loadLastViewed,
   saveLastViewed,
 } from "./data/tagStorage";
+import {
+  AppPersistenceMode,
+  AppwriteGraphRepository,
+  AppwriteRepositoryError,
+} from "./data/appwriteGraphRepository";
 import GraphCanvas from "./components/GraphCanvas";
 import GraphSelector from "./components/GraphSelector";
 import GraphManagementMenu from "./components/GraphManagementMenu";
@@ -97,11 +102,19 @@ function downloadGraphJson(
 }
 
 export default function App() {
+  const persistenceMode: AppPersistenceMode =
+    import.meta.env.VITE_GRAPH_PERSISTENCE_MODE === "appwrite"
+      ? "appwrite"
+      : "file";
+  const appwriteRepoRef = useRef<AppwriteGraphRepository | null>(null);
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [mgmtBusy, setMgmtBusy] = useState(false);
+  const [feedback, setFeedback] = useState<{ kind: "success" | "error"; message: string } | null>(null);
   const cyRef = useRef<Core | null>(null);
 
   useEffect(() => {
@@ -231,35 +244,113 @@ export default function App() {
   }, []);
 
   const handleNodeSave = useCallback(
-    (updated: KnowledgeNodeFile) => {
+    async (updated: KnowledgeNodeFile) => {
+      if (saveBusy) return;
       if (state.status !== "ready") return;
       const newNode = new KnowledgeNode(updated);
       const newNodes = state.graph.nodes.map((n) =>
         n.id === updated.id ? newNode : n
       );
       const newGraph = rebuildGraph(newNodes);
+      setSaveBusy(true);
 
-      downloadGraphJson(newGraph, state.categoryId, state.graphId);
+      try {
+        if (persistenceMode === "file") {
+          downloadGraphJson(newGraph, state.categoryId, state.graphId);
+          setFeedback({
+            kind: "success",
+            message: "已下载 graph.json，请提交到仓库。",
+          });
+        } else {
+          if (!appwriteRepoRef.current) {
+            appwriteRepoRef.current = new AppwriteGraphRepository();
+          }
+          await appwriteRepoRef.current.saveGraph(
+            state.categoryId,
+            state.graphId,
+            newGraph
+          );
+          setFeedback({ kind: "success", message: "已保存到 Appwrite。" });
+        }
+      } catch (error) {
+        if (error instanceof AppwriteRepositoryError) {
+          if (error.kind === "auth") {
+            setFeedback({ kind: "error", message: "登录已失效，请重新鉴权后再试。" });
+          } else if (error.kind === "permission") {
+            setFeedback({ kind: "error", message: "权限不足，无法保存该图。" });
+          } else if (error.kind === "network") {
+            setFeedback({ kind: "error", message: "网络异常，保存失败，请稍后重试。" });
+          } else {
+            setFeedback({ kind: "error", message: error.message });
+          }
+          return;
+        }
+        setFeedback({ kind: "error", message: (error as Error).message });
+        return;
+      } finally {
+        setSaveBusy(false);
+      }
 
       setState({ ...state, graph: newGraph });
       setSelectedNode(newNode);
     },
-    [state]
+    [state, persistenceMode, saveBusy]
   );
 
   const handleMoveGraph = useCallback(
-    (targetCategoryId: string) => {
+    async (targetCategoryId: string) => {
+      if (mgmtBusy) return;
       if (state.status !== "ready") return;
-      downloadGraphJson(state.graph, targetCategoryId, state.graphId);
-      alert(
-        `graph.json has been downloaded.\n\n` +
-          `To complete the move:\n` +
-          `1. Move the folder graph-data/${state.categoryId}/${state.graphId}/ ` +
-          `to graph-data/${targetCategoryId}/${state.graphId}/\n` +
-          `2. Commit and redeploy.`
-      );
+      if (
+        persistenceMode === "appwrite" &&
+        !window.confirm(`确认将图 "${state.graphId}" 移动到 "${targetCategoryId}" 吗？`)
+      ) {
+        return;
+      }
+
+      try {
+        setMgmtBusy(true);
+        if (persistenceMode === "file") {
+          downloadGraphJson(state.graph, targetCategoryId, state.graphId);
+          alert(
+            `graph.json has been downloaded.\n\n` +
+              `To complete the move:\n` +
+              `1. Move the folder graph-data/${state.categoryId}/${state.graphId}/ ` +
+              `to graph-data/${targetCategoryId}/${state.graphId}/\n` +
+              `2. Commit and redeploy.`
+          );
+          setFeedback({ kind: "success", message: "已下载 graph.json，请提交到仓库。" });
+          return;
+        }
+
+        if (!appwriteRepoRef.current) {
+          appwriteRepoRef.current = new AppwriteGraphRepository();
+        }
+        await appwriteRepoRef.current.moveGraph(
+          state.categoryId,
+          targetCategoryId,
+          state.graphId
+        );
+        setFeedback({ kind: "success", message: "已保存到 Appwrite。" });
+      } catch (error) {
+        if (error instanceof AppwriteRepositoryError) {
+          if (error.kind === "auth") {
+            setFeedback({ kind: "error", message: "登录已失效，请重新鉴权后再试。" });
+          } else if (error.kind === "permission") {
+            setFeedback({ kind: "error", message: "权限不足，无法移动该图。" });
+          } else if (error.kind === "network") {
+            setFeedback({ kind: "error", message: "网络异常，移动失败，请稍后重试。" });
+          } else {
+            setFeedback({ kind: "error", message: error.message });
+          }
+          return;
+        }
+        setFeedback({ kind: "error", message: (error as Error).message });
+      } finally {
+        setMgmtBusy(false);
+      }
     },
-    [state]
+    [state, persistenceMode, mgmtBusy]
   );
 
   const handleDeleteGraph = useCallback(() => {
@@ -280,26 +371,71 @@ export default function App() {
         status: "error",
         message: "All graphs have been removed. Add data to graph-data/ and redeploy.",
       });
-      alert(
-        `To permanently delete this graph, remove the folder:\n` +
-          `graph-data/${categoryId}/${graphId}/\n` +
-          `Then commit and redeploy.`
-      );
+      if (persistenceMode === "file") {
+        alert(
+          `To permanently delete this graph, remove the folder:\n` +
+            `graph-data/${categoryId}/${graphId}/\n` +
+            `Then commit and redeploy.`
+        );
+      }
       return;
     }
 
     const newCat = newCategories.find((c) => c.id === categoryId) ?? newCategories[0];
     const newGraphId = newCat.graphs[0].id;
 
-    alert(
-      `Graph removed from view.\n\n` +
-        `To permanently delete, remove the folder:\n` +
-        `graph-data/${categoryId}/${graphId}/\n` +
-        `Then commit and redeploy.`
-    );
+    if (persistenceMode === "file") {
+      downloadGraphJson(state.graph, categoryId, graphId);
+      alert(
+        `Graph removed from view.\n\n` +
+          `To permanently delete, remove the folder:\n` +
+          `graph-data/${categoryId}/${graphId}/\n` +
+          `Then commit and redeploy.`
+      );
+      setFeedback({ kind: "success", message: "已下载 graph.json，请提交到仓库。" });
+    } else {
+      setFeedback({ kind: "success", message: "已保存到 Appwrite。" });
+    }
 
     switchGraph(newManifest, newCat.id, newGraphId);
-  }, [state, switchGraph]);
+  }, [state, switchGraph, persistenceMode]);
+
+  const handleDeleteGraphByMode = useCallback(async () => {
+    if (mgmtBusy) return;
+    if (state.status !== "ready") return;
+    if (
+      persistenceMode === "appwrite" &&
+      !window.confirm(`确认删除图 "${state.graphId}" 吗？此操作不可撤销。`)
+    ) {
+      return;
+    }
+    try {
+      setMgmtBusy(true);
+      if (persistenceMode === "appwrite") {
+        if (!appwriteRepoRef.current) {
+          appwriteRepoRef.current = new AppwriteGraphRepository();
+        }
+        await appwriteRepoRef.current.deleteGraph(state.categoryId, state.graphId);
+      }
+      handleDeleteGraph();
+    } catch (error) {
+      if (error instanceof AppwriteRepositoryError) {
+        if (error.kind === "auth") {
+          setFeedback({ kind: "error", message: "登录已失效，请重新鉴权后再试。" });
+        } else if (error.kind === "permission") {
+          setFeedback({ kind: "error", message: "权限不足，无法删除该图。" });
+        } else if (error.kind === "network") {
+          setFeedback({ kind: "error", message: "网络异常，删除失败，请稍后重试。" });
+        } else {
+          setFeedback({ kind: "error", message: error.message });
+        }
+        return;
+      }
+      setFeedback({ kind: "error", message: (error as Error).message });
+    } finally {
+      setMgmtBusy(false);
+    }
+  }, [state, handleDeleteGraph, persistenceMode, mgmtBusy]);
 
   if (state.status === "loading") {
     return (
@@ -330,8 +466,10 @@ export default function App() {
           manifest={manifest}
           categoryId={categoryId}
           graphId={graphId}
+          mode={persistenceMode}
+          busy={mgmtBusy}
           onMove={handleMoveGraph}
-          onDelete={handleDeleteGraph}
+          onDelete={handleDeleteGraphByMode}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="toolbar-actions">
@@ -348,6 +486,9 @@ export default function App() {
       </div>
 
       <div className="graph-area">
+        {feedback && (
+          <div className={`feedback-banner ${feedback.kind}`}>{feedback.message}</div>
+        )}
         <div
           className={`graph-canvas-wrapper${selectedNode ? " with-panel" : ""}`}
         >
@@ -370,6 +511,7 @@ export default function App() {
               cyRef.current?.nodes().removeClass("selected-node");
             }}
             onSave={handleNodeSave}
+            saveBusy={saveBusy}
           />
         )}
       </div>

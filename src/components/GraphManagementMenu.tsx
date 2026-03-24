@@ -5,6 +5,8 @@ interface Props {
   manifest: Manifest;
   categoryId: string;
   graphId: string;
+  mode: "file" | "appwrite";
+  busy: boolean;
   onMove: (targetCategoryId: string) => void;
   onDelete: () => void;
 }
@@ -13,6 +15,8 @@ export default function GraphManagementMenu({
   manifest,
   categoryId,
   graphId,
+  mode,
+  busy,
   onMove,
   onDelete,
 }: Props) {
@@ -57,9 +61,11 @@ export default function GraphManagementMenu({
             <button
               className="mgmt-item"
               onClick={() => {
+                if (busy) return;
                 setMoveOpen(!moveOpen);
                 setConfirmDelete(false);
               }}
+              disabled={busy}
             >
               Move to category…
             </button>
@@ -72,10 +78,12 @@ export default function GraphManagementMenu({
                   key={c.id}
                   className="mgmt-item"
                   onClick={() => {
+                    if (busy) return;
                     onMove(c.id);
                     setOpen(false);
                     setMoveOpen(false);
                   }}
+                  disabled={busy}
                 >
                   → {c.label}
                 </button>
@@ -86,6 +94,7 @@ export default function GraphManagementMenu({
           <button
             className="mgmt-item mgmt-danger"
             onClick={() => {
+              if (busy) return;
               if (confirmDelete) {
                 onDelete();
                 setOpen(false);
@@ -95,9 +104,14 @@ export default function GraphManagementMenu({
                 setMoveOpen(false);
               }
             }}
+            disabled={busy}
           >
-            {confirmDelete
+            {busy
+              ? "处理中..."
+              : confirmDelete
               ? `Confirm delete "${graphId}"?`
+              : mode === "appwrite"
+              ? "Delete graph (cloud)…"
               : "Delete graph…"}
           </button>
         </div>

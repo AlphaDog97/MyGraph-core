@@ -6,6 +6,7 @@ interface Props {
   allNodeIds: string[];
   onClose: () => void;
   onSave: (updated: KnowledgeNodeFile) => void;
+  saveBusy: boolean;
 }
 
 interface LinkDraft {
@@ -19,6 +20,7 @@ export default function NodeDetailPanel({
   allNodeIds,
   onClose,
   onSave,
+  saveBusy,
 }: Props) {
   const [label, setLabel] = useState(node.label);
   const [description, setDescription] = useState(node.description);
@@ -64,6 +66,7 @@ export default function NodeDetailPanel({
   }, []);
 
   const handleSave = useCallback(() => {
+    if (saveBusy) return;
     const tags = tagsText
       .split(",")
       .map((t) => t.trim())
@@ -86,7 +89,7 @@ export default function NodeDetailPanel({
     };
 
     onSave(updated);
-  }, [node.id, node.label, label, description, tagsText, links, onSave]);
+  }, [node.id, node.label, label, description, tagsText, links, onSave, saveBusy]);
 
   const otherNodeIds = allNodeIds.filter((id) => id !== node.id);
 
@@ -203,8 +206,8 @@ export default function NodeDetailPanel({
       </div>
 
       <div className="detail-footer">
-        <button className="btn btn-primary" onClick={handleSave}>
-          Save
+        <button className="btn btn-primary" onClick={handleSave} disabled={saveBusy}>
+          {saveBusy ? "Saving..." : "Save"}
         </button>
       </div>
     </div>

@@ -113,6 +113,12 @@ body {
   transform: scale(0.97);
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 .btn-primary {
   background: #5a67d8;
   color: #fff;
@@ -229,6 +235,11 @@ body {
   background: #f7fafc;
 }
 
+.mgmt-item:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .mgmt-danger {
   color: #e53e3e;
 }
@@ -305,6 +316,30 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+.feedback-banner {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  font-size: 13px;
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+}
+
+.feedback-banner.success {
+  background: #f0fff4;
+  color: #276749;
+  border-color: #9ae6b4;
+}
+
+.feedback-banner.error {
+  background: #fff5f5;
+  color: #c53030;
+  border-color: #feb2b2;
 }
 
 /* ─── Legend ─────────────────────────────────────────────────────── */

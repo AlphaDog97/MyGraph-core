@@ -269,6 +269,24 @@ Update `README.md` with the new folder structure and navigation instructions.
 - thousands-of-nodes performance optimization
 - cross-graph linking (nodes linking to nodes in other graphs)
 
+### Persistence mode routing (file vs appwrite)
+
+- The app supports a runtime persistence mode flag:
+  - `file`: keep existing static workflow (download + user commits changes)
+  - `appwrite`: execute cloud CRUD via `AppwriteGraphRepository`
+- Node save (`handleNodeSave`) branches by mode:
+  - `file` downloads `graph.json`
+  - `appwrite` writes to Appwrite and keeps in-memory graph in sync
+- Graph management (move/delete) branches by mode:
+  - `file` keeps guidance + downloaded artifact behavior
+  - `appwrite` performs real mutations with explicit confirmation prompts
+- UX feedback becomes mode-aware:
+  - local mode: “已下载，请提交到仓库”
+  - cloud mode: “已保存到 Appwrite”
+- Add actionable error feedback for auth expiry, permission denial, and network
+  failure. Disable save/delete/move buttons while operations are in-flight to
+  prevent duplicate submissions.
+
 ## Plan
 
 - [x] Scaffold a React + Vite application suitable for GitHub Pages deployment.
@@ -297,6 +315,10 @@ Update `README.md` with the new folder structure and navigation instructions.
       and `data-science/ml-pipeline`.
 - [ ] Update `PROMPT_TEMPLATE.md` for single-file-per-graph format.
 - [ ] Update `README.md` with new folder structure and navigation docs.
+- [x] Add mode-aware persistence routing for node save (`file` / `appwrite`).
+- [x] Add mode-aware move/delete behavior for graph management actions.
+- [x] Add operation status handling and duplicate-submit protection.
+- [x] Add mode-aware success/error feedback UI.
 
 ## Test
 
@@ -319,6 +341,12 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm node detail panel opens on click with editable fields.
 - [ ] Confirm Save in node panel downloads updated `graph.json` and updates
       the graph in-memory.
+- [ ] Confirm in `appwrite` mode that Save persists through `AppwriteGraphRepository`.
+- [ ] Confirm move/delete use download guidance in `file` mode and real CRUD in
+      `appwrite` mode.
+- [ ] Confirm auth-expired, permission-denied, and network-failure feedback is
+      shown clearly.
+- [ ] Confirm save/move/delete controls are disabled while requests are pending.
 - [ ] Confirm search matches `label`, `id`, and `tags`.
 - [ ] Confirm an invalid `graph.json` produces a visible validation error.
 - [ ] Confirm zoom, pan, and reset/fit controls work.
