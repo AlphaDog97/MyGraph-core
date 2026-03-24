@@ -230,6 +230,19 @@ Unchanged from earlier design: white fill, gray border by default, first tag
 with a user-assigned color determines the border color. Legend shows all tags
 from the currently loaded graph.
 
+### Edge relation color mapping and legend behavior
+
+Edge relations are grouped into four visible types and rendered with consistent
+line, arrow, and label colors:
+
+- `Concept`: gray
+- `Description`: green
+- `Condition`: blue
+- `Action`: yellow
+
+A dedicated relation legend is shown in the graph area in addition to the tag
+legend so users can identify the semantic meaning of each edge color quickly.
+
 ### Visual design direction
 
 Unchanged: minimalist layout, restrained palette, glassmorphic surfaces,
@@ -310,6 +323,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Update `README.md` with new folder structure and navigation docs.
 - [x] Add guest/local vs logged-in/cloud save modes with explicit UI status.
 - [x] Wire Appwrite Tables read/write for logged-in email sessions.
+- [x] Adjust graph layout strategy to reduce visible edge crossings in common directed graphs.
 
 ## Test
 
@@ -326,8 +340,10 @@ Update `README.md` with the new folder structure and navigation instructions.
       confirmation.
 - [ ] Confirm nodes with multiple tags load and remain searchable by each tag.
 - [ ] Confirm tag color editing updates legend and node borders immediately.
+- [x] Confirm edge line and label colors follow Concept/Description/Condition/Action mapping.
 - [ ] Confirm node style precedence: first color-assigned tag wins, gray
       fallback.
+- [x] Confirm a dedicated relation legend is visible with all four edge types.
 - [ ] Confirm chosen tag colors persist across page refresh.
 - [ ] Confirm node detail panel opens on click with editable fields.
 - [ ] Confirm Save in node panel downloads updated `graph.json` and updates
@@ -335,6 +351,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm search matches `label`, `id`, and `tags`.
 - [ ] Confirm an invalid `graph.json` produces a visible validation error.
 - [ ] Confirm zoom, pan, and reset/fit controls work.
+- [x] Confirm layout update reduces visible edge intersections in the sample graph.
 - [ ] Deploy to GitHub Pages and verify the graph loads correctly.
 - [x] Confirm guest mode keeps JSON download save behavior.
 - [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
