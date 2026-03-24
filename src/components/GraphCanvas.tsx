@@ -47,14 +47,14 @@ function buildStyles(noMotion: boolean): any[] {
       selector: "edge",
       style: {
         width: 1.5,
-        "line-color": "#cbd5e0",
-        "target-arrow-color": "#cbd5e0",
+        "line-color": "data(edgeColor)",
+        "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
         "font-size": "10px",
-        color: "#a0aec0",
+        color: "data(edgeColor)",
         "text-rotation": "autorotate",
         "text-outline-color": "#f7f8fa",
         "text-outline-width": 2,
@@ -81,6 +81,34 @@ function buildStyles(noMotion: boolean): any[] {
   ];
 }
 
+
+function buildLayout(graph: KnowledgeGraph, noMotion: boolean): cytoscape.LayoutOptions {
+  const incoming = new Map<string, number>();
+
+  for (const node of graph.nodes) {
+    incoming.set(node.id, 0);
+  }
+  for (const edge of graph.edges) {
+    incoming.set(edge.target, (incoming.get(edge.target) ?? 0) + 1);
+  }
+
+  const roots = [...incoming.entries()]
+    .filter(([, count]) => count === 0)
+    .map(([id]) => id);
+
+  return {
+    name: "breadthfirst",
+    directed: true,
+    roots: roots.length > 0 ? roots.map((id) => `#${id}`).join(",") : undefined,
+    avoidOverlap: true,
+    spacingFactor: 1.25,
+    padding: 40,
+    animate: !noMotion,
+    animationDuration: 600,
+    fit: true,
+  } as cytoscape.LayoutOptions;
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
@@ -101,14 +129,7 @@ export default function GraphCanvas({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: {
-        name: "cose",
-        animate: !noMotion,
-        animationDuration: 600,
-        nodeRepulsion: () => 8000,
-        idealEdgeLength: () => 120,
-        padding: 40,
-      } as cytoscape.LayoutOptions,
+      layout: buildLayout(graph, noMotion),
       minZoom: 0.2,
       maxZoom: 4,
     });

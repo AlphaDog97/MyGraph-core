@@ -28,6 +28,7 @@ import GraphSelector from "./components/GraphSelector";
 import GraphManagementMenu from "./components/GraphManagementMenu";
 import SearchBar from "./components/SearchBar";
 import TagLegend from "./components/TagLegend";
+import EdgeTypeLegend from "./components/EdgeTypeLegend";
 import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
@@ -447,6 +448,7 @@ export default function App() {
           />
         </div>
         <TagLegend tags={graph.tags} tagColors={tagColors} />
+        <EdgeTypeLegend />
 
         {selectedNode && (
           <NodeDetailPanel
