@@ -82,22 +82,30 @@ function buildStyles(noMotion: boolean): any[] {
 }
 
 
-function buildLayout(noMotion: boolean): cytoscape.LayoutOptions {
+function buildLayout(
+  noMotion: boolean,
+  nodeCount: number
+): cytoscape.LayoutOptions {
+  const denseGraph = nodeCount >= 16;
+
   return {
-    name: "concentric",
+    name: "cose",
     fit: true,
-    padding: 40,
+    padding: 48,
     animate: !noMotion,
     animationDuration: 600,
+    randomize: false,
     avoidOverlap: true,
-    minNodeSpacing: 40,
-    spacingFactor: 1.15,
-    startAngle: -Math.PI / 2,
-    sweep: 2 * Math.PI,
-    clockwise: true,
-    equidistant: true,
-    concentric: (node: cytoscape.NodeSingular) => node.degree(false),
-    levelWidth: () => 1,
+    nodeOverlap: 12,
+    nodeRepulsion: denseGraph ? 6500 : 9000,
+    idealEdgeLength: denseGraph ? 120 : 180,
+    edgeElasticity: 100,
+    nestingFactor: 0.7,
+    gravity: denseGraph ? 1.4 : 1.2,
+    numIter: 1200,
+    initialTemp: 200,
+    coolingFactor: 0.96,
+    minTemp: 1,
   } as cytoscape.LayoutOptions;
 }
 
@@ -121,9 +129,13 @@ export default function GraphCanvas({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: buildLayout(noMotion),
-      minZoom: 0.2,
+      layout: buildLayout(noMotion, graph.nodes.length),
+      minZoom: 0.05,
       maxZoom: 4,
+    });
+
+    cy.one("layoutstop", () => {
+      cy.fit(cy.elements(), 40);
     });
 
     cy.on("tap", "node", (evt) => {

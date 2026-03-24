@@ -250,9 +250,14 @@ polished typography, subtle motion, `prefers-reduced-motion` support.
 
 ### Layout strategy
 
-Use a concentric center-out layout for default rendering so dense graphs
-spread outward from high-degree hubs while maintaining overlap avoidance and
-improved readability.
+Use a tuned `cose` force layout for default rendering with deterministic
+seeding (`randomize: false`) and density-aware spacing:
+
+- smaller ideal edge length and moderated repulsion for larger graphs, and
+- stronger spacing for smaller graphs.
+
+Keep `fit` behavior resilient by allowing deeper zoom-out bounds and forcing a
+final `fit` on `layoutstop`, so larger datasets remain visible when loaded.
 
 
 ### Search behavior
