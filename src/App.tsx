@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Core } from "cytoscape";
 import {
   Manifest,
@@ -114,10 +114,15 @@ function downloadGraphJson(
 export default function App() {
   const { loading: authLoading, user } = useAuth();
   const [state, setState] = useState<AppState>({ status: "loading" });
-  const [storageMode, setStorageMode] = useState<StorageMode>({
-    type: "local",
-    reason: cloudEnabled() ? "guest" : "cloud-not-configured",
-  });
+  const storageMode = useMemo<StorageMode>(() => {
+    if (user?.email && cloudEnabled()) {
+      return { type: "cloud", email: user.email };
+    }
+    return {
+      type: "local",
+      reason: cloudEnabled() ? "guest" : "cloud-not-configured",
+    };
+  }, [user]);
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
@@ -148,15 +153,6 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        if (user?.email && cloudEnabled()) {
-          setStorageMode({ type: "cloud", email: user.email });
-        } else {
-          setStorageMode({
-            type: "local",
-            reason: cloudEnabled() ? "guest" : "cloud-not-configured",
-          });
-        }
-
         const manifest = await loadManifest();
         if (manifest.categories.length === 0) {
           setState({
@@ -205,7 +201,7 @@ export default function App() {
         });
       }
     })();
-  }, [resolveGraph, user]);
+  }, [resolveGraph]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
