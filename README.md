@@ -129,6 +129,7 @@ Click **Edit tag colors** to assign colors to tags. Colors are stored in browser
 
 Type in the search bar (or press `/`) to filter nodes. Search matches `id`, `label`, and `tags` using case-insensitive substring matching. Press `Escape` to clear.
 
+
 ## Generating content with AI
 
 See `PROMPT_TEMPLATE.md` for ready-to-use prompts (English and Chinese) that you can send to any AI model to generate a `graph.json` for your topic.
