@@ -22,6 +22,8 @@ import TagLegend from "./components/TagLegend";
 import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
+import AuthControls from "./auth/AuthControls";
+import { useAuth } from "./auth/AuthProvider";
 
 type AppState =
   | { status: "loading" }
@@ -97,12 +99,22 @@ function downloadGraphJson(
 }
 
 export default function App() {
+  const { loading: authLoading } = useAuth();
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const cyRef = useRef<Core | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const authError = url.searchParams.get("auth_error");
+    if (!authError) return;
+    alert("第三方登录未完成，请重试。");
+    url.searchParams.delete("auth_error");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -305,7 +317,7 @@ export default function App() {
     return (
       <div className="app-loading">
         <div className="spinner" />
-        <p>Loading knowledge graph…</p>
+        <p>{authLoading ? "Loading authentication…" : "Loading knowledge graph…"}</p>
       </div>
     );
   }
@@ -318,6 +330,9 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <div className="auth-toolbar">
+        <AuthControls />
+      </div>
       <div className="toolbar">
         <GraphSelector
           manifest={manifest}
