@@ -114,15 +114,18 @@ The repository now includes a versioned Appwrite schema at:
 Initialize Appwrite CLI and push schema changes:
 
 ```bash
-# 1) Login once
-appwrite login
+# Install CLIs (if needed)
+npm install -g appwrite-cli lean-spec
 
-# 2) Confirm appwrite.json placeholders are replaced
-#    <APPWRITE_PROJECT_ID> <APPWRITE_ENDPOINT> <APPWRITE_DATABASE_ID>
-
-# 3) Push table schema (graphs / nodes / edges / tags / node_tags / user_preferences)
-appwrite push tables
+# Configure the target project (requires server API key)
+export APPWRITE_API_KEY=<server-api-key>
+./scripts/apply-appwrite-schema.sh
 ```
+
+This repo is pre-configured to push against:
+- Endpoint: `https://sgp.cloud.appwrite.io/v1`
+- Project: `69bd040e000949b8a413`
+- Database: `69bd042e000bc22ca3f4`
 
 Set these Vite environment variables in `.env.local` to enable cloud mode:
 
@@ -168,11 +171,13 @@ Remove `--dry-run` to execute writes.
 
 ### Authentication
 
-The built-in auth module currently supports:
+The built-in auth module supports **email-only authentication**:
 
 - **Email registration**
 - **Email login**
 - **Guest mode**
+
+GitHub OAuth and other third-party OAuth login flows are intentionally removed from UI and service logic.
 
 When you stay in guest mode, all graph browsing/editing remains available and
 data is handled in local mode unless a valid cloud session is active.

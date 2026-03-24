@@ -123,6 +123,16 @@ version Appwrite table schema in-repo for repeatable environments.
   3. Run migration for real
   4. Deploy frontend using multi-table env vars
 
+
+### 2026-03-24 follow-up scope
+
+- Bind `appwrite.json` to the target cloud environment:
+  - endpoint: `https://sgp.cloud.appwrite.io/v1`
+  - project: `69bd040e000949b8a413`
+  - database: `69bd042e000bc22ca3f4`
+- Add a non-interactive schema apply script that uses `APPWRITE_API_KEY`.
+- Keep authentication explicitly email-only (no GitHub OAuth UI/service paths).
+
 ## Plan
 
 - [x] Replace single-table env usage with per-table env IDs.
@@ -131,12 +141,16 @@ version Appwrite table schema in-repo for repeatable environments.
 - [x] Add one-time offline migration script for legacy rows.
 - [x] Add versioned Appwrite schema files in repository.
 - [x] Update docs and app wiring to the new repository + table push flow.
+- [x] Bind Appwrite project endpoint/database IDs in `appwrite.json`.
+- [x] Add scripted schema push flow for the target cloud project.
+- [x] Re-verify auth remains email-only with no OAuth login path.
 
 ## Test
 
-- [ ] `lean-spec list` *(blocked: CLI unavailable in container)*
-- [ ] `lean-spec validate` *(blocked: CLI unavailable in container)*
+- [x] `lean-spec list`
+- [x] `lean-spec validate`
 - [x] `npm run build`
-- [x] `node scripts/migrate-single-table-to-multi-table.mjs --dry-run` (fails fast without env, confirming guardrails)
-- [x] Manual review: auth module exposes email login/register + guest mode only.
+- [x] `appwrite --version`
+- [x] `./scripts/apply-appwrite-schema.sh` *(expected failure without `APPWRITE_API_KEY`; guardrail verified)*
+- [x] Manual review: auth module exposes email login/register + guest mode only, and does not include GitHub OAuth actions.
 - [x] Manual review: Appwrite schema file includes fields/indexes/permissions for all canonical tables.
