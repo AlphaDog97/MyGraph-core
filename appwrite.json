@@ -1,0 +1,14 @@
+{
+  "$schema": "https://appwrite.io/schema/cli.json",
+  "projectId": "<APPWRITE_PROJECT_ID>",
+  "endpoint": "https://<APPWRITE_ENDPOINT>/v1",
+  "databases": [
+    {
+      "databaseId": "<APPWRITE_DATABASE_ID>",
+      "name": "mygraph",
+      "tables": [
+        "appwrite/schemas/mygraph-tables.json"
+      ]
+    }
+  ]
+}

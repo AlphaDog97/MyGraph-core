@@ -106,18 +106,36 @@ If cloud read fails, the app automatically falls back to local `graph-data` for 
 
 #### Appwrite Tables configuration
 
-Set these Vite environment variables to enable cloud mode:
+The repository now includes a versioned Appwrite schema at:
+
+- `appwrite.json`
+- `appwrite/schemas/mygraph-tables.json`
+
+Initialize Appwrite CLI and push schema changes:
+
+```bash
+# 1) Login once
+appwrite login
+
+# 2) Confirm appwrite.json placeholders are replaced
+#    <APPWRITE_PROJECT_ID> <APPWRITE_ENDPOINT> <APPWRITE_DATABASE_ID>
+
+# 3) Push table schema (graphs / nodes / edges / tags / node_tags / user_preferences)
+appwrite push tables
+```
+
+Set these Vite environment variables in `.env.local` to enable cloud mode:
 
 ```bash
 VITE_APPWRITE_ENDPOINT=https://<your-appwrite-endpoint>/v1
 VITE_APPWRITE_PROJECT_ID=<project-id>
 VITE_APPWRITE_DATABASE_ID=<database-id>
-VITE_APPWRITE_TABLE_GRAPHS_ID=<graphs-table-id>
-VITE_APPWRITE_TABLE_NODES_ID=<nodes-table-id>
-VITE_APPWRITE_TABLE_EDGES_ID=<edges-table-id>
-VITE_APPWRITE_TABLE_TAGS_ID=<tags-table-id>
-VITE_APPWRITE_TABLE_NODE_TAGS_ID=<node-tags-table-id>
-VITE_APPWRITE_TABLE_USER_PREFERENCES_ID=<user-preferences-table-id>
+VITE_APPWRITE_TABLE_GRAPHS_ID=graphs
+VITE_APPWRITE_TABLE_NODES_ID=nodes
+VITE_APPWRITE_TABLE_EDGES_ID=edges
+VITE_APPWRITE_TABLE_TAGS_ID=tags
+VITE_APPWRITE_TABLE_NODE_TAGS_ID=node_tags
+VITE_APPWRITE_TABLE_USER_PREFERENCES_ID=user_preferences
 ```
 
 Without this config, the app always stays in local mode.

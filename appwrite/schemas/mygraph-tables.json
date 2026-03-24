@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "tables": [
+    {
+      "tableId": "graphs",
+      "name": "graphs",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["any"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "graph_key", "type": "string", "size": 255, "required": true },
+        { "key": "category_id", "type": "string", "size": 128, "required": true },
+        { "key": "graph_id", "type": "string", "size": 128, "required": true },
+        { "key": "owner_user_id", "type": "string", "size": 128, "required": true },
+        {
+          "key": "visibility",
+          "type": "enum",
+          "elements": ["public", "private"],
+          "required": true,
+          "default": "private"
+        }
+      ],
+      "indexes": [
+        { "key": "idx_graph_key", "type": "key", "attributes": ["graph_key"], "orders": ["ASC"] },
+        { "key": "idx_owner_visibility", "type": "key", "attributes": ["owner_user_id", "visibility"], "orders": ["ASC", "ASC"] },
+        { "key": "idx_category_graph", "type": "key", "attributes": ["category_id", "graph_id"], "orders": ["ASC", "ASC"] }
+      ]
+    },
+    {
+      "tableId": "nodes",
+      "name": "nodes",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["any"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "graph_key", "type": "string", "size": 255, "required": true },
+        { "key": "node_id", "type": "string", "size": 128, "required": true },
+        { "key": "label", "type": "string", "size": 255, "required": true },
+        { "key": "description", "type": "string", "size": 4096, "required": false, "default": "" }
+      ],
+      "indexes": [
+        { "key": "idx_nodes_graph", "type": "key", "attributes": ["graph_key"], "orders": ["ASC"] },
+        { "key": "idx_nodes_graph_node", "type": "key", "attributes": ["graph_key", "node_id"], "orders": ["ASC", "ASC"] }
+      ]
+    },
+    {
+      "tableId": "edges",
+      "name": "edges",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["any"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "graph_key", "type": "string", "size": 255, "required": true },
+        { "key": "edge_id", "type": "string", "size": 255, "required": true },
+        { "key": "source_node_id", "type": "string", "size": 128, "required": true },
+        { "key": "target_node_id", "type": "string", "size": 128, "required": true },
+        { "key": "edge_type", "type": "string", "size": 128, "required": true },
+        { "key": "edge_label", "type": "string", "size": 255, "required": false, "default": "" }
+      ],
+      "indexes": [
+        { "key": "idx_edges_graph", "type": "key", "attributes": ["graph_key"], "orders": ["ASC"] },
+        { "key": "idx_edges_graph_edge", "type": "key", "attributes": ["graph_key", "edge_id"], "orders": ["ASC", "ASC"] },
+        { "key": "idx_edges_source_target", "type": "key", "attributes": ["graph_key", "source_node_id", "target_node_id"], "orders": ["ASC", "ASC", "ASC"] }
+      ]
+    },
+    {
+      "tableId": "tags",
+      "name": "tags",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["any"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "graph_key", "type": "string", "size": 255, "required": true },
+        { "key": "tag", "type": "string", "size": 128, "required": true }
+      ],
+      "indexes": [
+        { "key": "idx_tags_graph", "type": "key", "attributes": ["graph_key"], "orders": ["ASC"] },
+        { "key": "idx_tags_graph_tag", "type": "key", "attributes": ["graph_key", "tag"], "orders": ["ASC", "ASC"] }
+      ]
+    },
+    {
+      "tableId": "node_tags",
+      "name": "node_tags",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["any"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "graph_key", "type": "string", "size": 255, "required": true },
+        { "key": "node_id", "type": "string", "size": 128, "required": true },
+        { "key": "tag", "type": "string", "size": 128, "required": true }
+      ],
+      "indexes": [
+        { "key": "idx_node_tags_graph", "type": "key", "attributes": ["graph_key"], "orders": ["ASC"] },
+        { "key": "idx_node_tags_node", "type": "key", "attributes": ["graph_key", "node_id"], "orders": ["ASC", "ASC"] },
+        { "key": "idx_node_tags_unique", "type": "unique", "attributes": ["graph_key", "node_id", "tag"], "orders": ["ASC", "ASC", "ASC"] }
+      ]
+    },
+    {
+      "tableId": "user_preferences",
+      "name": "user_preferences",
+      "rowSecurity": true,
+      "permissions": {
+        "read": ["users"],
+        "create": ["users"],
+        "update": ["users"],
+        "delete": ["users"]
+      },
+      "attributes": [
+        { "key": "user_id", "type": "string", "size": 128, "required": true },
+        { "key": "preference_key", "type": "string", "size": 128, "required": true },
+        { "key": "preference_json", "type": "string", "size": 8192, "required": true }
+      ],
+      "indexes": [
+        { "key": "idx_preferences_user", "type": "key", "attributes": ["user_id"], "orders": ["ASC"] },
+        { "key": "idx_preferences_user_key", "type": "unique", "attributes": ["user_id", "preference_key"], "orders": ["ASC", "ASC"] }
+      ]
+    }
+  ]
+}
