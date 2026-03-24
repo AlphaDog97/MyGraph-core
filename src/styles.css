@@ -90,6 +90,30 @@ body {
   flex-shrink: 0;
 }
 
+.storage-badge {
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.storage-badge.is-cloud {
+  color: #22543d;
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.storage-badge.is-local {
+  color: #744210;
+  background: #fffaf0;
+  border-color: #f6e05e;
+}
+
 /* ─── Buttons ───────────────────────────────────────────────────── */
 
 .btn {

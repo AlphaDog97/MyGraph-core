@@ -7,13 +7,23 @@ import {
   KnowledgeGraph,
   TagColorAssignment,
 } from "./domain/types";
-import { loadManifest, loadGraphData } from "./data/loader";
+import {
+  buildGraphFromRaw,
+  loadLocalGraphNodes,
+  loadManifest,
+} from "./data/loader";
 import {
   loadTagColors,
   saveTagColors,
   loadLastViewed,
   saveLastViewed,
 } from "./data/tagStorage";
+import {
+  cloudEnabled,
+  getCloudUser,
+  loadCloudGraphNodes,
+  saveCloudGraph,
+} from "./data/cloudStorage";
 import GraphCanvas from "./components/GraphCanvas";
 import GraphSelector from "./components/GraphSelector";
 import GraphManagementMenu from "./components/GraphManagementMenu";
@@ -33,6 +43,10 @@ type AppState =
       graphId: string;
       graph: KnowledgeGraph;
     };
+
+type StorageMode =
+  | { type: "local"; reason: "guest" | "cloud-not-configured" }
+  | { type: "cloud"; email: string };
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -98,15 +112,51 @@ function downloadGraphJson(
 
 export default function App() {
   const [state, setState] = useState<AppState>({ status: "loading" });
+  const [storageMode, setStorageMode] = useState<StorageMode>({
+    type: "local",
+    reason: cloudEnabled() ? "guest" : "cloud-not-configured",
+  });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const cyRef = useRef<Core | null>(null);
 
+  const resolveGraph = useCallback(
+    async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
+      const localNodes = await loadLocalGraphNodes(categoryId, graphId);
+      const shouldUseCloud = storageMode.type === "cloud";
+      if (!shouldUseCloud) {
+        return buildGraphFromRaw(localNodes, categoryId, graphId);
+      }
+      try {
+        const cloudNodes = await loadCloudGraphNodes(categoryId, graphId);
+        return buildGraphFromRaw(
+          cloudNodes ?? localNodes,
+          categoryId,
+          graphId
+        );
+      } catch (err) {
+        console.warn("Cloud read failed; falling back to local graph-data.", err);
+        return buildGraphFromRaw(localNodes, categoryId, graphId);
+      }
+    },
+    [storageMode]
+  );
+
   useEffect(() => {
     (async () => {
       try {
+        const user = await getCloudUser();
+        if (user?.email) {
+          setStorageMode({ type: "cloud", email: user.email });
+        } else {
+          setStorageMode({
+            type: "local",
+            reason: cloudEnabled() ? "guest" : "cloud-not-configured",
+          });
+        }
+
         const manifest = await loadManifest();
         if (manifest.categories.length === 0) {
           setState({
@@ -139,7 +189,7 @@ export default function App() {
           return;
         }
 
-        const graph = await loadGraphData(catId, gId);
+        const graph = await resolveGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
         setState({
           status: "ready",
@@ -155,7 +205,7 @@ export default function App() {
         });
       }
     })();
-  }, []);
+  }, [resolveGraph]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
@@ -164,7 +214,7 @@ export default function App() {
         return { ...prev, status: "loading" as const } as AppState;
       });
       try {
-        const graph = await loadGraphData(catId, gId);
+        const graph = await resolveGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
         setSelectedNode(null);
         setSearchQuery("");
@@ -182,7 +232,7 @@ export default function App() {
         });
       }
     },
-    []
+    [resolveGraph]
   );
 
   const handleCategoryChange = useCallback(
@@ -239,12 +289,25 @@ export default function App() {
       );
       const newGraph = rebuildGraph(newNodes);
 
-      downloadGraphJson(newGraph, state.categoryId, state.graphId);
+      if (storageMode.type === "cloud") {
+        saveCloudGraph(state.categoryId, state.graphId, newGraph)
+          .then(() => {
+            alert("Saved to Appwrite cloud.");
+          })
+          .catch((err) => {
+            console.error(err);
+            alert(
+              "Cloud save failed. Your update is kept in memory for this session only."
+            );
+          });
+      } else {
+        downloadGraphJson(newGraph, state.categoryId, state.graphId);
+      }
 
       setState({ ...state, graph: newGraph });
       setSelectedNode(newNode);
     },
-    [state]
+    [state, storageMode]
   );
 
   const handleMoveGraph = useCallback(
@@ -315,6 +378,12 @@ export default function App() {
   }
 
   const { manifest, categoryId, graphId, graph } = state;
+  const modeText =
+    storageMode.type === "cloud"
+      ? `Cloud mode · ${storageMode.email}`
+      : storageMode.reason === "cloud-not-configured"
+        ? "Local mode · Cloud not configured"
+        : "Local mode · Guest";
 
   return (
     <div className="app-shell">
@@ -334,6 +403,16 @@ export default function App() {
           onDelete={handleDeleteGraph}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <span
+          className={`storage-badge ${storageMode.type === "cloud" ? "is-cloud" : "is-local"}`}
+          title={
+            storageMode.type === "cloud"
+              ? "Changes are saved to Appwrite Tables."
+              : "Changes are saved locally by downloading graph.json."
+          }
+        >
+          {modeText}
+        </span>
         <div className="toolbar-actions">
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view
