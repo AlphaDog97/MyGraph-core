@@ -117,6 +117,17 @@ VITE_APPWRITE_TABLE_ID=<table-id>
 
 Without this config, the app always stays in local mode.
 
+### Authentication
+
+The built-in auth module currently supports:
+
+- **Email registration**
+- **Email login**
+- **Guest mode**
+
+When you stay in guest mode, all graph browsing/editing remains available and
+data is handled in local mode unless a valid cloud session is active.
+
 ### Node detail panel
 
 Click any node to open a side panel showing its details. You can edit the label, description, tags, and links. The **Save** button downloads an updated `graph.json` with your changes and updates the graph in-memory.

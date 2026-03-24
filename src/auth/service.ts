@@ -84,23 +84,6 @@ export async function loginWithEmail(email: string, password: string) {
   });
 }
 
-export async function loginWithGitHubOAuth() {
-  ensureConfigured();
-  const callbackUrl = new URL(window.location.href);
-  callbackUrl.searchParams.set("auth_callback", "github");
-  callbackUrl.searchParams.delete("auth_error");
-
-  const failureUrl = new URL(window.location.href);
-  failureUrl.searchParams.set("auth_error", "github");
-
-  const oauthUrl = new URL(`${appwriteEndpoint}/account/sessions/oauth2/github`);
-  oauthUrl.searchParams.set("project", appwriteProjectId);
-  oauthUrl.searchParams.set("success", callbackUrl.toString());
-  oauthUrl.searchParams.set("failure", failureUrl.toString());
-
-  window.location.assign(oauthUrl.toString());
-}
-
 export async function getCurrentSession(): Promise<AuthSession | null> {
   if (!isAuthConfigured) return null;
   try {

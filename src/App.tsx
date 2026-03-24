@@ -148,15 +148,6 @@ export default function App() {
   );
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const authError = url.searchParams.get("auth_error");
-    if (!authError) return;
-    alert("第三方登录未完成，请重试。");
-    url.searchParams.delete("auth_error");
-    window.history.replaceState({}, "", url.toString());
-  }, []);
-
-  useEffect(() => {
     (async () => {
       try {
         const user = await getCloudUser();
