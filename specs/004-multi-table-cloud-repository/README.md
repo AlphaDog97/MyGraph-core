@@ -18,7 +18,8 @@ created_at: '2026-03-24T00:00:00+00:00'
 
 Replace the deprecated single-table Appwrite model (`VITE_APPWRITE_TABLE_ID`) with
 normalized multi-table storage. Add a repository abstraction for graph
-load/save/list and provide a one-time migration script from legacy rows.
+load/save/list, provide a one-time migration script from legacy rows, and
+version Appwrite table schema in-repo for repeatable environments.
 
 ## Design
 
@@ -31,11 +32,68 @@ load/save/list and provide a one-time migration script from legacy rows.
 - `node_tags`
 - `user_preferences`
 
-### Repository interface
+### Field model
 
-- `loadGraph(categoryId, graphId, ownerId?)`
-- `saveGraph(graphMeta, nodes, edges, tags)`
-- `listGraphs(ownerId | visibility)`
+#### `graphs`
+
+- `graph_key` (string, required, unique lookup key)
+- `category_id` (string, required)
+- `graph_id` (string, required)
+- `owner_user_id` (string, required)
+- `visibility` (enum: `public|private`, required, default `private`)
+
+#### `nodes`
+
+- `graph_key` (string, required)
+- `node_id` (string, required)
+- `label` (string, required)
+- `description` (string, optional)
+
+#### `edges`
+
+- `graph_key` (string, required)
+- `edge_id` (string, required)
+- `source_node_id` (string, required)
+- `target_node_id` (string, required)
+- `edge_type` (string, required)
+- `edge_label` (string, optional)
+
+#### `tags`
+
+- `graph_key` (string, required)
+- `tag` (string, required)
+
+#### `node_tags`
+
+- `graph_key` (string, required)
+- `node_id` (string, required)
+- `tag` (string, required)
+
+#### `user_preferences`
+
+- `user_id` (string, required)
+- `preference_key` (string, required)
+- `preference_json` (stringified JSON, required)
+
+### Index strategy
+
+- `graphs`: `graph_key` key index; composite indexes on
+  `owner_user_id + visibility` and `category_id + graph_id`.
+- `nodes`: key indexes on `graph_key` and `graph_key + node_id`.
+- `edges`: key indexes on `graph_key`, `graph_key + edge_id`, and
+  `graph_key + source_node_id + target_node_id`.
+- `tags`: key indexes on `graph_key` and `graph_key + tag`.
+- `node_tags`: key indexes on `graph_key`, `graph_key + node_id`, and unique
+  index on `graph_key + node_id + tag`.
+- `user_preferences`: key index on `user_id`; unique index on
+  `user_id + preference_key`.
+
+### Permission policy
+
+- Anonymous users: read `public` graphs only.
+- Authenticated users: write only rows where `owner_user_id` equals current user.
+- `user_preferences` rows are user-scoped (read/write by authenticated users only).
+- Unauthenticated cloud writes are blocked by client logic and table permissions.
 
 ### Save transaction strategy (logical transaction)
 
@@ -50,11 +108,20 @@ load/save/list and provide a one-time migration script from legacy rows.
 2. Batch query `nodes` / `edges` / `node_tags` (+ `tags`) by `graph_key`
 3. Recompose to front-end `KnowledgeGraph`
 
-### Permission policy
+### Migration strategy
 
-- Anonymous users: read `public` graphs only.
-- Authenticated users: write only rows where `owner_user_id` equals current user.
-- Unauthenticated cloud writes are blocked.
+- Source: legacy single table where one row stores `nodes` JSON array.
+- Script: `scripts/migrate-single-table-to-multi-table.mjs`.
+- Mode:
+  - `--dry-run`: validation-only, no writes.
+  - without `--dry-run`: upsert into normalized tables.
+- Idempotency:
+  - deterministic row IDs (`<graph_key>--...`) enable safe re-runs.
+- Rollout:
+  1. Push schema (`appwrite push tables`)
+  2. Run migration in dry-run
+  3. Run migration for real
+  4. Deploy frontend using multi-table env vars
 
 ## Plan
 
@@ -62,10 +129,14 @@ load/save/list and provide a one-time migration script from legacy rows.
 - [x] Implement repository interface + cloud wrappers used by UI.
 - [x] Enforce read/write policy checks in client repository logic.
 - [x] Add one-time offline migration script for legacy rows.
-- [x] Update docs and app wiring to the new repository.
+- [x] Add versioned Appwrite schema files in repository.
+- [x] Update docs and app wiring to the new repository + table push flow.
 
 ## Test
 
+- [ ] `lean-spec list` *(blocked: CLI unavailable in container)*
+- [ ] `lean-spec validate` *(blocked: CLI unavailable in container)*
 - [x] `npm run build`
 - [x] `node scripts/migrate-single-table-to-multi-table.mjs --dry-run` (fails fast without env, confirming guardrails)
-- [x] Manual review of repository methods against required APIs.
+- [x] Manual review: auth module exposes email login/register + guest mode only.
+- [x] Manual review: Appwrite schema file includes fields/indexes/permissions for all canonical tables.

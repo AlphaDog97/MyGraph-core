@@ -11,7 +11,6 @@ export type AuthUser = {
 export type AuthSession = {
   $id: string;
   userId: string;
-  provider: string;
   expire: string;
 };
 
