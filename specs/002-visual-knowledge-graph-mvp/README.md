@@ -250,10 +250,9 @@ polished typography, subtle motion, `prefers-reduced-motion` support.
 
 ### Layout strategy
 
-Use a tuned `cose` force layout for default rendering with deterministic
-seeding (`randomize: false`), stronger node repulsion, and longer ideal edge
-length to keep a center-out feel while avoiding the no-render failure observed
-with strict concentric placement on some graphs.
+Use a concentric center-out layout for default rendering so dense graphs
+spread outward from high-degree hubs while maintaining overlap avoidance and
+improved readability.
 
 
 ### Search behavior

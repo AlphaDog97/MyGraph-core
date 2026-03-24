@@ -84,23 +84,20 @@ function buildStyles(noMotion: boolean): any[] {
 
 function buildLayout(noMotion: boolean): cytoscape.LayoutOptions {
   return {
-    name: "cose",
+    name: "concentric",
     fit: true,
-    padding: 48,
+    padding: 40,
     animate: !noMotion,
     animationDuration: 600,
-    randomize: false,
     avoidOverlap: true,
-    nodeOverlap: 12,
-    nodeRepulsion: 9000,
-    idealEdgeLength: 180,
-    edgeElasticity: 100,
-    nestingFactor: 0.7,
-    gravity: 1.2,
-    numIter: 1200,
-    initialTemp: 200,
-    coolingFactor: 0.96,
-    minTemp: 1,
+    minNodeSpacing: 40,
+    spacingFactor: 1.15,
+    startAngle: -Math.PI / 2,
+    sweep: 2 * Math.PI,
+    clockwise: true,
+    equidistant: true,
+    concentric: (node: cytoscape.NodeSingular) => node.degree(false),
+    levelWidth: () => 1,
   } as cytoscape.LayoutOptions;
 }
 
