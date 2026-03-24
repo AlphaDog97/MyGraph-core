@@ -169,6 +169,19 @@ Because the app is static and cannot modify files on the server, these actions
 produce guidance or file downloads rather than direct mutations. The user must
 commit and redeploy to make changes permanent.
 
+### Guest/local and logged-in/cloud persistence modes
+
+The app supports two explicit persistence modes shown in the toolbar:
+
+- **Local mode (guest):** continue using repository `graph-data/*/*/graph.json`
+  as the source of truth, and save edits by downloading `graph.json`.
+- **Cloud mode (logged-in email):** when a valid Appwrite email session exists,
+  reads can use Appwrite Tables row data and saves write back to Appwrite
+  Tables for the current `<category>/<graph>`.
+
+If cloud read fails, the loader falls back to local `graph-data` data so the
+graph remains usable.
+
 ### Runtime tag color editor
 
 Same as before: discover tags from the currently loaded graph, let the user
@@ -262,8 +275,6 @@ Update `README.md` with the new folder structure and navigation instructions.
 
 - in-browser graph editing that writes back to the repository
 - drag-and-drop node placement persistence
-- backend storage or sync
-- authentication and permissions
 - advanced analytics or graph algorithms
 - fuzzy search, tag faceting, or clustering controls
 - thousands-of-nodes performance optimization
@@ -297,6 +308,8 @@ Update `README.md` with the new folder structure and navigation instructions.
       and `data-science/ml-pipeline`.
 - [ ] Update `PROMPT_TEMPLATE.md` for single-file-per-graph format.
 - [ ] Update `README.md` with new folder structure and navigation docs.
+- [x] Add guest/local vs logged-in/cloud save modes with explicit UI status.
+- [x] Wire Appwrite Tables read/write for logged-in email sessions.
 
 ## Test
 
@@ -323,3 +336,6 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm an invalid `graph.json` produces a visible validation error.
 - [ ] Confirm zoom, pan, and reset/fit controls work.
 - [ ] Deploy to GitHub Pages and verify the graph loads correctly.
+- [x] Confirm guest mode keeps JSON download save behavior.
+- [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
+- [x] Confirm save mode text is always visible in toolbar.

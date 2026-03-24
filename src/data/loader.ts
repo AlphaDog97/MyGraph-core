@@ -3,6 +3,7 @@ import {
   KnowledgeNode,
   KnowledgeEdge,
   KnowledgeGraph,
+  KnowledgeNodeFile,
   TagColorAssignment,
 } from "../domain/types";
 
@@ -19,25 +20,11 @@ export async function loadManifest(): Promise<Manifest> {
   return res.json();
 }
 
-export async function loadGraphData(
+export function buildGraphFromRaw(
+  rawArray: unknown,
   categoryId: string,
   graphId: string
-): Promise<KnowledgeGraph> {
-  const url = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(
-      `Failed to load graph (${res.status}): ${categoryId}/${graphId}`
-    );
-  }
-
-  let rawArray: unknown;
-  try {
-    rawArray = await res.json();
-  } catch {
-    throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
-  }
-
+): KnowledgeGraph {
   if (!Array.isArray(rawArray)) {
     throw new Error(
       `${categoryId}/${graphId}/graph.json must be a JSON array of nodes.`
@@ -96,6 +83,33 @@ export async function loadGraphData(
     tags: [...tagSet].sort(),
     warnings,
   };
+}
+
+export async function loadLocalGraphNodes(
+  categoryId: string,
+  graphId: string
+): Promise<KnowledgeNodeFile[]> {
+  const url = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(
+      `Failed to load graph (${res.status}): ${categoryId}/${graphId}`
+    );
+  }
+
+  try {
+    return (await res.json()) as KnowledgeNodeFile[];
+  } catch {
+    throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
+  }
+}
+
+export async function loadGraphData(
+  categoryId: string,
+  graphId: string
+): Promise<KnowledgeGraph> {
+  const rawArray = await loadLocalGraphNodes(categoryId, graphId);
+  return buildGraphFromRaw(rawArray, categoryId, graphId);
 }
 
 export function toCytoscapeElements(
