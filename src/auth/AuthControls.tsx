@@ -6,7 +6,7 @@ function isValidEmail(email: string) {
 }
 
 export default function AuthControls() {
-  const { user, authMode, loading, signIn, signUp, signOut, signInWithGitHub } = useAuth();
+  const { user, authMode, loading, signIn, signUp, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -37,15 +37,6 @@ export default function AuthControls() {
       setPassword("");
     } catch (err) {
       setError((err as Error).message || `${modeLabel}失败，请稍后重试。`);
-    }
-  };
-
-  const handleGithubLogin = async () => {
-    setError(null);
-    try {
-      await signInWithGitHub();
-    } catch (err) {
-      setError((err as Error).message || "GitHub 登录失败。");
     }
   };
 
@@ -104,9 +95,6 @@ export default function AuthControls() {
             disabled={loading}
           >
             {mode === "login" ? "切换注册" : "切换登录"}
-          </button>
-          <button className="btn btn-secondary" type="button" onClick={() => void handleGithubLogin()} disabled={loading}>
-            GitHub 登录
           </button>
         </form>
       )}

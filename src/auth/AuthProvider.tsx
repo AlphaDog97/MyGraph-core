@@ -13,7 +13,6 @@ import {
   getCurrentSession,
   getCurrentUser,
   loginWithEmail,
-  loginWithGitHubOAuth,
   logoutCurrentSession,
   registerWithEmail,
 } from "./service";
@@ -27,7 +26,6 @@ type AuthContextValue = {
   loading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signInWithGitHub: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshAuth: () => Promise<void>;
 };
@@ -60,17 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void refreshAuth();
   }, [refreshAuth]);
 
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    const callback = url.searchParams.get("auth_callback");
-    if (!callback) return;
-
-    void refreshAuth().finally(() => {
-      url.searchParams.delete("auth_callback");
-      window.history.replaceState({}, "", url.toString());
-    });
-  }, [refreshAuth]);
-
   const signUp = useCallback(
     async (email: string, password: string) => {
       setLoading(true);
@@ -98,10 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const signInWithGitHub = useCallback(async () => {
-    await loginWithGitHubOAuth();
-  }, []);
-
   const signOut = useCallback(async () => {
     setLoading(true);
     try {
@@ -121,11 +104,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       signUp,
       signIn,
-      signInWithGitHub,
       signOut,
       refreshAuth,
     }),
-    [user, session, loading, signUp, signIn, signInWithGitHub, signOut, refreshAuth]
+    [user, session, loading, signUp, signIn, signOut, refreshAuth]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
