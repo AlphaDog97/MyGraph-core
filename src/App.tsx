@@ -7,7 +7,11 @@ import {
   KnowledgeGraph,
   TagColorAssignment,
 } from "./domain/types";
-import { loadManifest, loadGraphData } from "./data/loader";
+import {
+  buildGraphFromRaw,
+  loadLocalGraphNodes,
+  loadManifest,
+} from "./data/loader";
 import {
   loadTagColors,
   saveTagColors,
@@ -27,6 +31,8 @@ import TagLegend from "./components/TagLegend";
 import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
+import AuthControls from "./auth/AuthControls";
+import { useAuth } from "./auth/AuthProvider";
 
 type AppState =
   | { status: "loading" }
@@ -38,6 +44,10 @@ type AppState =
       graphId: string;
       graph: KnowledgeGraph;
     };
+
+type StorageMode =
+  | { type: "local"; reason: "guest" | "cloud-not-configured" }
+  | { type: "cloud"; email: string };
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -108,6 +118,10 @@ export default function App() {
       : "file";
   const appwriteRepoRef = useRef<AppwriteGraphRepository | null>(null);
   const [state, setState] = useState<AppState>({ status: "loading" });
+  const [storageMode, setStorageMode] = useState<StorageMode>({
+    type: "local",
+    reason: cloudEnabled() ? "guest" : "cloud-not-configured",
+  });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
@@ -117,9 +131,50 @@ export default function App() {
   const [feedback, setFeedback] = useState<{ kind: "success" | "error"; message: string } | null>(null);
   const cyRef = useRef<Core | null>(null);
 
+  const resolveGraph = useCallback(
+    async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
+      const localNodes = await loadLocalGraphNodes(categoryId, graphId);
+      const shouldUseCloud = storageMode.type === "cloud";
+      if (!shouldUseCloud) {
+        return buildGraphFromRaw(localNodes, categoryId, graphId);
+      }
+      try {
+        const cloudNodes = await loadCloudGraphNodes(categoryId, graphId);
+        return buildGraphFromRaw(
+          cloudNodes ?? localNodes,
+          categoryId,
+          graphId
+        );
+      } catch (err) {
+        console.warn("Cloud read failed; falling back to local graph-data.", err);
+        return buildGraphFromRaw(localNodes, categoryId, graphId);
+      }
+    },
+    [storageMode]
+  );
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const authError = url.searchParams.get("auth_error");
+    if (!authError) return;
+    alert("第三方登录未完成，请重试。");
+    url.searchParams.delete("auth_error");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
+        const user = await getCloudUser();
+        if (user?.email) {
+          setStorageMode({ type: "cloud", email: user.email });
+        } else {
+          setStorageMode({
+            type: "local",
+            reason: cloudEnabled() ? "guest" : "cloud-not-configured",
+          });
+        }
+
         const manifest = await loadManifest();
         if (manifest.categories.length === 0) {
           setState({
@@ -152,7 +207,7 @@ export default function App() {
           return;
         }
 
-        const graph = await loadGraphData(catId, gId);
+        const graph = await resolveGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
         setState({
           status: "ready",
@@ -168,7 +223,7 @@ export default function App() {
         });
       }
     })();
-  }, []);
+  }, [resolveGraph]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
@@ -177,7 +232,7 @@ export default function App() {
         return { ...prev, status: "loading" as const } as AppState;
       });
       try {
-        const graph = await loadGraphData(catId, gId);
+        const graph = await resolveGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
         setSelectedNode(null);
         setSearchQuery("");
@@ -195,7 +250,7 @@ export default function App() {
         });
       }
     },
-    []
+    [resolveGraph]
   );
 
   const handleCategoryChange = useCallback(
@@ -441,7 +496,7 @@ export default function App() {
     return (
       <div className="app-loading">
         <div className="spinner" />
-        <p>Loading knowledge graph…</p>
+        <p>{authLoading ? "Loading authentication…" : "Loading knowledge graph…"}</p>
       </div>
     );
   }
@@ -451,9 +506,18 @@ export default function App() {
   }
 
   const { manifest, categoryId, graphId, graph } = state;
+  const modeText =
+    storageMode.type === "cloud"
+      ? `Cloud mode · ${storageMode.email}`
+      : storageMode.reason === "cloud-not-configured"
+        ? "Local mode · Cloud not configured"
+        : "Local mode · Guest";
 
   return (
     <div className="app-shell">
+      <div className="auth-toolbar">
+        <AuthControls />
+      </div>
       <div className="toolbar">
         <GraphSelector
           manifest={manifest}
@@ -472,6 +536,16 @@ export default function App() {
           onDelete={handleDeleteGraphByMode}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <span
+          className={`storage-badge ${storageMode.type === "cloud" ? "is-cloud" : "is-local"}`}
+          title={
+            storageMode.type === "cloud"
+              ? "Changes are saved to Appwrite Tables."
+              : "Changes are saved locally by downloading graph.json."
+          }
+        >
+          {modeText}
+        </span>
         <div className="toolbar-actions">
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view

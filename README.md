@@ -95,6 +95,28 @@ Click the **⋯** button next to the graph selector to:
 
 Since this is a static app, these operations provide guidance and file downloads rather than modifying files directly. Commit and redeploy to make changes permanent.
 
+### Save mode (local vs cloud)
+
+The toolbar shows an explicit save mode badge to avoid confusion:
+
+- **Local mode · Guest**: uses local `graph-data` files and downloads `graph.json` when saving node edits.
+- **Cloud mode · your-email@example.com**: if an Appwrite email session is active, node edits are saved to Appwrite Tables.
+
+If cloud read fails, the app automatically falls back to local `graph-data` for loading.
+
+#### Appwrite Tables configuration
+
+Set these Vite environment variables to enable cloud mode:
+
+```bash
+VITE_APPWRITE_ENDPOINT=https://<your-appwrite-endpoint>/v1
+VITE_APPWRITE_PROJECT_ID=<project-id>
+VITE_APPWRITE_DATABASE_ID=<database-id>
+VITE_APPWRITE_TABLE_ID=<table-id>
+```
+
+Without this config, the app always stays in local mode.
+
 ### Node detail panel
 
 Click any node to open a side panel showing its details. You can edit the label, description, tags, and links. The **Save** button downloads an updated `graph.json` with your changes and updates the graph in-memory.
@@ -106,6 +128,7 @@ Click **Edit tag colors** to assign colors to tags. Colors are stored in browser
 ### Search
 
 Type in the search bar (or press `/`) to filter nodes. Search matches `id`, `label`, and `tags` using case-insensitive substring matching. Press `Escape` to clear.
+
 
 ## Generating content with AI
 

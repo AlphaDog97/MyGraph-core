@@ -69,6 +69,59 @@ body {
   width: 100%;
 }
 
+/* ─── Auth Toolbar ─────────────────────────────────────────────── */
+
+.auth-toolbar {
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.auth-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #4a5568;
+  background: #fff;
+}
+
+.auth-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-input {
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 13px;
+  min-width: 220px;
+}
+
+.auth-error {
+  font-size: 13px;
+  color: #c53030;
+}
+
 /* ─── Toolbar ───────────────────────────────────────────────────── */
 
 .toolbar {
@@ -88,6 +141,30 @@ body {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.storage-badge {
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.storage-badge.is-cloud {
+  color: #22543d;
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.storage-badge.is-local {
+  color: #744210;
+  background: #fffaf0;
+  border-color: #f6e05e;
 }
 
 /* ─── Buttons ───────────────────────────────────────────────────── */
