@@ -78,9 +78,10 @@ function graphDataPlugin(): Plugin {
     },
 
     configureServer(server) {
-      const base = server.config.base || "/";
+      const configuredBase = server.config.base || "/";
+      const devBase = configuredBase.startsWith("/") ? configuredBase : "/";
       server.middlewares.use((req, res, next) => {
-        const prefix = `${base}graph-data/`;
+        const prefix = `${devBase}graph-data/`;
         if (!req.url?.startsWith(prefix)) return next();
 
         const relPath = req.url.slice(prefix.length);
@@ -133,6 +134,6 @@ function copyGraphDataPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), graphDataPlugin(), copyGraphDataPlugin()],
-  base: "/MyGraph/",
+  base: "./",
   publicDir: false,
 });
