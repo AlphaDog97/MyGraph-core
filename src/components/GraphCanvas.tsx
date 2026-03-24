@@ -82,30 +82,22 @@ function buildStyles(noMotion: boolean): any[] {
 }
 
 
-function buildLayout(graph: KnowledgeGraph, noMotion: boolean): cytoscape.LayoutOptions {
-  const incoming = new Map<string, number>();
-
-  for (const node of graph.nodes) {
-    incoming.set(node.id, 0);
-  }
-  for (const edge of graph.edges) {
-    incoming.set(edge.target, (incoming.get(edge.target) ?? 0) + 1);
-  }
-
-  const roots = [...incoming.entries()]
-    .filter(([, count]) => count === 0)
-    .map(([id]) => id);
-
+function buildLayout(noMotion: boolean): cytoscape.LayoutOptions {
   return {
-    name: "breadthfirst",
-    directed: true,
-    roots: roots.length > 0 ? roots.map((id) => `#${id}`).join(",") : undefined,
-    avoidOverlap: true,
-    spacingFactor: 1.25,
+    name: "concentric",
+    fit: true,
     padding: 40,
     animate: !noMotion,
     animationDuration: 600,
-    fit: true,
+    avoidOverlap: true,
+    minNodeSpacing: 40,
+    spacingFactor: 1.15,
+    startAngle: -Math.PI / 2,
+    sweep: 2 * Math.PI,
+    clockwise: true,
+    equidistant: true,
+    concentric: (node: cytoscape.NodeSingular) => node.degree(false),
+    levelWidth: () => 1,
   } as cytoscape.LayoutOptions;
 }
 
@@ -129,7 +121,7 @@ export default function GraphCanvas({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: buildLayout(graph, noMotion),
+      layout: buildLayout(noMotion),
       minZoom: 0.2,
       maxZoom: 4,
     });

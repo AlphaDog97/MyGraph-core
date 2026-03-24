@@ -248,6 +248,13 @@ legend so users can identify the semantic meaning of each edge color quickly.
 Unchanged: minimalist layout, restrained palette, glassmorphic surfaces,
 polished typography, subtle motion, `prefers-reduced-motion` support.
 
+### Layout strategy
+
+Use a concentric center-out layout for default rendering so dense graphs
+spread outward from high-degree hubs while maintaining overlap avoidance and
+improved readability.
+
+
 ### Search behavior
 
 Unchanged: case-insensitive substring matching on `id`, `label`, and `tags`
