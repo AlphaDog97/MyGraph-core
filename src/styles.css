@@ -90,6 +90,29 @@ body {
   flex-shrink: 0;
 }
 
+.repo-mode-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.repo-mode-badge {
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e0;
+  color: #2d3748;
+  background: #f8fafc;
+  white-space: nowrap;
+}
+
+.repo-mode-select {
+  max-width: 120px;
+}
+
+
 /* ─── Buttons ───────────────────────────────────────────────────── */
 
 .btn {

@@ -262,7 +262,6 @@ Update `README.md` with the new folder structure and navigation instructions.
 
 - in-browser graph editing that writes back to the repository
 - drag-and-drop node placement persistence
-- backend storage or sync
 - authentication and permissions
 - advanced analytics or graph algorithms
 - fuzzy search, tag faceting, or clustering controls
@@ -293,6 +292,11 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Add category dropdown and graph dropdown to the toolbar.
 - [ ] Implement last-viewed persistence so the app reopens the same graph.
 - [ ] Add graph management menu with move-to-category and delete actions.
+- [x] Add `GraphRepository` abstraction in `src/data/` with methods for loading/saving graphs and listing user graphs.
+- [x] Split repository implementations into `FileGraphRepository` and `AppwriteGraphRepository`.
+- [x] Route app data loading through repository mode selection instead of direct fetch calls in `App.tsx`.
+- [x] Add repository mode selection rules: guest defaults to `file`, logged-in users can switch to `appwrite`, and persist preference in `localStorage`.
+- [x] Add explicit mode status UI labels (`Guest / Local Repo` and `Cloud / Appwrite`) to avoid save-location ambiguity.
 - [ ] Create sample data for two categories: `web-development/frontend-stack`
       and `data-science/ml-pipeline`.
 - [ ] Update `PROMPT_TEMPLATE.md` for single-file-per-graph format.
@@ -305,6 +309,11 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm the category dropdown populates from the manifest.
 - [ ] Confirm selecting a category updates the graph dropdown.
 - [ ] Confirm selecting a graph loads and renders the correct `graph.json`.
+- [ ] Confirm repository mode defaults to `file` when no Appwrite login context exists.
+- [ ] Confirm mode preference persists in `localStorage` and restores on reload when logged in.
+- [ ] Confirm switching to `appwrite` mode reads graph data from Appwrite Tables.
+- [ ] Confirm save in `appwrite` mode writes graph data to Appwrite Tables.
+- [ ] Confirm mode badge updates between `Guest / Local Repo` and `Cloud / Appwrite`.
 - [ ] Confirm switching between graphs in different categories works smoothly.
 - [ ] Confirm the last-viewed graph is restored on page reload.
 - [ ] Confirm the graph management menu appears for the selected graph.

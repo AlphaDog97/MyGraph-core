@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Core } from "cytoscape";
 import {
   Manifest,
@@ -7,13 +7,15 @@ import {
   KnowledgeGraph,
   TagColorAssignment,
 } from "./domain/types";
-import { loadManifest, loadGraphData } from "./data/loader";
 import {
   loadTagColors,
   saveTagColors,
   loadLastViewed,
   saveLastViewed,
 } from "./data/tagStorage";
+import { AppwriteGraphRepository } from "./data/appwriteGraphRepository";
+import { FileGraphRepository } from "./data/fileGraphRepository";
+import { GraphRepository, RepositoryMode } from "./data/repository";
 import GraphCanvas from "./components/GraphCanvas";
 import GraphSelector from "./components/GraphSelector";
 import GraphManagementMenu from "./components/GraphManagementMenu";
@@ -28,15 +30,35 @@ type AppState =
   | { status: "error"; message: string }
   | {
       status: "ready";
+      mode: RepositoryMode;
       manifest: Manifest;
       categoryId: string;
       graphId: string;
       graph: KnowledgeGraph;
     };
 
+const REPOSITORY_MODE_KEY = "mygraph.repositoryMode";
+
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const isLoggedInToAppwrite = () =>
+  Boolean(localStorage.getItem("mygraph.appwriteUserId")?.trim());
+
+const modeDisplayText: Record<RepositoryMode, string> = {
+  file: "Guest / Local Repo",
+  appwrite: "Cloud / Appwrite",
+};
+
+function loadRepositoryModePreference(): RepositoryMode {
+  const raw = localStorage.getItem(REPOSITORY_MODE_KEY);
+  return raw === "appwrite" || raw === "file" ? raw : "file";
+}
+
+function saveRepositoryModePreference(mode: RepositoryMode): void {
+  localStorage.setItem(REPOSITORY_MODE_KEY, mode);
+}
 
 function rebuildGraph(nodes: KnowledgeNode[]): KnowledgeGraph {
   const seenIds = new Set(nodes.map((n) => n.id));
@@ -65,37 +87,6 @@ function rebuildGraph(nodes: KnowledgeNode[]): KnowledgeGraph {
   return { nodes, edges, tags: [...tagSet].sort(), warnings };
 }
 
-function downloadGraphJson(
-  graph: KnowledgeGraph,
-  _categoryId: string,
-  _graphId: string
-) {
-  const raw: KnowledgeNodeFile[] = graph.nodes.map((n) => {
-    const obj: KnowledgeNodeFile = { id: n.id, label: n.label, tags: n.tags };
-    if (n.description) obj.description = n.description;
-    if (n.links.length > 0)
-      obj.links = n.links.map((l) => {
-        const link: { target: string; type: string; label?: string } = {
-          target: l.target,
-          type: l.type,
-        };
-        if (l.label) link.label = l.label;
-        return link;
-      });
-    return obj;
-  });
-  const json = JSON.stringify(raw, null, 2) + "\n";
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "graph.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
 export default function App() {
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
@@ -104,50 +95,70 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const cyRef = useRef<Core | null>(null);
 
+  const repositories = useMemo<Record<RepositoryMode, GraphRepository>>(
+    () => ({
+      file: new FileGraphRepository(),
+      appwrite: new AppwriteGraphRepository(),
+    }),
+    []
+  );
+
+  const initializeFromRepository = useCallback(
+    async (mode: RepositoryMode, preferred?: { categoryId: string; graphId: string }) => {
+      const repo = repositories[mode];
+      const manifest = await repo.loadManifest();
+
+      if (manifest.categories.length === 0) {
+        throw new Error(
+          mode === "appwrite"
+            ? "No cloud graphs found. Save a graph in Appwrite first."
+            : "No categories found in graph-data/."
+        );
+      }
+
+      let catId = manifest.categories[0].id;
+      let gId = manifest.categories[0].graphs[0]?.id;
+
+      if (preferred) {
+        const cat = manifest.categories.find((c) => c.id === preferred.categoryId);
+        if (cat) {
+          catId = cat.id;
+          const gr = cat.graphs.find((g) => g.id === preferred.graphId);
+          gId = gr ? gr.id : cat.graphs[0]?.id;
+        }
+      }
+
+      if (!gId) {
+        throw new Error(`Category '${catId}' has no graphs.`);
+      }
+
+      const graph = await repo.loadGraph(catId, gId);
+      saveLastViewed({ categoryId: catId, graphId: gId });
+
+      setState({
+        status: "ready",
+        mode,
+        manifest,
+        categoryId: catId,
+        graphId: gId,
+        graph,
+      });
+    },
+    [repositories]
+  );
+
   useEffect(() => {
     (async () => {
       try {
-        const manifest = await loadManifest();
-        if (manifest.categories.length === 0) {
-          setState({
-            status: "error",
-            message: "No categories found in graph-data/.",
-          });
-          return;
+        const loggedIn = isLoggedInToAppwrite();
+        const preferredMode = loadRepositoryModePreference();
+        const mode: RepositoryMode = loggedIn ? preferredMode : "file";
+
+        if (!loggedIn && preferredMode !== "file") {
+          saveRepositoryModePreference("file");
         }
 
-        const lastViewed = loadLastViewed();
-        let catId = manifest.categories[0].id;
-        let gId = manifest.categories[0].graphs[0]?.id;
-
-        if (lastViewed) {
-          const cat = manifest.categories.find(
-            (c) => c.id === lastViewed.categoryId
-          );
-          if (cat) {
-            catId = cat.id;
-            const gr = cat.graphs.find((g) => g.id === lastViewed.graphId);
-            gId = gr ? gr.id : cat.graphs[0]?.id;
-          }
-        }
-
-        if (!gId) {
-          setState({
-            status: "error",
-            message: `Category '${catId}' has no graphs.`,
-          });
-          return;
-        }
-
-        const graph = await loadGraphData(catId, gId);
-        saveLastViewed({ categoryId: catId, graphId: gId });
-        setState({
-          status: "ready",
-          manifest,
-          categoryId: catId,
-          graphId: gId,
-          graph,
-        });
+        await initializeFromRepository(mode, loadLastViewed() ?? undefined);
       } catch (err) {
         setState({
           status: "error",
@@ -155,21 +166,25 @@ export default function App() {
         });
       }
     })();
-  }, []);
+  }, [initializeFromRepository]);
 
   const switchGraph = useCallback(
-    async (manifest: Manifest, catId: string, gId: string) => {
-      setState((prev) => {
-        if (prev.status !== "ready") return prev;
-        return { ...prev, status: "loading" as const } as AppState;
-      });
+    async (
+      mode: RepositoryMode,
+      manifest: Manifest,
+      catId: string,
+      gId: string
+    ) => {
+      const repo = repositories[mode];
+      setState({ status: "loading" });
       try {
-        const graph = await loadGraphData(catId, gId);
+        const graph = await repo.loadGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
         setSelectedNode(null);
         setSearchQuery("");
         setState({
           status: "ready",
+          mode,
           manifest,
           categoryId: catId,
           graphId: gId,
@@ -182,7 +197,24 @@ export default function App() {
         });
       }
     },
-    []
+    [repositories]
+  );
+
+  const handleModeChange = useCallback(
+    async (mode: RepositoryMode) => {
+      if (mode === "appwrite" && !isLoggedInToAppwrite()) {
+        alert("Please log in before switching to Cloud / Appwrite mode.");
+        return;
+      }
+      saveRepositoryModePreference(mode);
+      setState({ status: "loading" });
+      try {
+        await initializeFromRepository(mode, loadLastViewed() ?? undefined);
+      } catch (err) {
+        setState({ status: "error", message: (err as Error).message });
+      }
+    },
+    [initializeFromRepository]
   );
 
   const handleCategoryChange = useCallback(
@@ -190,7 +222,7 @@ export default function App() {
       if (state.status !== "ready") return;
       const cat = state.manifest.categories.find((c) => c.id === newCatId);
       if (!cat || cat.graphs.length === 0) return;
-      switchGraph(state.manifest, newCatId, cat.graphs[0].id);
+      switchGraph(state.mode, state.manifest, newCatId, cat.graphs[0].id);
     },
     [state, switchGraph]
   );
@@ -198,7 +230,7 @@ export default function App() {
   const handleGraphChange = useCallback(
     (newGraphId: string) => {
       if (state.status !== "ready") return;
-      switchGraph(state.manifest, state.categoryId, newGraphId);
+      switchGraph(state.mode, state.manifest, state.categoryId, newGraphId);
     },
     [state, switchGraph]
   );
@@ -231,7 +263,7 @@ export default function App() {
   }, []);
 
   const handleNodeSave = useCallback(
-    (updated: KnowledgeNodeFile) => {
+    async (updated: KnowledgeNodeFile) => {
       if (state.status !== "ready") return;
       const newNode = new KnowledgeNode(updated);
       const newNodes = state.graph.nodes.map((n) =>
@@ -239,27 +271,49 @@ export default function App() {
       );
       const newGraph = rebuildGraph(newNodes);
 
-      downloadGraphJson(newGraph, state.categoryId, state.graphId);
-
-      setState({ ...state, graph: newGraph });
-      setSelectedNode(newNode);
+      try {
+        await repositories[state.mode].saveGraph(
+          state.categoryId,
+          state.graphId,
+          newGraph
+        );
+        setState({ ...state, graph: newGraph });
+        setSelectedNode(newNode);
+      } catch (error) {
+        alert((error as Error).message);
+      }
     },
-    [state]
+    [repositories, state]
   );
 
   const handleMoveGraph = useCallback(
-    (targetCategoryId: string) => {
+    async (targetCategoryId: string) => {
       if (state.status !== "ready") return;
-      downloadGraphJson(state.graph, targetCategoryId, state.graphId);
-      alert(
-        `graph.json has been downloaded.\n\n` +
-          `To complete the move:\n` +
-          `1. Move the folder graph-data/${state.categoryId}/${state.graphId}/ ` +
-          `to graph-data/${targetCategoryId}/${state.graphId}/\n` +
-          `2. Commit and redeploy.`
-      );
+      try {
+        await repositories[state.mode].saveGraph(
+          targetCategoryId,
+          state.graphId,
+          state.graph
+        );
+
+        if (state.mode === "file") {
+          alert(
+            `graph.json has been downloaded.\n\n` +
+              `To complete the move:\n` +
+              `1. Move the folder graph-data/${state.categoryId}/${state.graphId}/ ` +
+              `to graph-data/${targetCategoryId}/${state.graphId}/\n` +
+              `2. Commit and redeploy.`
+          );
+        } else {
+          alert(
+            `Saved '${state.graphId}' to cloud category '${targetCategoryId}'.`
+          );
+        }
+      } catch (error) {
+        alert((error as Error).message);
+      }
     },
-    [state]
+    [repositories, state]
   );
 
   const handleDeleteGraph = useCallback(() => {
@@ -278,27 +332,35 @@ export default function App() {
     if (newCategories.length === 0) {
       setState({
         status: "error",
-        message: "All graphs have been removed. Add data to graph-data/ and redeploy.",
+        message:
+          state.mode === "appwrite"
+            ? "All cloud graphs are removed from view. Save a new graph to continue."
+            : "All graphs have been removed. Add data to graph-data/ and redeploy.",
       });
-      alert(
-        `To permanently delete this graph, remove the folder:\n` +
-          `graph-data/${categoryId}/${graphId}/\n` +
-          `Then commit and redeploy.`
-      );
+      if (state.mode === "file") {
+        alert(
+          `To permanently delete this graph, remove the folder:\n` +
+            `graph-data/${categoryId}/${graphId}/\n` +
+            `Then commit and redeploy.`
+        );
+      }
       return;
     }
 
-    const newCat = newCategories.find((c) => c.id === categoryId) ?? newCategories[0];
+    const newCat =
+      newCategories.find((c) => c.id === categoryId) ?? newCategories[0];
     const newGraphId = newCat.graphs[0].id;
 
-    alert(
-      `Graph removed from view.\n\n` +
-        `To permanently delete, remove the folder:\n` +
-        `graph-data/${categoryId}/${graphId}/\n` +
-        `Then commit and redeploy.`
-    );
+    if (state.mode === "file") {
+      alert(
+        `Graph removed from view.\n\n` +
+          `To permanently delete, remove the folder:\n` +
+          `graph-data/${categoryId}/${graphId}/\n` +
+          `Then commit and redeploy.`
+      );
+    }
 
-    switchGraph(newManifest, newCat.id, newGraphId);
+    switchGraph(state.mode, newManifest, newCat.id, newGraphId);
   }, [state, switchGraph]);
 
   if (state.status === "loading") {
@@ -314,11 +376,30 @@ export default function App() {
     return <ErrorDisplay error={state.message} />;
   }
 
-  const { manifest, categoryId, graphId, graph } = state;
+  const { mode, manifest, categoryId, graphId, graph } = state;
+  const appwriteLoggedIn = isLoggedInToAppwrite();
 
   return (
     <div className="app-shell">
       <div className="toolbar">
+        <div className="repo-mode-block">
+          <div className="repo-mode-badge">{modeDisplayText[mode]}</div>
+          <select
+            className="selector-dropdown repo-mode-select"
+            value={mode}
+            onChange={(e) => handleModeChange(e.target.value as RepositoryMode)}
+            disabled={!appwriteLoggedIn}
+            title={
+              appwriteLoggedIn
+                ? "Switch data source mode"
+                : "Log in to enable Cloud / Appwrite mode"
+            }
+          >
+            <option value="file">file</option>
+            <option value="appwrite">appwrite</option>
+          </select>
+        </div>
+
         <GraphSelector
           manifest={manifest}
           categoryId={categoryId}
