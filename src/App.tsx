@@ -20,8 +20,7 @@ import {
 } from "./data/tagStorage";
 import {
   cloudEnabled,
-  getCloudUser,
-  loadCloudGraphNodes,
+  loadCloudGraph,
   saveCloudGraph,
 } from "./data/cloudStorage";
 import GraphCanvas from "./components/GraphCanvas";
@@ -113,7 +112,7 @@ function downloadGraphJson(
 }
 
 export default function App() {
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, user } = useAuth();
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [storageMode, setStorageMode] = useState<StorageMode>({
     type: "local",
@@ -133,25 +132,23 @@ export default function App() {
         return buildGraphFromRaw(localNodes, categoryId, graphId);
       }
       try {
-        const cloudNodes = await loadCloudGraphNodes(categoryId, graphId);
-        return buildGraphFromRaw(
-          cloudNodes ?? localNodes,
-          categoryId,
-          graphId
-        );
+        const cloudGraph = await loadCloudGraph(categoryId, graphId, user?.$id);
+        if (cloudGraph) {
+          return cloudGraph;
+        }
+        return buildGraphFromRaw(localNodes, categoryId, graphId);
       } catch (err) {
         console.warn("Cloud read failed; falling back to local graph-data.", err);
         return buildGraphFromRaw(localNodes, categoryId, graphId);
       }
     },
-    [storageMode]
+    [storageMode, user]
   );
 
   useEffect(() => {
     (async () => {
       try {
-        const user = await getCloudUser();
-        if (user?.email) {
+        if (user?.email && cloudEnabled()) {
           setStorageMode({ type: "cloud", email: user.email });
         } else {
           setStorageMode({
@@ -208,7 +205,7 @@ export default function App() {
         });
       }
     })();
-  }, [resolveGraph]);
+  }, [resolveGraph, user]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
@@ -293,7 +290,16 @@ export default function App() {
       const newGraph = rebuildGraph(newNodes);
 
       if (storageMode.type === "cloud") {
-        saveCloudGraph(state.categoryId, state.graphId, newGraph)
+        if (!user) {
+          alert("Cloud save requires sign-in.");
+          return;
+        }
+        saveCloudGraph({
+          categoryId: state.categoryId,
+          graphId: state.graphId,
+          ownerUserId: user.$id,
+          visibility: "private",
+        }, newGraph)
           .then(() => {
             alert("Saved to Appwrite cloud.");
           })
@@ -310,7 +316,7 @@ export default function App() {
       setState({ ...state, graph: newGraph });
       setSelectedNode(newNode);
     },
-    [state, storageMode]
+    [state, storageMode, user]
   );
 
   const handleMoveGraph = useCallback(

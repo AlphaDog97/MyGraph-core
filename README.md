@@ -100,7 +100,7 @@ Since this is a static app, these operations provide guidance and file downloads
 The toolbar shows an explicit save mode badge to avoid confusion:
 
 - **Local mode · Guest**: uses local `graph-data` files and downloads `graph.json` when saving node edits.
-- **Cloud mode · your-email@example.com**: if an Appwrite email session is active, node edits are saved to Appwrite Tables.
+- **Cloud mode · your-email@example.com**: if an Appwrite email session is active, node edits are saved with the normalized Appwrite multi-table schema.
 
 If cloud read fails, the app automatically falls back to local `graph-data` for loading.
 
@@ -112,10 +112,41 @@ Set these Vite environment variables to enable cloud mode:
 VITE_APPWRITE_ENDPOINT=https://<your-appwrite-endpoint>/v1
 VITE_APPWRITE_PROJECT_ID=<project-id>
 VITE_APPWRITE_DATABASE_ID=<database-id>
-VITE_APPWRITE_TABLE_ID=<table-id>
+VITE_APPWRITE_TABLE_GRAPHS_ID=<graphs-table-id>
+VITE_APPWRITE_TABLE_NODES_ID=<nodes-table-id>
+VITE_APPWRITE_TABLE_EDGES_ID=<edges-table-id>
+VITE_APPWRITE_TABLE_TAGS_ID=<tags-table-id>
+VITE_APPWRITE_TABLE_NODE_TAGS_ID=<node-tags-table-id>
+VITE_APPWRITE_TABLE_USER_PREFERENCES_ID=<user-preferences-table-id>
 ```
 
 Without this config, the app always stays in local mode.
+
+Cloud access policy:
+
+- Anonymous users can only read graphs with `visibility=public`.
+- Logged-in users can write only graphs where `owner_user_id` matches their Appwrite account ID.
+- Unauthenticated users cannot write to cloud tables and remain local-only.
+
+#### One-time legacy migration (single-table -> multi-table)
+
+Use the offline migration script to move legacy rows (JSON `nodes` per row) into the normalized schema:
+
+```bash
+APPWRITE_ENDPOINT=https://<endpoint>/v1 \
+APPWRITE_PROJECT_ID=<project-id> \
+APPWRITE_DATABASE_ID=<database-id> \
+APPWRITE_TABLE_OLD_NODES_ID=<legacy-table-id> \
+APPWRITE_TABLE_GRAPHS_ID=<graphs-table-id> \
+APPWRITE_TABLE_NODES_ID=<nodes-table-id> \
+APPWRITE_TABLE_EDGES_ID=<edges-table-id> \
+APPWRITE_TABLE_TAGS_ID=<tags-table-id> \
+APPWRITE_TABLE_NODE_TAGS_ID=<node-tags-table-id> \
+APPWRITE_API_KEY=<server-api-key> \
+node scripts/migrate-single-table-to-multi-table.mjs --dry-run
+```
+
+Remove `--dry-run` to execute writes.
 
 ### Authentication
 
