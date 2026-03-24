@@ -441,6 +441,14 @@ body {
   }
 }
 
+
+.edge-legend-panel {
+  left: auto;
+  right: 16px;
+  bottom: 16px;
+  min-width: 160px;
+}
+
 /* ─── Tag Color Editor ──────────────────────────────────────────── */
 
 .editor-overlay {
