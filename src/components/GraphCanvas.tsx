@@ -47,14 +47,14 @@ function buildStyles(noMotion: boolean): any[] {
       selector: "edge",
       style: {
         width: 1.5,
-        "line-color": "#cbd5e0",
-        "target-arrow-color": "#cbd5e0",
+        "line-color": "data(edgeColor)",
+        "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
         "font-size": "10px",
-        color: "#a0aec0",
+        color: "data(edgeColor)",
         "text-rotation": "autorotate",
         "text-outline-color": "#f7f8fa",
         "text-outline-width": 2,
@@ -81,6 +81,29 @@ function buildStyles(noMotion: boolean): any[] {
   ];
 }
 
+
+function buildLayout(noMotion: boolean): cytoscape.LayoutOptions {
+  return {
+    name: "cose",
+    fit: true,
+    padding: 48,
+    animate: !noMotion,
+    animationDuration: 600,
+    randomize: false,
+    avoidOverlap: true,
+    nodeOverlap: 12,
+    nodeRepulsion: 9000,
+    idealEdgeLength: 180,
+    edgeElasticity: 100,
+    nestingFactor: 0.7,
+    gravity: 1.2,
+    numIter: 1200,
+    initialTemp: 200,
+    coolingFactor: 0.96,
+    minTemp: 1,
+  } as cytoscape.LayoutOptions;
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
@@ -101,14 +124,7 @@ export default function GraphCanvas({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: {
-        name: "cose",
-        animate: !noMotion,
-        animationDuration: 600,
-        nodeRepulsion: () => 8000,
-        idealEdgeLength: () => 120,
-        padding: 40,
-      } as cytoscape.LayoutOptions,
+      layout: buildLayout(noMotion),
       minZoom: 0.2,
       maxZoom: 4,
     });
