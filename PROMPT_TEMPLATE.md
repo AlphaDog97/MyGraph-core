@@ -36,13 +36,20 @@ Field rules:
 - "tags": 1–3 tags that categorize this node. Reuse tags across nodes for meaningful filtering.
 - "links": outbound relationships to other nodes in this array. Each link needs:
   - "target": the id of the target node (must exist in the array).
-  - "type": a machine-readable relation kind (e.g. "uses", "depends-on", "alternative-to").
+  - "type": MUST be one of: "Concept", "Description", "Condition", "Action".
   - "label": a short human-readable description (e.g. "bundled by", "runs on").
 
 Additional guidelines:
 - Links must only reference IDs that exist in the array you produce.
 - Every node should have at least one inbound or outbound link (connected graph).
-- Use 4–7 distinct tags total and 3–6 distinct relationship types.
+- Use 4–7 distinct tags total.
+- Restrict all relationship types to this fixed set only: "Concept", "Description", "Condition", "Action".
+- Structure the graph as a radial hierarchy (center → outer layers):
+  - Put broad, high-level concepts near the center (core/foundation nodes).
+  - Put specialized, derived, or implementation details in outer layers.
+  - Prefer edges that point from inner/core nodes to outer/derived nodes.
+  - Avoid linking outer-layer nodes directly back to inner/core hubs.
+  - Avoid skip-layer links (e.g., center directly to far outer ring). Prefer links only between adjacent layers.
 - Output the entire array as a single JSON code block.
 
 Please generate the nodes now.
@@ -82,13 +89,20 @@ Please generate the nodes now.
 - "tags"：1–3 个分类标签。请在多个节点间复用标签。
 - "links"：指向数组中其他节点的关系。每个 link 需要：
   - "target"：目标节点的 id（必须存在于数组中）。
-  - "type"：机器可读的关系类型（例如 "uses"、"depends-on"、"alternative-to"）。
+  - "type"：必须且只能是以下四种之一："Concept"、"Description"、"Condition"、"Action"。
   - "label"：简短的人类可读关系描述（例如 "依赖于"、"运行在"）。
 
 额外要求：
 - links 中引用的节点 ID 必须存在于数组中。
 - 构建一个连通图：每个节点至少要有一条入边或出边。
-- 总共使用 4–7 个不同标签，3–6 种不同关系类型。
+- 总共使用 4–7 个不同标签。
+- 关系类型只允许使用固定四种："Concept"、"Description"、"Condition"、"Action"。
+- 图结构尽量按“中心 → 外围”的层次扩散：
+  - 更大、更基础、更抽象的概念放在中心层（核心节点）。
+  - 细分、派生、实现层面的概念放在外层。
+  - 尽量让关系从中心层指向外层。
+  - 避免外层节点再直接连回中心核心节点。
+  - 避免跨层跳连（例如中心层直接连到最外层），优先只连接相邻层。
 - 将整个数组输出为一个 JSON 代码块。
 
 请现在生成这些节点。
