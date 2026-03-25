@@ -6,7 +6,7 @@ Use this template when you want one topic (e.g. `EF Core`) to be split into **mu
 
 ---
 
-## Prompt (English)
+## Step 1: Topic Split Prompt (English)
 
 ```
 I'm building a visual knowledge graph project.
@@ -51,7 +51,7 @@ Hard rules:
 
 ---
 
-## Prompt（中文版）
+## Step 2：单个子图生成提示词（中文版）
 
 ```
 我正在构建一个可视化知识图谱项目。
