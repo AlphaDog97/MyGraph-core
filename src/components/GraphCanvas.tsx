@@ -47,14 +47,14 @@ function buildStyles(noMotion: boolean): any[] {
       selector: "edge",
       style: {
         width: 1.5,
-        "line-color": "#cbd5e0",
-        "target-arrow-color": "#cbd5e0",
+        "line-color": "data(edgeColor)",
+        "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
         "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
         "font-size": "10px",
-        color: "#a0aec0",
+        color: "data(edgeColor)",
         "text-rotation": "autorotate",
         "text-outline-color": "#f7f8fa",
         "text-outline-width": 2,
@@ -81,6 +81,103 @@ function buildStyles(noMotion: boolean): any[] {
   ];
 }
 
+
+function resolveLayoutRoots(graph: KnowledgeGraph): string[] {
+  const indegree = new Map<string, number>();
+  const outdegree = new Map<string, number>();
+
+  for (const node of graph.nodes) {
+    indegree.set(node.id, 0);
+    outdegree.set(node.id, 0);
+  }
+
+  for (const edge of graph.edges) {
+    indegree.set(edge.target, (indegree.get(edge.target) ?? 0) + 1);
+    outdegree.set(edge.source, (outdegree.get(edge.source) ?? 0) + 1);
+  }
+
+  const roots = graph.nodes
+    .filter((node) => (indegree.get(node.id) ?? 0) === 0)
+    .map((node) => node.id);
+  if (roots.length > 0) return roots;
+
+  const fallback = [...graph.nodes].sort((a, b) => {
+    const outDiff = (outdegree.get(b.id) ?? 0) - (outdegree.get(a.id) ?? 0);
+    if (outDiff !== 0) return outDiff;
+    return (indegree.get(a.id) ?? 0) - (indegree.get(b.id) ?? 0);
+  });
+  return fallback.slice(0, 1).map((node) => node.id);
+}
+
+function resolveNodeDepths(
+  graph: KnowledgeGraph,
+  roots: string[]
+): { depthById: Map<string, number>; maxDepth: number } {
+  const outgoing = new Map<string, string[]>();
+  for (const node of graph.nodes) outgoing.set(node.id, []);
+  for (const edge of graph.edges) {
+    outgoing.set(edge.source, [...(outgoing.get(edge.source) ?? []), edge.target]);
+  }
+
+  const depthById = new Map<string, number>();
+  const queue: string[] = [];
+  for (const root of roots) {
+    depthById.set(root, 0);
+    queue.push(root);
+  }
+
+  for (let i = 0; i < queue.length; i++) {
+    const nodeId = queue[i];
+    const depth = depthById.get(nodeId) ?? 0;
+    for (const next of outgoing.get(nodeId) ?? []) {
+      if (!depthById.has(next)) {
+        depthById.set(next, depth + 1);
+        queue.push(next);
+      }
+    }
+  }
+
+  let maxDepth = 0;
+  for (const value of depthById.values()) {
+    maxDepth = Math.max(maxDepth, value);
+  }
+
+  for (const node of graph.nodes) {
+    if (!depthById.has(node.id)) {
+      maxDepth += 1;
+      depthById.set(node.id, maxDepth);
+    }
+  }
+
+  return { depthById, maxDepth };
+}
+
+function buildLayout(
+  noMotion: boolean,
+  depthById: Map<string, number>,
+  maxDepth: number,
+  compact = false
+): cytoscape.LayoutOptions {
+  return {
+    name: "concentric",
+    fit: true,
+    padding: compact ? 40 : 64,
+    animate: !noMotion,
+    animationDuration: 600,
+    avoidOverlap: true,
+    spacingFactor: compact ? 1.15 : 1.55,
+    nodeDimensionsIncludeLabels: true,
+    equidistant: true,
+    startAngle: -Math.PI / 2,
+    sweep: 2 * Math.PI,
+    clockwise: true,
+    minNodeSpacing: compact ? 36 : 70,
+    concentric: (node: cytoscape.NodeSingular) =>
+      maxDepth - (depthById.get(node.id()) ?? maxDepth),
+    levelWidth: () => 1,
+  } as cytoscape.LayoutOptions;
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
@@ -96,21 +193,26 @@ export default function GraphCanvas({
 
     const elements = toCytoscapeElements(graph, tagColors);
     const noMotion = prefersReducedMotion();
+    const roots = resolveLayoutRoots(graph);
+    const { depthById, maxDepth } = resolveNodeDepths(graph, roots);
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: {
-        name: "cose",
-        animate: !noMotion,
-        animationDuration: 600,
-        nodeRepulsion: () => 8000,
-        idealEdgeLength: () => 120,
-        padding: 40,
-      } as cytoscape.LayoutOptions,
-      minZoom: 0.2,
+      layout: buildLayout(noMotion, depthById, maxDepth),
+      minZoom: 0.01,
       maxZoom: 4,
+    });
+
+    cy.one("layoutstop", () => {
+      cy.fit(cy.elements(), 40);
+      if (cy.zoom() <= 0.011) {
+        cy.one("layoutstop", () => {
+          cy.fit(cy.elements(), 32);
+        });
+        cy.layout(buildLayout(noMotion, depthById, maxDepth, true)).run();
+      }
     });
 
     cy.on("tap", "node", (evt) => {
