@@ -113,10 +113,43 @@ function resolveLayoutRoots(graph: KnowledgeGraph): string[] {
   return fallback.slice(0, 1).map((node) => node.id);
 }
 
+function buildDepthMap(graph: KnowledgeGraph, roots: string[]): { depthById: Map<string, number>; maxDepth: number } {
+  const childrenById = new Map<string, string[]>();
+  for (const node of graph.nodes) childrenById.set(node.id, []);
+  for (const edge of graph.edges) {
+    const children = childrenById.get(edge.source);
+    if (children) children.push(edge.target);
+  }
+
+  const depthById = new Map<string, number>();
+  const queue: Array<{ id: string; depth: number }> = roots.map((id) => ({ id, depth: 0 }));
+
+  while (queue.length > 0) {
+    const next = queue.shift();
+    if (!next) break;
+
+    const knownDepth = depthById.get(next.id);
+    if (knownDepth !== undefined && knownDepth <= next.depth) continue;
+
+    depthById.set(next.id, next.depth);
+    for (const childId of childrenById.get(next.id) ?? []) {
+      queue.push({ id: childId, depth: next.depth + 1 });
+    }
+  }
+
+  for (const node of graph.nodes) {
+    if (!depthById.has(node.id)) depthById.set(node.id, 0);
+  }
+
+  const maxDepth = Math.max(0, ...depthById.values());
+  return { depthById, maxDepth };
+}
+
 function buildLayout(
   noMotion: boolean,
   roots: string[],
-  nodeCount: number,
+  depthById: Map<string, number>,
+  maxDepth: number,
   compact = false
 ): cytoscape.LayoutOptions {
   const spacingFactor = compact ? 1.08 : 1.28;
@@ -151,7 +184,8 @@ function runLayoutWithAdaptiveFit(
   cy: Core,
   noMotion: boolean,
   roots: string[],
-  nodeCount: number
+  depthById: Map<string, number>,
+  maxDepth: number
 ) {
   const fitToAll = (padding: number) => {
     cy.fit(cy.elements(), padding);
@@ -165,7 +199,7 @@ function runLayoutWithAdaptiveFit(
       cy.one("layoutstop", () => {
         fitToAll(24);
       });
-      cy.layout(buildLayout(noMotion, roots, nodeCount, true)).run();
+      cy.layout(buildLayout(noMotion, roots, depthById, maxDepth, true)).run();
     }
   });
 }
@@ -186,25 +220,18 @@ export default function GraphCanvas({
     const elements = toCytoscapeElements(graph, tagColors);
     const noMotion = prefersReducedMotion();
     const roots = resolveLayoutRoots(graph);
+    const { depthById, maxDepth } = buildDepthMap(graph, roots);
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: buildLayout(noMotion, depthById, maxDepth),
+      layout: buildLayout(noMotion, roots, depthById, maxDepth),
       minZoom: COMPACT_LAYOUT_ZOOM_THRESHOLD,
       maxZoom: 4,
     });
 
-    cy.one("layoutstop", () => {
-      cy.fit(cy.elements(), 40);
-      if (cy.zoom() <= COMPACT_LAYOUT_ZOOM_THRESHOLD) {
-        cy.one("layoutstop", () => {
-          cy.fit(cy.elements(), 32);
-        });
-        cy.layout(buildLayout(noMotion, depthById, maxDepth, true)).run();
-      }
-    });
+    runLayoutWithAdaptiveFit(cy, noMotion, roots, depthById, maxDepth);
 
     cy.on("tap", "node", (evt) => {
       const nodeId = evt.target.id();
