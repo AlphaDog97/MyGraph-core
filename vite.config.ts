@@ -23,6 +23,34 @@ interface Manifest {
   categories: ManifestCategory[];
 }
 
+interface MultiGraphCategoryFile {
+  categoryId?: string;
+  graphs?: Array<{
+    graphId?: string;
+    graphLabel?: string;
+    nodes?: unknown[];
+  }>;
+}
+
+function parseCategoryGraphFile(filePath: string): ManifestGraph[] {
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(raw) as MultiGraphCategoryFile;
+    if (!Array.isArray(parsed.graphs)) return [];
+    return parsed.graphs
+      .filter((g) => typeof g?.graphId === "string" && g.graphId.trim() !== "")
+      .map((g) => ({
+        id: g.graphId as string,
+        label:
+          typeof g.graphLabel === "string" && g.graphLabel.trim() !== ""
+            ? g.graphLabel
+            : labelFromId(g.graphId as string),
+      }));
+  } catch {
+    return [];
+  }
+}
+
 function graphDataPlugin(): Plugin {
   const graphDir = path.resolve(__dirname, "graph-data");
 
@@ -35,20 +63,33 @@ function graphDataPlugin(): Plugin {
       .filter((d) => d.isDirectory())
       .sort((a, b) => a.name.localeCompare(b.name))) {
       const catDir = path.join(graphDir, catEntry.name);
-      const graphs: ManifestGraph[] = [];
+      const graphMap = new Map<string, ManifestGraph>();
 
+      // New mode: graph-data/<category>/graph.json with { graphs: [...] }
+      const categoryGraphFile = path.join(catDir, "graph.json");
+      if (fs.existsSync(categoryGraphFile)) {
+        for (const graph of parseCategoryGraphFile(categoryGraphFile)) {
+          graphMap.set(graph.id, graph);
+        }
+      }
+
+      // Legacy mode: graph-data/<category>/<graph>/graph.json
       for (const graphEntry of fs
         .readdirSync(catDir, { withFileTypes: true })
         .filter((d) => d.isDirectory())
         .sort((a, b) => a.name.localeCompare(b.name))) {
         const graphFile = path.join(catDir, graphEntry.name, "graph.json");
         if (fs.existsSync(graphFile)) {
-          graphs.push({
+          graphMap.set(graphEntry.name, {
             id: graphEntry.name,
             label: labelFromId(graphEntry.name),
           });
         }
       }
+
+      const graphs = [...graphMap.values()].sort((a, b) =>
+        a.label.localeCompare(b.label)
+      );
 
       if (graphs.length > 0) {
         categories.push({
