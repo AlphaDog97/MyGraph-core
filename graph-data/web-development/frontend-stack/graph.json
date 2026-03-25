@@ -1,1 +1,634 @@
-{"topic":"EF Core","categoryId":"ef-core","subgraphs":[{"id":"getting-started-and-architecture","label":"入门与整体架构","focus":"EF Core 的核心组成、运行方式以及应用接入方式，建立对 DbContext、Provider、实体与数据库之间关系的整体认知。","mustInclude":["DbContext","DbSet","Provider","Change Tracker","LINQ","Database Provider"]},{"id":"entity-modeling","label":"实体建模与映射","focus":"如何定义实体模型以及将 CLR 类型映射到数据库结构，包括键、关系、拥有类型、继承与配置方式。","mustInclude":["Entity Type","Primary Key","Foreign Key","Navigation Property","Owned Entity","Inheritance Mapping","Fluent API","Data Annotations"]},{"id":"querying-and-loading-data","label":"查询与数据加载","focus":"如何使用 LINQ 查询数据，以及延迟加载、预先加载、显式加载、投影、跟踪查询与无跟踪查询等读取模式。","mustInclude":["LINQ Queries","Include","ThenInclude","Projection","Tracking Query","No-Tracking Query","Lazy Loading","Explicit Loading"]},{"id":"change-tracking-and-saving","label":"变更跟踪与持久化","focus":"实体状态管理、添加更新删除流程、SaveChanges 行为，以及并发控制和拦截保存过程的机制。","mustInclude":["Entity State","Add/Update/Remove","SaveChanges","Change Detection","Optimistic Concurrency","Concurrency Token","Interceptors"]},{"id":"migrations-and-schema-management","label":"迁移与数据库结构管理","focus":"数据库创建、迁移生成与应用、模型快照、脚本部署，以及开发和生产环境中的模式演进流程。","mustInclude":["Migrations","Model Snapshot","Database EnsureCreated","Update Database","Migration Script","Schema Evolution"]},{"id":"performance-transactions-and-advanced-features","label":"性能、事务与高级能力","focus":"提升 EF Core 应用性能与可靠性的关键机制，包括事务、批处理、编译查询、原始 SQL、连接弹性与缓存相关实践。","mustInclude":["Transactions","Execution Strategy","Compiled Query","Batching","Raw SQL","Split Query","Connection Resiliency"]}]}
+[
+    {
+        "id": "ef-core",
+        "label": "EF Core",
+        "description": "EF Core 是 .NET 的现代 ORM，用于把对象模型映射到关系型数据库并执行查询与保存。",
+        "tags": [
+            "orm",
+            "dotnet",
+            "cluster:foundations"
+        ],
+        "links": [
+            {
+                "target": "dbcontext",
+                "type": "Concept",
+                "label": "核心入口是"
+            },
+            {
+                "target": "model-building",
+                "type": "Concept",
+                "label": "包含建模主题"
+            },
+            {
+                "target": "querying-data",
+                "type": "Concept",
+                "label": "包含查询主题"
+            },
+            {
+                "target": "saving-data",
+                "type": "Concept",
+                "label": "包含保存主题"
+            },
+            {
+                "target": "schema-management",
+                "type": "Concept",
+                "label": "包含架构管理主题"
+            }
+        ]
+    },
+    {
+        "id": "dbcontext",
+        "label": "DbContext",
+        "description": "DbContext 负责管理连接、模型、查询管道和变更跟踪的工作单元。",
+        "tags": [
+            "dotnet",
+            "database",
+            "cluster:foundations"
+        ],
+        "links": [
+            {
+                "target": "dbset",
+                "type": "Concept",
+                "label": "公开实体集合"
+            },
+            {
+                "target": "change-tracker",
+                "type": "Action",
+                "label": "使用变更跟踪器"
+            },
+            {
+                "target": "providers",
+                "type": "Condition",
+                "label": "依赖数据库提供程序"
+            }
+        ]
+    },
+    {
+        "id": "dbset",
+        "label": "DbSet",
+        "description": "DbSet 表示某个实体类型的集合，是大多数查询与增删改操作的入口。",
+        "tags": [
+            "database",
+            "querying",
+            "cluster:foundations"
+        ],
+        "links": [
+            {
+                "target": "querying-data",
+                "type": "Action",
+                "label": "用于发起查询"
+            }
+        ]
+    },
+    {
+        "id": "change-tracker",
+        "label": "Change Tracker",
+        "description": "变更跟踪器负责识别实体状态变化，以便在保存时生成正确的数据库操作。",
+        "tags": [
+            "database",
+            "persistence",
+            "cluster:foundations"
+        ],
+        "links": [
+            {
+                "target": "entity-states",
+                "type": "Concept",
+                "label": "维护实体状态"
+            }
+        ]
+    },
+    {
+        "id": "providers",
+        "label": "Providers",
+        "description": "提供程序为不同数据库实现 SQL 生成、类型映射和特定能力支持。",
+        "tags": [
+            "database",
+            "operations",
+            "cluster:foundations"
+        ],
+        "links": [
+            {
+                "target": "schema-management",
+                "type": "Condition",
+                "label": "影响架构管理能力"
+            }
+        ]
+    },
+    {
+        "id": "model-building",
+        "label": "Model Building",
+        "description": "模型构建定义 EF Core 如何理解实体、属性、键和关系并映射到数据库结构。",
+        "tags": [
+            "modeling",
+            "database",
+            "cluster:modeling"
+        ],
+        "links": [
+            {
+                "target": "entity-types",
+                "type": "Concept",
+                "label": "定义实体类型"
+            },
+            {
+                "target": "property-configuration",
+                "type": "Concept",
+                "label": "配置属性"
+            },
+            {
+                "target": "keys-and-constraints",
+                "type": "Concept",
+                "label": "定义键与约束"
+            },
+            {
+                "target": "relationships",
+                "type": "Concept",
+                "label": "定义实体关系"
+            }
+        ]
+    },
+    {
+        "id": "entity-types",
+        "label": "Entity Types",
+        "description": "实体类型是模型中的核心单元，对应数据库中的表或视图映射主体。",
+        "tags": [
+            "modeling",
+            "orm",
+            "cluster:modeling"
+        ],
+        "links": [
+            {
+                "target": "owned-entity-types",
+                "type": "Concept",
+                "label": "可细分为拥有实体"
+            },
+            {
+                "target": "inheritance-mapping",
+                "type": "Concept",
+                "label": "可配置继承映射"
+            }
+        ]
+    },
+    {
+        "id": "property-configuration",
+        "label": "Property Configuration",
+        "description": "属性配置决定列名、类型、长度、必填性以及转换规则等细节。",
+        "tags": [
+            "modeling",
+            "database",
+            "cluster:modeling"
+        ],
+        "links": [
+            {
+                "target": "value-converters",
+                "type": "Concept",
+                "label": "可使用值转换器"
+            },
+            {
+                "target": "indexes",
+                "type": "Concept",
+                "label": "可配合索引优化"
+            }
+        ]
+    },
+    {
+        "id": "keys-and-constraints",
+        "label": "Keys & Constraints",
+        "description": "键与约束用于唯一标识实体，并保证模型与数据库的一致性约束。",
+        "tags": [
+            "modeling",
+            "database",
+            "cluster:modeling"
+        ],
+        "links": [
+            {
+                "target": "relationships",
+                "type": "Condition",
+                "label": "为关系提供主外键基础"
+            }
+        ]
+    },
+    {
+        "id": "relationships",
+        "label": "Relationships",
+        "description": "关系定义实体之间的一对一、一对多和多对多导航与外键结构。",
+        "tags": [
+            "modeling",
+            "database",
+            "cluster:modeling"
+        ],
+        "links": [
+            {
+                "target": "loading-related-data",
+                "type": "Action",
+                "label": "决定相关数据加载方式"
+            }
+        ]
+    },
+    {
+        "id": "owned-entity-types",
+        "label": "Owned Types",
+        "description": "拥有实体类型用于建模值对象，使其生命周期从属于拥有者实体。",
+        "tags": [
+            "modeling",
+            "orm",
+            "cluster:modeling"
+        ],
+        "links": []
+    },
+    {
+        "id": "inheritance-mapping",
+        "label": "Inheritance Mapping",
+        "description": "继承映射控制层次结构如何落到表结构上，例如 TPH 或 TPT。",
+        "tags": [
+            "modeling",
+            "orm",
+            "cluster:modeling"
+        ],
+        "links": []
+    },
+    {
+        "id": "value-converters",
+        "label": "Value Converters",
+        "description": "值转换器可以在实体属性类型与数据库存储类型之间进行双向转换。",
+        "tags": [
+            "modeling",
+            "database",
+            "cluster:modeling"
+        ],
+        "links": []
+    },
+    {
+        "id": "indexes",
+        "label": "Indexes",
+        "description": "索引配置定义数据库级索引，以支持过滤、排序和唯一性等需求。",
+        "tags": [
+            "modeling",
+            "performance",
+            "cluster:modeling"
+        ],
+        "links": []
+    },
+    {
+        "id": "querying-data",
+        "label": "Querying Data",
+        "description": "查询主题涵盖 LINQ、跟踪行为、翻译过程以及加载相关数据的方式。",
+        "tags": [
+            "querying",
+            "database",
+            "cluster:querying"
+        ],
+        "links": [
+            {
+                "target": "linq-queries",
+                "type": "Concept",
+                "label": "主要通过 LINQ 查询"
+            },
+            {
+                "target": "loading-related-data",
+                "type": "Concept",
+                "label": "处理相关数据加载"
+            },
+            {
+                "target": "tracking-queries",
+                "type": "Concept",
+                "label": "区分跟踪行为"
+            },
+            {
+                "target": "query-translation",
+                "type": "Concept",
+                "label": "依赖查询翻译"
+            }
+        ]
+    },
+    {
+        "id": "linq-queries",
+        "label": "LINQ Queries",
+        "description": "LINQ 查询是 EF Core 最常见的查询表达方式，会被转换成数据库可执行命令。",
+        "tags": [
+            "querying",
+            "dotnet",
+            "cluster:querying"
+        ],
+        "links": [
+            {
+                "target": "projections-and-filtering",
+                "type": "Concept",
+                "label": "包含投影与过滤"
+            },
+            {
+                "target": "pagination",
+                "type": "Concept",
+                "label": "支持分页模式"
+            }
+        ]
+    },
+    {
+        "id": "loading-related-data",
+        "label": "Loading Related Data",
+        "description": "相关数据加载决定导航属性何时以及如何被填充到对象图中。",
+        "tags": [
+            "querying",
+            "database",
+            "cluster:querying"
+        ],
+        "links": [
+            {
+                "target": "eager-lazy-explicit-loading",
+                "type": "Concept",
+                "label": "细分为多种加载策略"
+            }
+        ]
+    },
+    {
+        "id": "tracking-queries",
+        "label": "Tracking vs No-Tracking",
+        "description": "查询可选择启用或关闭跟踪，以在更新能力与读取性能之间平衡。",
+        "tags": [
+            "querying",
+            "performance",
+            "cluster:querying"
+        ],
+        "links": [
+            {
+                "target": "compiled-queries",
+                "type": "Description",
+                "label": "常与性能优化一起考虑"
+            }
+        ]
+    },
+    {
+        "id": "query-translation",
+        "label": "Query Translation",
+        "description": "查询翻译负责把表达式树转换成数据库提供程序支持的 SQL 或等效命令。",
+        "tags": [
+            "querying",
+            "database",
+            "cluster:querying"
+        ],
+        "links": [
+            {
+                "target": "raw-sql",
+                "type": "Action",
+                "label": "必要时可退回原生 SQL"
+            },
+            {
+                "target": "compiled-queries",
+                "type": "Concept",
+                "label": "可配合编译查询"
+            }
+        ]
+    },
+    {
+        "id": "projections-and-filtering",
+        "label": "Projection & Filtering",
+        "description": "投影与过滤用于只选取所需列和符合条件的记录，以减少数据传输。",
+        "tags": [
+            "querying",
+            "performance",
+            "cluster:querying"
+        ],
+        "links": []
+    },
+    {
+        "id": "pagination",
+        "label": "Pagination",
+        "description": "分页通过 Skip、Take 或键集分页等方式限制结果集大小。",
+        "tags": [
+            "querying",
+            "performance",
+            "cluster:querying"
+        ],
+        "links": []
+    },
+    {
+        "id": "eager-lazy-explicit-loading",
+        "label": "Eager/Lazy/Explicit Loading",
+        "description": "预先加载、延迟加载和显式加载分别适用于不同的数据访问模式与性能需求。",
+        "tags": [
+            "querying",
+            "database",
+            "cluster:querying"
+        ],
+        "links": []
+    },
+    {
+        "id": "compiled-queries",
+        "label": "Compiled Queries",
+        "description": "编译查询可复用查询计划，减少高频查询场景中的表达式解析开销。",
+        "tags": [
+            "querying",
+            "performance",
+            "cluster:querying"
+        ],
+        "links": []
+    },
+    {
+        "id": "raw-sql",
+        "label": "Raw SQL",
+        "description": "原生 SQL 允许在复杂或提供程序特定场景下直接执行 SQL 语句。",
+        "tags": [
+            "querying",
+            "database",
+            "cluster:querying"
+        ],
+        "links": []
+    },
+    {
+        "id": "saving-data",
+        "label": "Saving Data",
+        "description": "保存主题涵盖状态变更持久化、并发处理、事务以及失败重试。",
+        "tags": [
+            "persistence",
+            "database",
+            "cluster:saving"
+        ],
+        "links": [
+            {
+                "target": "savechanges",
+                "type": "Action",
+                "label": "通过 SaveChanges 持久化"
+            },
+            {
+                "target": "transactions",
+                "type": "Concept",
+                "label": "可受事务保护"
+            },
+            {
+                "target": "concurrency-control",
+                "type": "Concept",
+                "label": "需要处理并发冲突"
+            },
+            {
+                "target": "execution-strategies",
+                "type": "Concept",
+                "label": "可使用执行策略"
+            }
+        ]
+    },
+    {
+        "id": "savechanges",
+        "label": "SaveChanges",
+        "description": "SaveChanges 会根据已跟踪实体状态生成插入、更新和删除命令并提交到数据库。",
+        "tags": [
+            "persistence",
+            "database",
+            "cluster:saving"
+        ],
+        "links": [
+            {
+                "target": "entity-states",
+                "type": "Condition",
+                "label": "依赖实体状态决策"
+            },
+            {
+                "target": "batching",
+                "type": "Action",
+                "label": "可进行命令批处理"
+            }
+        ]
+    },
+    {
+        "id": "entity-states",
+        "label": "Entity States",
+        "description": "实体状态如 Added、Modified 和 Deleted 决定保存时将执行何种数据库操作。",
+        "tags": [
+            "persistence",
+            "orm",
+            "cluster:saving"
+        ],
+        "links": [
+            {
+                "target": "savechanges",
+                "type": "Action",
+                "label": "驱动保存行为"
+            }
+        ]
+    },
+    {
+        "id": "transactions",
+        "label": "Transactions",
+        "description": "事务保证一组数据库操作要么全部成功，要么全部回滚。",
+        "tags": [
+            "persistence",
+            "transactions",
+            "cluster:saving"
+        ],
+        "links": []
+    },
+    {
+        "id": "concurrency-control",
+        "label": "Concurrency Control",
+        "description": "并发控制通过并发令牌等机制检测多用户同时更新同一数据时的冲突。",
+        "tags": [
+            "persistence",
+            "transactions",
+            "cluster:saving"
+        ],
+        "links": []
+    },
+    {
+        "id": "execution-strategies",
+        "label": "Execution Strategies",
+        "description": "执行策略用于在瞬时故障场景下自动重试失败的数据库操作。",
+        "tags": [
+            "persistence",
+            "operations",
+            "cluster:saving"
+        ],
+        "links": []
+    },
+    {
+        "id": "batching",
+        "label": "Batching",
+        "description": "批处理把多个命令合并发送给数据库，以减少往返次数并提高吞吐。",
+        "tags": [
+            "persistence",
+            "performance",
+            "cluster:saving"
+        ],
+        "links": []
+    },
+    {
+        "id": "schema-management",
+        "label": "Schema Management",
+        "description": "架构管理负责数据库结构的创建、演进、反向生成和初始数据准备。",
+        "tags": [
+            "migrations",
+            "database",
+            "cluster:schema-management"
+        ],
+        "links": [
+            {
+                "target": "migrations",
+                "type": "Concept",
+                "label": "核心机制是迁移"
+            },
+            {
+                "target": "reverse-engineering",
+                "type": "Action",
+                "label": "支持从现有库反向生成"
+            },
+            {
+                "target": "data-seeding",
+                "type": "Action",
+                "label": "可配置初始数据"
+            }
+        ]
+    },
+    {
+        "id": "migrations",
+        "label": "Migrations",
+        "description": "迁移记录模型变化，并把这些变化转换为可执行的数据库架构更新步骤。",
+        "tags": [
+            "migrations",
+            "dotnet",
+            "cluster:schema-management"
+        ],
+        "links": [
+            {
+                "target": "model-snapshot",
+                "type": "Concept",
+                "label": "维护模型快照"
+            }
+        ]
+    },
+    {
+        "id": "model-snapshot",
+        "label": "Model Snapshot",
+        "description": "模型快照保存当前模型形态，供后续迁移比较差异时使用。",
+        "tags": [
+            "migrations",
+            "modeling",
+            "cluster:schema-management"
+        ],
+        "links": []
+    },
+    {
+        "id": "reverse-engineering",
+        "label": "Reverse Engineering",
+        "description": "反向工程可从现有数据库生成实体类和 DbContext，以便先库后码开发。",
+        "tags": [
+            "migrations",
+            "database",
+            "cluster:schema-management"
+        ],
+        "links": []
+    },
+    {
+        "id": "data-seeding",
+        "label": "Data Seeding",
+        "description": "数据种子用于在初始化或迁移过程中填充基础数据。",
+        "tags": [
+            "migrations",
+            "database",
+            "cluster:schema-management"
+        ],
+        "links": [
+            {
+                "target": "migrations",
+                "type": "Condition",
+                "label": "常与迁移协同应用"
+            }
+        ]
+    }
+]
