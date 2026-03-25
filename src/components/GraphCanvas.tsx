@@ -157,22 +157,23 @@ function resolveNodeDepths(
 function buildLayout(
   noMotion: boolean,
   depthById: Map<string, number>,
-  maxDepth: number
+  maxDepth: number,
+  compact = false
 ): cytoscape.LayoutOptions {
   return {
     name: "concentric",
     fit: true,
-    padding: 64,
+    padding: compact ? 40 : 64,
     animate: !noMotion,
     animationDuration: 600,
     avoidOverlap: true,
-    spacingFactor: 1.55,
+    spacingFactor: compact ? 1.15 : 1.55,
     nodeDimensionsIncludeLabels: true,
     equidistant: true,
     startAngle: -Math.PI / 2,
     sweep: 2 * Math.PI,
     clockwise: true,
-    minNodeSpacing: 70,
+    minNodeSpacing: compact ? 36 : 70,
     concentric: (node: cytoscape.NodeSingular) =>
       maxDepth - (depthById.get(node.id()) ?? maxDepth),
     levelWidth: () => 1,
@@ -202,12 +203,18 @@ export default function GraphCanvas({
       elements,
       style: buildStyles(noMotion),
       layout: buildLayout(noMotion, depthById, maxDepth),
-      minZoom: 0.05,
+      minZoom: 0.01,
       maxZoom: 4,
     });
 
     cy.one("layoutstop", () => {
       cy.fit(cy.elements(), 40);
+      if (cy.zoom() <= 0.011) {
+        cy.one("layoutstop", () => {
+          cy.fit(cy.elements(), 32);
+        });
+        cy.layout(buildLayout(noMotion, depthById, maxDepth, true)).run();
+      }
     });
 
     cy.on("tap", "node", (evt) => {

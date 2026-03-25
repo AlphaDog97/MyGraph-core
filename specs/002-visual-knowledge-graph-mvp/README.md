@@ -259,6 +259,10 @@ from center concepts outward ring by ring:
 - keep ring spacing wider (`minNodeSpacing`, `spacingFactor`) and include
   labels in overlap calculations for cleaner separation.
 
+If the first radial fit still lands at the minimum zoom bound, rerun a compact
+concentric pass with tighter spacing and refit to ensure the graph remains
+visibly rendered instead of appearing blank.
+
 Keep `fit` behavior resilient by allowing deeper zoom-out bounds and forcing a
 final `fit` on `layoutstop`, so larger datasets remain visible when loaded.
 
