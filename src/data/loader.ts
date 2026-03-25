@@ -10,6 +10,15 @@ import { resolveEdgeTypeColor } from "../domain/edgeTypes";
 
 const BASE = import.meta.env.BASE_URL;
 
+interface MultiGraphCategoryFile {
+  categoryId?: string;
+  graphs?: Array<{
+    graphId?: string;
+    graphLabel?: string;
+    nodes?: KnowledgeNodeFile[];
+  }>;
+}
+
 export async function loadManifest(): Promise<Manifest> {
   const res = await fetch(`${BASE}graph-data/manifest.json`);
   if (!res.ok) {
@@ -90,19 +99,46 @@ export async function loadLocalGraphNodes(
   categoryId: string,
   graphId: string
 ): Promise<KnowledgeNodeFile[]> {
-  const url = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
-  const res = await fetch(url);
-  if (!res.ok) {
+  // Legacy path: graph-data/<category>/<graph>/graph.json
+  const legacyUrl = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
+  const legacyRes = await fetch(legacyUrl);
+  if (legacyRes.ok) {
+    try {
+      return (await legacyRes.json()) as KnowledgeNodeFile[];
+    } catch {
+      throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
+    }
+  }
+
+  // New path: graph-data/<category>/graph.json with { graphs: [...] }
+  const categoryUrl = `${BASE}graph-data/${categoryId}/graph.json`;
+  const categoryRes = await fetch(categoryUrl);
+  if (!categoryRes.ok) {
     throw new Error(
-      `Failed to load graph (${res.status}): ${categoryId}/${graphId}`
+      `Failed to load graph (${legacyRes.status}): ${categoryId}/${graphId}`
     );
   }
 
+  let parsed: MultiGraphCategoryFile;
   try {
-    return (await res.json()) as KnowledgeNodeFile[];
+    parsed = (await categoryRes.json()) as MultiGraphCategoryFile;
   } catch {
-    throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
+    throw new Error(`${categoryId}/graph.json: invalid JSON.`);
   }
+
+  const graphs = parsed.graphs ?? [];
+  const matched = graphs.find((g) => g.graphId === graphId);
+  if (!matched) {
+    throw new Error(
+      `graph-data/${categoryId}/graph.json: graphId '${graphId}' not found.`
+    );
+  }
+  if (!Array.isArray(matched.nodes)) {
+    throw new Error(
+      `graph-data/${categoryId}/graph.json: graph '${graphId}' nodes must be an array.`
+    );
+  }
+  return matched.nodes;
 }
 
 export async function loadGraphData(
