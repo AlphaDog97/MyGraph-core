@@ -1,634 +1,1016 @@
-[
-    {
-        "id": "ef-core",
-        "label": "EF Core",
-        "description": "EF Core 是 .NET 的现代 ORM，用于把对象模型映射到关系型数据库并执行查询与保存。",
-        "tags": [
-            "orm",
-            "dotnet",
-            "cluster:foundations"
-        ],
-        "links": [
-            {
-                "target": "dbcontext",
-                "type": "Concept",
-                "label": "核心入口是"
-            },
-            {
-                "target": "model-building",
-                "type": "Concept",
-                "label": "包含建模主题"
-            },
-            {
-                "target": "querying-data",
-                "type": "Concept",
-                "label": "包含查询主题"
-            },
-            {
-                "target": "saving-data",
-                "type": "Concept",
-                "label": "包含保存主题"
-            },
-            {
-                "target": "schema-management",
-                "type": "Concept",
-                "label": "包含架构管理主题"
-            }
-        ]
-    },
-    {
-        "id": "dbcontext",
-        "label": "DbContext",
-        "description": "DbContext 负责管理连接、模型、查询管道和变更跟踪的工作单元。",
-        "tags": [
-            "dotnet",
-            "database",
-            "cluster:foundations"
-        ],
-        "links": [
-            {
-                "target": "dbset",
-                "type": "Concept",
-                "label": "公开实体集合"
-            },
-            {
-                "target": "change-tracker",
-                "type": "Action",
-                "label": "使用变更跟踪器"
-            },
-            {
-                "target": "providers",
-                "type": "Condition",
-                "label": "依赖数据库提供程序"
-            }
-        ]
-    },
-    {
-        "id": "dbset",
-        "label": "DbSet",
-        "description": "DbSet 表示某个实体类型的集合，是大多数查询与增删改操作的入口。",
-        "tags": [
-            "database",
-            "querying",
-            "cluster:foundations"
-        ],
-        "links": [
-            {
-                "target": "querying-data",
-                "type": "Action",
-                "label": "用于发起查询"
-            }
-        ]
-    },
-    {
-        "id": "change-tracker",
-        "label": "Change Tracker",
-        "description": "变更跟踪器负责识别实体状态变化，以便在保存时生成正确的数据库操作。",
-        "tags": [
-            "database",
-            "persistence",
-            "cluster:foundations"
-        ],
-        "links": [
-            {
-                "target": "entity-states",
-                "type": "Concept",
-                "label": "维护实体状态"
-            }
-        ]
-    },
-    {
-        "id": "providers",
-        "label": "Providers",
-        "description": "提供程序为不同数据库实现 SQL 生成、类型映射和特定能力支持。",
-        "tags": [
-            "database",
-            "operations",
-            "cluster:foundations"
-        ],
-        "links": [
-            {
-                "target": "schema-management",
-                "type": "Condition",
-                "label": "影响架构管理能力"
-            }
-        ]
-    },
-    {
-        "id": "model-building",
-        "label": "Model Building",
-        "description": "模型构建定义 EF Core 如何理解实体、属性、键和关系并映射到数据库结构。",
-        "tags": [
-            "modeling",
-            "database",
-            "cluster:modeling"
-        ],
-        "links": [
-            {
-                "target": "entity-types",
-                "type": "Concept",
-                "label": "定义实体类型"
-            },
-            {
-                "target": "property-configuration",
-                "type": "Concept",
-                "label": "配置属性"
-            },
-            {
-                "target": "keys-and-constraints",
-                "type": "Concept",
-                "label": "定义键与约束"
-            },
-            {
-                "target": "relationships",
-                "type": "Concept",
-                "label": "定义实体关系"
-            }
-        ]
-    },
-    {
-        "id": "entity-types",
-        "label": "Entity Types",
-        "description": "实体类型是模型中的核心单元，对应数据库中的表或视图映射主体。",
-        "tags": [
-            "modeling",
-            "orm",
-            "cluster:modeling"
-        ],
-        "links": [
-            {
-                "target": "owned-entity-types",
-                "type": "Concept",
-                "label": "可细分为拥有实体"
-            },
-            {
-                "target": "inheritance-mapping",
-                "type": "Concept",
-                "label": "可配置继承映射"
-            }
-        ]
-    },
-    {
-        "id": "property-configuration",
-        "label": "Property Configuration",
-        "description": "属性配置决定列名、类型、长度、必填性以及转换规则等细节。",
-        "tags": [
-            "modeling",
-            "database",
-            "cluster:modeling"
-        ],
-        "links": [
-            {
-                "target": "value-converters",
-                "type": "Concept",
-                "label": "可使用值转换器"
-            },
-            {
-                "target": "indexes",
-                "type": "Concept",
-                "label": "可配合索引优化"
-            }
-        ]
-    },
-    {
-        "id": "keys-and-constraints",
-        "label": "Keys & Constraints",
-        "description": "键与约束用于唯一标识实体，并保证模型与数据库的一致性约束。",
-        "tags": [
-            "modeling",
-            "database",
-            "cluster:modeling"
-        ],
-        "links": [
-            {
-                "target": "relationships",
-                "type": "Condition",
-                "label": "为关系提供主外键基础"
-            }
-        ]
-    },
-    {
-        "id": "relationships",
-        "label": "Relationships",
-        "description": "关系定义实体之间的一对一、一对多和多对多导航与外键结构。",
-        "tags": [
-            "modeling",
-            "database",
-            "cluster:modeling"
-        ],
-        "links": [
-            {
-                "target": "loading-related-data",
-                "type": "Action",
-                "label": "决定相关数据加载方式"
-            }
-        ]
-    },
-    {
-        "id": "owned-entity-types",
-        "label": "Owned Types",
-        "description": "拥有实体类型用于建模值对象，使其生命周期从属于拥有者实体。",
-        "tags": [
-            "modeling",
-            "orm",
-            "cluster:modeling"
-        ],
-        "links": []
-    },
-    {
-        "id": "inheritance-mapping",
-        "label": "Inheritance Mapping",
-        "description": "继承映射控制层次结构如何落到表结构上，例如 TPH 或 TPT。",
-        "tags": [
-            "modeling",
-            "orm",
-            "cluster:modeling"
-        ],
-        "links": []
-    },
-    {
-        "id": "value-converters",
-        "label": "Value Converters",
-        "description": "值转换器可以在实体属性类型与数据库存储类型之间进行双向转换。",
-        "tags": [
-            "modeling",
-            "database",
-            "cluster:modeling"
-        ],
-        "links": []
-    },
-    {
-        "id": "indexes",
-        "label": "Indexes",
-        "description": "索引配置定义数据库级索引，以支持过滤、排序和唯一性等需求。",
-        "tags": [
-            "modeling",
-            "performance",
-            "cluster:modeling"
-        ],
-        "links": []
-    },
-    {
-        "id": "querying-data",
-        "label": "Querying Data",
-        "description": "查询主题涵盖 LINQ、跟踪行为、翻译过程以及加载相关数据的方式。",
-        "tags": [
-            "querying",
-            "database",
-            "cluster:querying"
-        ],
-        "links": [
-            {
-                "target": "linq-queries",
-                "type": "Concept",
-                "label": "主要通过 LINQ 查询"
-            },
-            {
-                "target": "loading-related-data",
-                "type": "Concept",
-                "label": "处理相关数据加载"
-            },
-            {
-                "target": "tracking-queries",
-                "type": "Concept",
-                "label": "区分跟踪行为"
-            },
-            {
-                "target": "query-translation",
-                "type": "Concept",
-                "label": "依赖查询翻译"
-            }
-        ]
-    },
-    {
-        "id": "linq-queries",
-        "label": "LINQ Queries",
-        "description": "LINQ 查询是 EF Core 最常见的查询表达方式，会被转换成数据库可执行命令。",
-        "tags": [
-            "querying",
-            "dotnet",
-            "cluster:querying"
-        ],
-        "links": [
-            {
-                "target": "projections-and-filtering",
-                "type": "Concept",
-                "label": "包含投影与过滤"
-            },
-            {
-                "target": "pagination",
-                "type": "Concept",
-                "label": "支持分页模式"
-            }
-        ]
-    },
-    {
-        "id": "loading-related-data",
-        "label": "Loading Related Data",
-        "description": "相关数据加载决定导航属性何时以及如何被填充到对象图中。",
-        "tags": [
-            "querying",
-            "database",
-            "cluster:querying"
-        ],
-        "links": [
-            {
-                "target": "eager-lazy-explicit-loading",
-                "type": "Concept",
-                "label": "细分为多种加载策略"
-            }
-        ]
-    },
-    {
-        "id": "tracking-queries",
-        "label": "Tracking vs No-Tracking",
-        "description": "查询可选择启用或关闭跟踪，以在更新能力与读取性能之间平衡。",
-        "tags": [
-            "querying",
-            "performance",
-            "cluster:querying"
-        ],
-        "links": [
-            {
-                "target": "compiled-queries",
-                "type": "Description",
-                "label": "常与性能优化一起考虑"
-            }
-        ]
-    },
-    {
-        "id": "query-translation",
-        "label": "Query Translation",
-        "description": "查询翻译负责把表达式树转换成数据库提供程序支持的 SQL 或等效命令。",
-        "tags": [
-            "querying",
-            "database",
-            "cluster:querying"
-        ],
-        "links": [
-            {
-                "target": "raw-sql",
-                "type": "Action",
-                "label": "必要时可退回原生 SQL"
-            },
-            {
-                "target": "compiled-queries",
-                "type": "Concept",
-                "label": "可配合编译查询"
-            }
-        ]
-    },
-    {
-        "id": "projections-and-filtering",
-        "label": "Projection & Filtering",
-        "description": "投影与过滤用于只选取所需列和符合条件的记录，以减少数据传输。",
-        "tags": [
-            "querying",
-            "performance",
-            "cluster:querying"
-        ],
-        "links": []
-    },
-    {
-        "id": "pagination",
-        "label": "Pagination",
-        "description": "分页通过 Skip、Take 或键集分页等方式限制结果集大小。",
-        "tags": [
-            "querying",
-            "performance",
-            "cluster:querying"
-        ],
-        "links": []
-    },
-    {
-        "id": "eager-lazy-explicit-loading",
-        "label": "Eager/Lazy/Explicit Loading",
-        "description": "预先加载、延迟加载和显式加载分别适用于不同的数据访问模式与性能需求。",
-        "tags": [
-            "querying",
-            "database",
-            "cluster:querying"
-        ],
-        "links": []
-    },
-    {
-        "id": "compiled-queries",
-        "label": "Compiled Queries",
-        "description": "编译查询可复用查询计划，减少高频查询场景中的表达式解析开销。",
-        "tags": [
-            "querying",
-            "performance",
-            "cluster:querying"
-        ],
-        "links": []
-    },
-    {
-        "id": "raw-sql",
-        "label": "Raw SQL",
-        "description": "原生 SQL 允许在复杂或提供程序特定场景下直接执行 SQL 语句。",
-        "tags": [
-            "querying",
-            "database",
-            "cluster:querying"
-        ],
-        "links": []
-    },
-    {
-        "id": "saving-data",
-        "label": "Saving Data",
-        "description": "保存主题涵盖状态变更持久化、并发处理、事务以及失败重试。",
-        "tags": [
-            "persistence",
-            "database",
-            "cluster:saving"
-        ],
-        "links": [
-            {
-                "target": "savechanges",
-                "type": "Action",
-                "label": "通过 SaveChanges 持久化"
-            },
-            {
-                "target": "transactions",
-                "type": "Concept",
-                "label": "可受事务保护"
-            },
-            {
-                "target": "concurrency-control",
-                "type": "Concept",
-                "label": "需要处理并发冲突"
-            },
-            {
-                "target": "execution-strategies",
-                "type": "Concept",
-                "label": "可使用执行策略"
-            }
-        ]
-    },
-    {
-        "id": "savechanges",
-        "label": "SaveChanges",
-        "description": "SaveChanges 会根据已跟踪实体状态生成插入、更新和删除命令并提交到数据库。",
-        "tags": [
-            "persistence",
-            "database",
-            "cluster:saving"
-        ],
-        "links": [
-            {
-                "target": "entity-states",
-                "type": "Condition",
-                "label": "依赖实体状态决策"
-            },
-            {
-                "target": "batching",
-                "type": "Action",
-                "label": "可进行命令批处理"
-            }
-        ]
-    },
-    {
-        "id": "entity-states",
-        "label": "Entity States",
-        "description": "实体状态如 Added、Modified 和 Deleted 决定保存时将执行何种数据库操作。",
-        "tags": [
-            "persistence",
-            "orm",
-            "cluster:saving"
-        ],
-        "links": [
-            {
-                "target": "savechanges",
-                "type": "Action",
-                "label": "驱动保存行为"
-            }
-        ]
-    },
-    {
-        "id": "transactions",
-        "label": "Transactions",
-        "description": "事务保证一组数据库操作要么全部成功，要么全部回滚。",
-        "tags": [
-            "persistence",
-            "transactions",
-            "cluster:saving"
-        ],
-        "links": []
-    },
-    {
-        "id": "concurrency-control",
-        "label": "Concurrency Control",
-        "description": "并发控制通过并发令牌等机制检测多用户同时更新同一数据时的冲突。",
-        "tags": [
-            "persistence",
-            "transactions",
-            "cluster:saving"
-        ],
-        "links": []
-    },
-    {
-        "id": "execution-strategies",
-        "label": "Execution Strategies",
-        "description": "执行策略用于在瞬时故障场景下自动重试失败的数据库操作。",
-        "tags": [
-            "persistence",
-            "operations",
-            "cluster:saving"
-        ],
-        "links": []
-    },
-    {
-        "id": "batching",
-        "label": "Batching",
-        "description": "批处理把多个命令合并发送给数据库，以减少往返次数并提高吞吐。",
-        "tags": [
-            "persistence",
-            "performance",
-            "cluster:saving"
-        ],
-        "links": []
-    },
-    {
-        "id": "schema-management",
-        "label": "Schema Management",
-        "description": "架构管理负责数据库结构的创建、演进、反向生成和初始数据准备。",
-        "tags": [
-            "migrations",
-            "database",
-            "cluster:schema-management"
-        ],
-        "links": [
-            {
-                "target": "migrations",
-                "type": "Concept",
-                "label": "核心机制是迁移"
-            },
-            {
-                "target": "reverse-engineering",
-                "type": "Action",
-                "label": "支持从现有库反向生成"
-            },
-            {
-                "target": "data-seeding",
-                "type": "Action",
-                "label": "可配置初始数据"
-            }
-        ]
-    },
-    {
-        "id": "migrations",
-        "label": "Migrations",
-        "description": "迁移记录模型变化，并把这些变化转换为可执行的数据库架构更新步骤。",
-        "tags": [
-            "migrations",
-            "dotnet",
-            "cluster:schema-management"
-        ],
-        "links": [
-            {
-                "target": "model-snapshot",
-                "type": "Concept",
-                "label": "维护模型快照"
-            }
-        ]
-    },
-    {
-        "id": "model-snapshot",
-        "label": "Model Snapshot",
-        "description": "模型快照保存当前模型形态，供后续迁移比较差异时使用。",
-        "tags": [
-            "migrations",
-            "modeling",
-            "cluster:schema-management"
-        ],
-        "links": []
-    },
-    {
-        "id": "reverse-engineering",
-        "label": "Reverse Engineering",
-        "description": "反向工程可从现有数据库生成实体类和 DbContext，以便先库后码开发。",
-        "tags": [
-            "migrations",
-            "database",
-            "cluster:schema-management"
-        ],
-        "links": []
-    },
-    {
-        "id": "data-seeding",
-        "label": "Data Seeding",
-        "description": "数据种子用于在初始化或迁移过程中填充基础数据。",
-        "tags": [
-            "migrations",
-            "database",
-            "cluster:schema-management"
-        ],
-        "links": [
-            {
-                "target": "migrations",
-                "type": "Condition",
-                "label": "常与迁移协同应用"
-            }
-        ]
-    }
-]
+{
+    "categoryId": "ef-core",
+    "graphs": [
+        {
+            "graphId": "dbcontext",
+            "graphLabel": "DbContext",
+            "nodes": [
+                {
+                    "id": "dbcontext",
+                    "label": "DbContext",
+                    "description": "EF Core 的核心会话对象，负责协调实体查询、跟踪与保存。",
+                    "tags": [
+                        "core",
+                        "session"
+                    ],
+                    "links": [
+                        {
+                            "target": "dbset",
+                            "type": "Concept",
+                            "label": "暴露实体集合"
+                        },
+                        {
+                            "target": "savechanges",
+                            "type": "Action",
+                            "label": "提交变更"
+                        },
+                        {
+                            "target": "options",
+                            "type": "Description",
+                            "label": "依赖配置选项"
+                        }
+                    ]
+                },
+                {
+                    "id": "dbset",
+                    "label": "DbSet",
+                    "description": "表示某个实体类型的集合，用于查询和增删改操作。",
+                    "tags": [
+                        "entity-set",
+                        "query"
+                    ],
+                    "links": [
+                        {
+                            "target": "dbcontext",
+                            "type": "Concept",
+                            "label": "由上下文管理"
+                        },
+                        {
+                            "target": "entity-model",
+                            "type": "Concept",
+                            "label": "对应实体类型"
+                        }
+                    ]
+                },
+                {
+                    "id": "savechanges",
+                    "label": "SaveChanges",
+                    "description": "将跟踪到的更改转换为数据库命令并执行。",
+                    "tags": [
+                        "persistence",
+                        "unit-of-work"
+                    ],
+                    "links": [
+                        {
+                            "target": "change-tracking",
+                            "type": "Condition",
+                            "label": "依赖已跟踪状态"
+                        },
+                        {
+                            "target": "dbcontext",
+                            "type": "Action",
+                            "label": "由上下文触发"
+                        }
+                    ]
+                },
+                {
+                    "id": "options",
+                    "label": "DbContextOptions",
+                    "description": "定义上下文使用的数据库提供程序、连接与行为配置。",
+                    "tags": [
+                        "configuration",
+                        "provider"
+                    ],
+                    "links": [
+                        {
+                            "target": "dbcontext",
+                            "type": "Description",
+                            "label": "配置上下文行为"
+                        },
+                        {
+                            "target": "provider",
+                            "type": "Concept",
+                            "label": "指定数据库提供程序"
+                        }
+                    ]
+                },
+                {
+                    "id": "provider",
+                    "label": "Provider",
+                    "description": "数据库提供程序负责把 EF Core 操作翻译为特定数据库能力。",
+                    "tags": [
+                        "database",
+                        "translation"
+                    ],
+                    "links": [
+                        {
+                            "target": "options",
+                            "type": "Concept",
+                            "label": "由选项选择"
+                        }
+                    ]
+                },
+                {
+                    "id": "entity-model",
+                    "label": "Entity Model",
+                    "description": "上下文中注册的实体结构与映射元数据集合。",
+                    "tags": [
+                        "model",
+                        "metadata"
+                    ],
+                    "links": [
+                        {
+                            "target": "dbset",
+                            "type": "Description",
+                            "label": "被集合访问"
+                        }
+                    ]
+                },
+                {
+                    "id": "change-tracking",
+                    "label": "Tracked State",
+                    "description": "上下文记录实体当前状态以判断需要插入、更新还是删除。",
+                    "tags": [
+                        "state",
+                        "tracking"
+                    ],
+                    "links": [
+                        {
+                            "target": "savechanges",
+                            "type": "Action",
+                            "label": "驱动保存决策"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "change-tracker",
+            "graphLabel": "Change Tracker",
+            "nodes": [
+                {
+                    "id": "change-tracker",
+                    "label": "Change Tracker",
+                    "description": "负责监视实体实例及其属性变化的组件。",
+                    "tags": [
+                        "tracking",
+                        "state-management"
+                    ],
+                    "links": [
+                        {
+                            "target": "entity-state",
+                            "type": "Concept",
+                            "label": "维护实体状态"
+                        },
+                        {
+                            "target": "detect-changes",
+                            "type": "Action",
+                            "label": "执行变更检测"
+                        }
+                    ]
+                },
+                {
+                    "id": "entity-state",
+                    "label": "EntityState",
+                    "description": "实体可处于 Added、Modified、Deleted、Unchanged 或 Detached 等状态。",
+                    "tags": [
+                        "state",
+                        "lifecycle"
+                    ],
+                    "links": [
+                        {
+                            "target": "change-tracker",
+                            "type": "Description",
+                            "label": "由跟踪器维护"
+                        },
+                        {
+                            "target": "save-pipeline",
+                            "type": "Condition",
+                            "label": "决定保存行为"
+                        }
+                    ]
+                },
+                {
+                    "id": "detect-changes",
+                    "label": "DetectChanges",
+                    "description": "扫描实体和属性，识别当前值与原始值的差异。",
+                    "tags": [
+                        "detection",
+                        "runtime"
+                    ],
+                    "links": [
+                        {
+                            "target": "property-values",
+                            "type": "Condition",
+                            "label": "比较属性值"
+                        },
+                        {
+                            "target": "entity-state",
+                            "type": "Action",
+                            "label": "更新实体状态"
+                        }
+                    ]
+                },
+                {
+                    "id": "property-values",
+                    "label": "Property Values",
+                    "description": "实体属性的当前值与原始值共同支持修改判断。",
+                    "tags": [
+                        "properties",
+                        "comparison"
+                    ],
+                    "links": [
+                        {
+                            "target": "detect-changes",
+                            "type": "Description",
+                            "label": "供变更检测使用"
+                        }
+                    ]
+                },
+                {
+                    "id": "save-pipeline",
+                    "label": "Save Pipeline",
+                    "description": "保存流程根据跟踪状态生成对应的数据库命令。",
+                    "tags": [
+                        "save",
+                        "commands"
+                    ],
+                    "links": [
+                        {
+                            "target": "entity-state",
+                            "type": "Concept",
+                            "label": "读取状态"
+                        },
+                        {
+                            "target": "accept-changes",
+                            "type": "Action",
+                            "label": "保存后确认状态"
+                        }
+                    ]
+                },
+                {
+                    "id": "accept-changes",
+                    "label": "Accept Changes",
+                    "description": "保存成功后将实体状态重置为已接受状态。",
+                    "tags": [
+                        "post-save",
+                        "state-reset"
+                    ],
+                    "links": [
+                        {
+                            "target": "save-pipeline",
+                            "type": "Description",
+                            "label": "在保存后发生"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "querying",
+            "graphLabel": "Querying",
+            "nodes": [
+                {
+                    "id": "linq-query",
+                    "label": "LINQ Query",
+                    "description": "EF Core 通过 LINQ 表达式构建面向对象的查询语义。",
+                    "tags": [
+                        "linq",
+                        "query"
+                    ],
+                    "links": [
+                        {
+                            "target": "query-provider",
+                            "type": "Concept",
+                            "label": "交给查询提供程序"
+                        },
+                        {
+                            "target": "projection",
+                            "type": "Action",
+                            "label": "可投影结果"
+                        }
+                    ]
+                },
+                {
+                    "id": "query-provider",
+                    "label": "Query Provider",
+                    "description": "查询提供程序负责解析表达式树并转译为数据库查询。",
+                    "tags": [
+                        "translation",
+                        "provider"
+                    ],
+                    "links": [
+                        {
+                            "target": "sql-translation",
+                            "type": "Action",
+                            "label": "生成 SQL"
+                        },
+                        {
+                            "target": "linq-query",
+                            "type": "Description",
+                            "label": "接收 LINQ 表达式"
+                        }
+                    ]
+                },
+                {
+                    "id": "sql-translation",
+                    "label": "SQL Translation",
+                    "description": "将可翻译的查询表达式转换成底层数据库命令文本。",
+                    "tags": [
+                        "sql",
+                        "translation"
+                    ],
+                    "links": [
+                        {
+                            "target": "execution",
+                            "type": "Action",
+                            "label": "交给执行阶段"
+                        },
+                        {
+                            "target": "client-eval",
+                            "type": "Condition",
+                            "label": "不可翻译时受限制"
+                        }
+                    ]
+                },
+                {
+                    "id": "execution",
+                    "label": "Execution",
+                    "description": "执行阶段向数据库发送命令并读取结果集。",
+                    "tags": [
+                        "database",
+                        "runtime"
+                    ],
+                    "links": [
+                        {
+                            "target": "materialization",
+                            "type": "Action",
+                            "label": "产生对象结果"
+                        },
+                        {
+                            "target": "sql-translation",
+                            "type": "Description",
+                            "label": "执行已翻译命令"
+                        }
+                    ]
+                },
+                {
+                    "id": "materialization",
+                    "label": "Materialization",
+                    "description": "把结果行转换为实体对象或投影对象。",
+                    "tags": [
+                        "objects",
+                        "mapping"
+                    ],
+                    "links": [
+                        {
+                            "target": "tracking-query",
+                            "type": "Condition",
+                            "label": "可进入跟踪模式"
+                        },
+                        {
+                            "target": "projection",
+                            "type": "Concept",
+                            "label": "也可形成投影结果"
+                        }
+                    ]
+                },
+                {
+                    "id": "tracking-query",
+                    "label": "Tracking Query",
+                    "description": "默认查询会将实体结果纳入变更跟踪器。",
+                    "tags": [
+                        "tracking",
+                        "default"
+                    ],
+                    "links": [
+                        {
+                            "target": "materialization",
+                            "type": "Description",
+                            "label": "作用于实体结果"
+                        },
+                        {
+                            "target": "no-tracking",
+                            "type": "Condition",
+                            "label": "可切换为不跟踪"
+                        }
+                    ]
+                },
+                {
+                    "id": "no-tracking",
+                    "label": "AsNoTracking",
+                    "description": "禁用结果跟踪以减少只读查询的开销。",
+                    "tags": [
+                        "performance",
+                        "readonly"
+                    ],
+                    "links": [
+                        {
+                            "target": "tracking-query",
+                            "type": "Action",
+                            "label": "替代默认跟踪"
+                        }
+                    ]
+                },
+                {
+                    "id": "projection",
+                    "label": "Projection",
+                    "description": "通过 Select 仅返回所需列或自定义形状的数据。",
+                    "tags": [
+                        "select",
+                        "shape"
+                    ],
+                    "links": [
+                        {
+                            "target": "linq-query",
+                            "type": "Description",
+                            "label": "由查询定义"
+                        }
+                    ]
+                },
+                {
+                    "id": "client-eval",
+                    "label": "Client Evaluation",
+                    "description": "部分表达式若无法翻译，通常需要改写以避免客户端求值问题。",
+                    "tags": [
+                        "translation-limit",
+                        "warning"
+                    ],
+                    "links": [
+                        {
+                            "target": "sql-translation",
+                            "type": "Condition",
+                            "label": "受翻译能力约束"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "modeling",
+            "graphLabel": "Modeling",
+            "nodes": [
+                {
+                    "id": "entity-type",
+                    "label": "Entity Type",
+                    "description": "实体类型描述领域对象及其在模型中的结构。",
+                    "tags": [
+                        "entity",
+                        "model"
+                    ],
+                    "links": [
+                        {
+                            "target": "key",
+                            "type": "Concept",
+                            "label": "定义主键"
+                        },
+                        {
+                            "target": "property",
+                            "type": "Concept",
+                            "label": "包含属性"
+                        },
+                        {
+                            "target": "relationship",
+                            "type": "Concept",
+                            "label": "建立关系"
+                        }
+                    ]
+                },
+                {
+                    "id": "key",
+                    "label": "Key",
+                    "description": "键用于唯一标识实体实例，并支持关系映射。",
+                    "tags": [
+                        "primary-key",
+                        "identity"
+                    ],
+                    "links": [
+                        {
+                            "target": "entity-type",
+                            "type": "Description",
+                            "label": "标识实体"
+                        },
+                        {
+                            "target": "relationship",
+                            "type": "Condition",
+                            "label": "支持外键关联"
+                        }
+                    ]
+                },
+                {
+                    "id": "property",
+                    "label": "Property",
+                    "description": "属性表示要映射到数据库列的数据成员。",
+                    "tags": [
+                        "column",
+                        "member"
+                    ],
+                    "links": [
+                        {
+                            "target": "value-conversion",
+                            "type": "Action",
+                            "label": "可应用值转换"
+                        },
+                        {
+                            "target": "entity-type",
+                            "type": "Description",
+                            "label": "属于实体"
+                        }
+                    ]
+                },
+                {
+                    "id": "relationship",
+                    "label": "Relationship",
+                    "description": "关系定义实体之间的一对一、一对多或多对多关联。",
+                    "tags": [
+                        "navigation",
+                        "foreign-key"
+                    ],
+                    "links": [
+                        {
+                            "target": "navigation",
+                            "type": "Concept",
+                            "label": "通过导航属性体现"
+                        },
+                        {
+                            "target": "key",
+                            "type": "Condition",
+                            "label": "依赖键与外键"
+                        }
+                    ]
+                },
+                {
+                    "id": "navigation",
+                    "label": "Navigation",
+                    "description": "导航属性允许代码层面在实体间遍历关系。",
+                    "tags": [
+                        "reference",
+                        "collection"
+                    ],
+                    "links": [
+                        {
+                            "target": "relationship",
+                            "type": "Description",
+                            "label": "表达关系访问"
+                        }
+                    ]
+                },
+                {
+                    "id": "value-conversion",
+                    "label": "Value Converter",
+                    "description": "值转换器在 CLR 类型和值库表示之间执行转换。",
+                    "tags": [
+                        "conversion",
+                        "mapping"
+                    ],
+                    "links": [
+                        {
+                            "target": "property",
+                            "type": "Description",
+                            "label": "作用于属性"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "migrations",
+            "graphLabel": "Migrations",
+            "nodes": [
+                {
+                    "id": "migration",
+                    "label": "Migration",
+                    "description": "迁移记录模型结构变化，并提供可重复执行的数据库演进步骤。",
+                    "tags": [
+                        "schema",
+                        "evolution"
+                    ],
+                    "links": [
+                        {
+                            "target": "model-snapshot",
+                            "type": "Concept",
+                            "label": "比较模型快照"
+                        },
+                        {
+                            "target": "up-method",
+                            "type": "Action",
+                            "label": "应用升级操作"
+                        },
+                        {
+                            "target": "down-method",
+                            "type": "Action",
+                            "label": "支持回滚"
+                        }
+                    ]
+                },
+                {
+                    "id": "model-snapshot",
+                    "label": "Model Snapshot",
+                    "description": "模型快照保存上一次迁移后的模型状态，用于差异比较。",
+                    "tags": [
+                        "snapshot",
+                        "comparison"
+                    ],
+                    "links": [
+                        {
+                            "target": "migration",
+                            "type": "Description",
+                            "label": "为迁移生成提供基线"
+                        }
+                    ]
+                },
+                {
+                    "id": "up-method",
+                    "label": "Up",
+                    "description": "Up 方法描述将数据库结构升级到新版本所需的操作。",
+                    "tags": [
+                        "upgrade",
+                        "ddl"
+                    ],
+                    "links": [
+                        {
+                            "target": "migration-builder",
+                            "type": "Action",
+                            "label": "通过构建器定义操作"
+                        },
+                        {
+                            "target": "migration",
+                            "type": "Description",
+                            "label": "属于迁移"
+                        }
+                    ]
+                },
+                {
+                    "id": "down-method",
+                    "label": "Down",
+                    "description": "Down 方法描述撤销当前迁移时应执行的操作。",
+                    "tags": [
+                        "rollback",
+                        "revert"
+                    ],
+                    "links": [
+                        {
+                            "target": "migration-builder",
+                            "type": "Action",
+                            "label": "通过构建器定义回退"
+                        },
+                        {
+                            "target": "migration",
+                            "type": "Description",
+                            "label": "属于迁移"
+                        }
+                    ]
+                },
+                {
+                    "id": "migration-builder",
+                    "label": "MigrationBuilder",
+                    "description": "迁移构建器用于声明建表、改列、加索引等结构操作。",
+                    "tags": [
+                        "operations",
+                        "builder"
+                    ],
+                    "links": [
+                        {
+                            "target": "up-method",
+                            "type": "Description",
+                            "label": "服务于升级脚本"
+                        },
+                        {
+                            "target": "down-method",
+                            "type": "Description",
+                            "label": "服务于回滚脚本"
+                        },
+                        {
+                            "target": "database-update",
+                            "type": "Action",
+                            "label": "最终作用到数据库"
+                        }
+                    ]
+                },
+                {
+                    "id": "database-update",
+                    "label": "Database Update",
+                    "description": "更新数据库命令会按顺序执行未应用迁移。",
+                    "tags": [
+                        "apply",
+                        "deployment"
+                    ],
+                    "links": [
+                        {
+                            "target": "migration-builder",
+                            "type": "Concept",
+                            "label": "执行已生成操作"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "relationships-loading",
+            "graphLabel": "Relationships & Loading",
+            "nodes": [
+                {
+                    "id": "relationship-data",
+                    "label": "Related Data",
+                    "description": "相关数据加载关注如何把有关联的实体一并取回。",
+                    "tags": [
+                        "relations",
+                        "loading"
+                    ],
+                    "links": [
+                        {
+                            "target": "eager-loading",
+                            "type": "Concept",
+                            "label": "支持预先加载"
+                        },
+                        {
+                            "target": "lazy-loading",
+                            "type": "Concept",
+                            "label": "支持按需加载"
+                        },
+                        {
+                            "target": "explicit-loading",
+                            "type": "Concept",
+                            "label": "支持显式加载"
+                        }
+                    ]
+                },
+                {
+                    "id": "eager-loading",
+                    "label": "Eager Loading",
+                    "description": "使用 Include 在主查询执行时把关联实体一起加载。",
+                    "tags": [
+                        "include",
+                        "single-query"
+                    ],
+                    "links": [
+                        {
+                            "target": "include",
+                            "type": "Action",
+                            "label": "通过 Include 指定"
+                        },
+                        {
+                            "target": "relationship-data",
+                            "type": "Description",
+                            "label": "是一种加载策略"
+                        }
+                    ]
+                },
+                {
+                    "id": "include",
+                    "label": "Include",
+                    "description": "Include 与 ThenInclude 指定需要展开的导航路径。",
+                    "tags": [
+                        "api",
+                        "navigation-path"
+                    ],
+                    "links": [
+                        {
+                            "target": "split-query",
+                            "type": "Condition",
+                            "label": "复杂图可拆分查询"
+                        },
+                        {
+                            "target": "eager-loading",
+                            "type": "Description",
+                            "label": "实现预加载"
+                        }
+                    ]
+                },
+                {
+                    "id": "lazy-loading",
+                    "label": "Lazy Loading",
+                    "description": "在首次访问导航属性时再触发数据库查询加载关联对象。",
+                    "tags": [
+                        "deferred",
+                        "proxy"
+                    ],
+                    "links": [
+                        {
+                            "target": "proxies",
+                            "type": "Condition",
+                            "label": "通常依赖代理或拦截"
+                        },
+                        {
+                            "target": "relationship-data",
+                            "type": "Description",
+                            "label": "是一种按需策略"
+                        }
+                    ]
+                },
+                {
+                    "id": "proxies",
+                    "label": "Proxies",
+                    "description": "代理对象可拦截导航访问并触发延迟加载行为。",
+                    "tags": [
+                        "proxy",
+                        "runtime"
+                    ],
+                    "links": [
+                        {
+                            "target": "lazy-loading",
+                            "type": "Action",
+                            "label": "支持延迟加载"
+                        }
+                    ]
+                },
+                {
+                    "id": "explicit-loading",
+                    "label": "Explicit Loading",
+                    "description": "开发者在需要时显式调用 API 加载某个导航属性。",
+                    "tags": [
+                        "manual",
+                        "controlled"
+                    ],
+                    "links": [
+                        {
+                            "target": "entry-api",
+                            "type": "Action",
+                            "label": "通过 Entry API 触发"
+                        },
+                        {
+                            "target": "relationship-data",
+                            "type": "Description",
+                            "label": "是一种手动策略"
+                        }
+                    ]
+                },
+                {
+                    "id": "entry-api",
+                    "label": "Entry API",
+                    "description": "Entry(...).Reference(...).Load 或 Collection(...).Load 用于显式加载。",
+                    "tags": [
+                        "api",
+                        "load"
+                    ],
+                    "links": [
+                        {
+                            "target": "explicit-loading",
+                            "type": "Description",
+                            "label": "实现显式加载"
+                        }
+                    ]
+                },
+                {
+                    "id": "split-query",
+                    "label": "Split Query",
+                    "description": "拆分查询可降低多表联接导致的数据重复和笛卡尔膨胀风险。",
+                    "tags": [
+                        "performance",
+                        "query-shape"
+                    ],
+                    "links": [
+                        {
+                            "target": "include",
+                            "type": "Description",
+                            "label": "常用于复杂 Include"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "graphId": "performance",
+            "graphLabel": "Performance Optimization",
+            "nodes": [
+                {
+                    "id": "performance",
+                    "label": "Performance",
+                    "description": "EF Core 性能优化围绕减少开销、缩小数据量与改进查询形状展开。",
+                    "tags": [
+                        "optimization",
+                        "efficiency"
+                    ],
+                    "links": [
+                        {
+                            "target": "compiled-query",
+                            "type": "Concept",
+                            "label": "可复用查询编译"
+                        },
+                        {
+                            "target": "batching",
+                            "type": "Concept",
+                            "label": "批量发送命令"
+                        },
+                        {
+                            "target": "projection-only",
+                            "type": "Concept",
+                            "label": "只取必要字段"
+                        }
+                    ]
+                },
+                {
+                    "id": "compiled-query",
+                    "label": "Compiled Query",
+                    "description": "预编译查询可减少重复解析表达式树的成本。",
+                    "tags": [
+                        "cache",
+                        "query-plan"
+                    ],
+                    "links": [
+                        {
+                            "target": "query-cache",
+                            "type": "Description",
+                            "label": "利用缓存结果"
+                        },
+                        {
+                            "target": "performance",
+                            "type": "Description",
+                            "label": "服务整体优化"
+                        }
+                    ]
+                },
+                {
+                    "id": "query-cache",
+                    "label": "Query Cache",
+                    "description": "查询缓存复用表达式到命令生成过程的中间成果。",
+                    "tags": [
+                        "cache",
+                        "reuse"
+                    ],
+                    "links": [
+                        {
+                            "target": "compiled-query",
+                            "type": "Concept",
+                            "label": "支撑预编译收益"
+                        }
+                    ]
+                },
+                {
+                    "id": "batching",
+                    "label": "Batching",
+                    "description": "批处理可将多条修改命令合并发送以减少往返次数。",
+                    "tags": [
+                        "save",
+                        "roundtrip"
+                    ],
+                    "links": [
+                        {
+                            "target": "savechanges-cost",
+                            "type": "Action",
+                            "label": "降低保存成本"
+                        },
+                        {
+                            "target": "performance",
+                            "type": "Description",
+                            "label": "属于优化手段"
+                        }
+                    ]
+                },
+                {
+                    "id": "savechanges-cost",
+                    "label": "SaveChanges Cost",
+                    "description": "保存成本受命令数量、跟踪规模与数据库往返次数影响。",
+                    "tags": [
+                        "cost",
+                        "save"
+                    ],
+                    "links": [
+                        {
+                            "target": "batching",
+                            "type": "Description",
+                            "label": "可被批处理优化"
+                        }
+                    ]
+                },
+                {
+                    "id": "projection-only",
+                    "label": "Projection",
+                    "description": "只投影所需列可减少网络传输与对象物化负担。",
+                    "tags": [
+                        "select",
+                        "payload"
+                    ],
+                    "links": [
+                        {
+                            "target": "tracking-off",
+                            "type": "Condition",
+                            "label": "常与不跟踪搭配"
+                        },
+                        {
+                            "target": "performance",
+                            "type": "Description",
+                            "label": "减少查询开销"
+                        }
+                    ]
+                },
+                {
+                    "id": "tracking-off",
+                    "label": "No Tracking",
+                    "description": "关闭跟踪能减少内存与状态管理开销，适合只读场景。",
+                    "tags": [
+                        "readonly",
+                        "memory"
+                    ],
+                    "links": [
+                        {
+                            "target": "projection-only",
+                            "type": "Action",
+                            "label": "增强只读查询效率"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
