@@ -250,11 +250,13 @@ polished typography, subtle motion, `prefers-reduced-motion` support.
 
 ### Layout strategy
 
-Use a tuned `cose` force layout for default rendering with deterministic
-seeding (`randomize: false`) and density-aware spacing:
+Use a directed `breadthfirst` layout by default so users can read the graph
+from root concepts outward in a clear layered flow:
 
-- smaller ideal edge length and moderated repulsion for larger graphs, and
-- stronger spacing for smaller graphs.
+- auto-detect root nodes (in-degree `0`) and fall back to highest out-degree
+  when no strict root exists,
+- expand layers with a larger spacing factor for less crowding,
+- include node labels in overlap calculations to keep rows tidy.
 
 Keep `fit` behavior resilient by allowing deeper zoom-out bounds and forcing a
 final `fit` on `layoutstop`, so larger datasets remain visible when loaded.
