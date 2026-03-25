@@ -6,7 +6,7 @@ Use this template when you want to generate **one `graph.json` file** for a topi
 
 ---
 
-## Prompt (English)
+## Step 1: Topic Split Prompt (English)
 
 ```
 I'm building a visual knowledge graph for "{{TOPIC}}".
@@ -50,7 +50,7 @@ Now generate the JSON array.
 
 ---
 
-## Prompt（中文版）
+## Step 2：单个子图生成提示词（中文版）
 
 ```
 我正在为“{{主题}}”构建可视化知识图谱。
