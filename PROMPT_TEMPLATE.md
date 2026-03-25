@@ -44,6 +44,11 @@ Additional guidelines:
 - Every node should have at least one inbound or outbound link (connected graph).
 - Use 4–7 distinct tags total.
 - Restrict all relationship types to this fixed set only: "Concept", "Description", "Condition", "Action".
+- Structure the graph as a radial hierarchy (center → outer layers):
+  - Put broad, high-level concepts near the center (core/foundation nodes).
+  - Put specialized, derived, or implementation details in outer layers.
+  - Prefer edges that point from inner/core nodes to outer/derived nodes.
+  - Avoid linking outer-layer nodes directly back to inner/core hubs unless absolutely necessary.
 - Output the entire array as a single JSON code block.
 
 Please generate the nodes now.
@@ -91,6 +96,11 @@ Please generate the nodes now.
 - 构建一个连通图：每个节点至少要有一条入边或出边。
 - 总共使用 4–7 个不同标签。
 - 关系类型只允许使用固定四种："Concept"、"Description"、"Condition"、"Action"。
+- 图结构尽量按“中心 → 外围”的层次扩散：
+  - 更大、更基础、更抽象的概念放在中心层（核心节点）。
+  - 细分、派生、实现层面的概念放在外层。
+  - 尽量让关系从中心层指向外层。
+  - 除非必要，避免外层节点再直接连回中心核心节点。
 - 将整个数组输出为一个 JSON 代码块。
 
 请现在生成这些节点。
