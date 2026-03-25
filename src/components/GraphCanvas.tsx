@@ -15,6 +15,8 @@ const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {
   return [
@@ -190,13 +192,13 @@ export default function GraphCanvas({
       elements,
       style: buildStyles(noMotion),
       layout: buildLayout(noMotion, depthById, maxDepth),
-      minZoom: 0.05,
+      minZoom: COMPACT_LAYOUT_ZOOM_THRESHOLD,
       maxZoom: 4,
     });
 
     cy.one("layoutstop", () => {
       cy.fit(cy.elements(), 40);
-      if (cy.zoom() <= 0.05) {
+      if (cy.zoom() <= COMPACT_LAYOUT_ZOOM_THRESHOLD) {
         cy.one("layoutstop", () => {
           cy.fit(cy.elements(), 32);
         });
