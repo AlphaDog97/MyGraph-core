@@ -180,6 +180,31 @@ function buildLayout(
   } as cytoscape.LayoutOptions;
 }
 
+const TINY_ZOOM_THRESHOLD = 0.05;
+
+function runLayoutWithAdaptiveFit(
+  cy: Core,
+  noMotion: boolean,
+  depthById: Map<string, number>,
+  maxDepth: number
+) {
+  const fitToAll = (padding: number) => {
+    cy.fit(cy.elements(), padding);
+    cy.center(cy.elements());
+  };
+
+  cy.one("layoutstop", () => {
+    fitToAll(40);
+
+    if (cy.zoom() <= TINY_ZOOM_THRESHOLD) {
+      cy.one("layoutstop", () => {
+        fitToAll(24);
+      });
+      cy.layout(buildLayout(noMotion, depthById, maxDepth, true)).run();
+    }
+  });
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
@@ -203,19 +228,11 @@ export default function GraphCanvas({
       elements,
       style: buildStyles(noMotion),
       layout: buildLayout(noMotion, depthById, maxDepth),
-      minZoom: 0.01,
+      minZoom: 0.05,
       maxZoom: 4,
     });
 
-    cy.one("layoutstop", () => {
-      cy.fit(cy.elements(), 40);
-      if (cy.zoom() <= 0.011) {
-        cy.one("layoutstop", () => {
-          cy.fit(cy.elements(), 32);
-        });
-        cy.layout(buildLayout(noMotion, depthById, maxDepth, true)).run();
-      }
-    });
+    runLayoutWithAdaptiveFit(cy, noMotion, depthById, maxDepth);
 
     cy.on("tap", "node", (evt) => {
       const nodeId = evt.target.id();
@@ -293,6 +310,19 @@ export default function GraphCanvas({
       }
     }
   }, [searchQuery, graph, cyRef]);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy || !containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      cy.resize();
+      cy.fit(cy.elements(), 40);
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, [cyRef]);
 
   return (
     <div
