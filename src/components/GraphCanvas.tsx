@@ -23,7 +23,7 @@ function buildStyles(noMotion: boolean): any[] {
       style: {
         shape: "roundrectangle",
         label: "data(label)",
-        "background-color": "#ffffff",
+        "background-color": "#f7fafc",
         "border-width": 3,
         "border-color": "data(borderColor)",
         "text-valign": "center",
@@ -35,7 +35,9 @@ function buildStyles(noMotion: boolean): any[] {
         "text-outline-color": "#ffffff",
         "text-outline-width": 2,
         width: "label",
+        "min-width": 110,
         height: 36,
+        "min-height": 36,
         padding: 14,
         "text-wrap": "none",
         "overlay-padding": 4,
@@ -109,62 +111,22 @@ function resolveLayoutRoots(graph: KnowledgeGraph): string[] {
   return fallback.slice(0, 1).map((node) => node.id);
 }
 
-function resolveNodeDepths(
-  graph: KnowledgeGraph,
-  roots: string[]
-): { depthById: Map<string, number>; maxDepth: number } {
-  const outgoing = new Map<string, string[]>();
-  for (const node of graph.nodes) outgoing.set(node.id, []);
-  for (const edge of graph.edges) {
-    outgoing.set(edge.source, [...(outgoing.get(edge.source) ?? []), edge.target]);
-  }
-
-  const depthById = new Map<string, number>();
-  const queue: string[] = [];
-  for (const root of roots) {
-    depthById.set(root, 0);
-    queue.push(root);
-  }
-
-  for (let i = 0; i < queue.length; i++) {
-    const nodeId = queue[i];
-    const depth = depthById.get(nodeId) ?? 0;
-    for (const next of outgoing.get(nodeId) ?? []) {
-      if (!depthById.has(next)) {
-        depthById.set(next, depth + 1);
-        queue.push(next);
-      }
-    }
-  }
-
-  let maxDepth = 0;
-  for (const value of depthById.values()) {
-    maxDepth = Math.max(maxDepth, value);
-  }
-
-  for (const node of graph.nodes) {
-    if (!depthById.has(node.id)) {
-      maxDepth += 1;
-      depthById.set(node.id, maxDepth);
-    }
-  }
-
-  return { depthById, maxDepth };
-}
-
 function buildLayout(
   noMotion: boolean,
-  depthById: Map<string, number>,
-  maxDepth: number,
+  roots: string[],
+  nodeCount: number,
   compact = false
 ): cytoscape.LayoutOptions {
   const spacingFactor = compact ? 1.08 : 1.28;
   const minNodeSpacing = compact ? 30 : 54;
 
   return {
-    name: "concentric",
+    name: "breadthfirst",
+    directed: true,
+    circle: false,
+    roots,
     fit: true,
-    padding: compact ? 40 : 64,
+    padding: compact ? 30 : 44,
     animate: !noMotion,
     animationDuration: 600,
     avoidOverlap: true,
@@ -179,6 +141,31 @@ function buildLayout(
       maxDepth - (depthById.get(node.id()) ?? maxDepth),
     levelWidth: () => 1,
   } as cytoscape.LayoutOptions;
+}
+
+const TINY_ZOOM_THRESHOLD = 0.05;
+
+function runLayoutWithAdaptiveFit(
+  cy: Core,
+  noMotion: boolean,
+  roots: string[],
+  nodeCount: number
+) {
+  const fitToAll = (padding: number) => {
+    cy.fit(cy.elements(), padding);
+    cy.center(cy.elements());
+  };
+
+  cy.one("layoutstop", () => {
+    fitToAll(40);
+
+    if (cy.zoom() <= TINY_ZOOM_THRESHOLD) {
+      cy.one("layoutstop", () => {
+        fitToAll(24);
+      });
+      cy.layout(buildLayout(noMotion, roots, nodeCount, true)).run();
+    }
+  });
 }
 
 export default function GraphCanvas({
@@ -197,7 +184,6 @@ export default function GraphCanvas({
     const elements = toCytoscapeElements(graph, tagColors);
     const noMotion = prefersReducedMotion();
     const roots = resolveLayoutRoots(graph);
-    const { depthById, maxDepth } = resolveNodeDepths(graph, roots);
 
     const cy = cytoscape({
       container: containerRef.current,
@@ -294,6 +280,19 @@ export default function GraphCanvas({
       }
     }
   }, [searchQuery, graph, cyRef]);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy || !containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      cy.resize();
+      cy.fit(cy.elements(), 40);
+    });
+
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, [cyRef]);
 
   return (
     <div
