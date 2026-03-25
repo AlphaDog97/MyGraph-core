@@ -239,5 +239,187 @@
     "links": [
       { "target": "vite", "type": "deploys", "label": "deploys output of" }
     ]
+  },
+  {
+    "id": "ef-core",
+    "label": "EF Core",
+    "description": "轻量级跨平台的ORM框架，用于在.NET中操作数据库。",
+    "tags": ["orm", "framework"],
+    "links": [
+      { "target": "dbcontext", "type": "Concept", "label": "核心组件" },
+      { "target": "linq", "type": "Concept", "label": "使用查询语言" }
+    ]
+  },
+  {
+    "id": "dbcontext",
+    "label": "DbContext",
+    "description": "EF Core 的核心类，用于管理实体与数据库连接。",
+    "tags": ["core", "lifecycle"],
+    "links": [
+      { "target": "change-tracker", "type": "Concept", "label": "包含" },
+      { "target": "dbconnection", "type": "Concept", "label": "管理连接" }
+    ]
+  },
+  {
+    "id": "change-tracker",
+    "label": "Change Tracker",
+    "description": "用于跟踪实体状态并生成更新操作。",
+    "tags": ["tracking", "core"],
+    "links": [
+      { "target": "entity-state", "type": "Concept", "label": "维护状态" }
+    ]
+  },
+  {
+    "id": "entity-state",
+    "label": "Entity State",
+    "description": "表示实体在上下文中的状态，如 Added、Modified、Deleted。",
+    "tags": ["tracking"],
+    "links": [
+      { "target": "save-changes", "type": "Action", "label": "影响提交行为" }
+    ]
+  },
+  {
+    "id": "save-changes",
+    "label": "SaveChanges",
+    "description": "将上下文中的更改持久化到数据库。",
+    "tags": ["operation", "database"],
+    "links": [
+      { "target": "transaction", "type": "Concept", "label": "使用事务" }
+    ]
+  },
+  {
+    "id": "linq",
+    "label": "LINQ",
+    "description": "用于构建查询表达式并转换为SQL。",
+    "tags": ["query", "language"],
+    "links": [
+      { "target": "expression-tree", "type": "Concept", "label": "生成表达式树" }
+    ]
+  },
+  {
+    "id": "expression-tree",
+    "label": "Expression Tree",
+    "description": "表示LINQ查询的结构化表达，用于转换为SQL。",
+    "tags": ["query"],
+    "links": [
+      { "target": "query-translation", "type": "Action", "label": "参与转换" }
+    ]
+  },
+  {
+    "id": "query-translation",
+    "label": "Query Translation",
+    "description": "将表达式树转换为SQL语句的过程。",
+    "tags": ["query", "database"],
+    "links": [
+      { "target": "sql-generation", "type": "Concept", "label": "生成SQL" }
+    ]
+  },
+  {
+    "id": "sql-generation",
+    "label": "SQL Generation",
+    "description": "根据查询生成对应的SQL语句。",
+    "tags": ["database"],
+    "links": [
+      { "target": "dbcommand", "type": "Action", "label": "执行命令" }
+    ]
+  },
+  {
+    "id": "dbcommand",
+    "label": "DbCommand",
+    "description": "用于执行SQL语句的数据库命令对象。",
+    "tags": ["database"],
+    "links": [
+      { "target": "datareader", "type": "Action", "label": "返回结果" }
+    ]
+  },
+  {
+    "id": "datareader",
+    "label": "DataReader",
+    "description": "用于逐行读取数据库结果的流式读取器。",
+    "tags": ["database", "performance"],
+    "links": [
+      { "target": "materialization", "type": "Action", "label": "生成实体" }
+    ]
+  },
+  {
+    "id": "materialization",
+    "label": "Materialization",
+    "description": "将数据库数据转换为实体对象的过程。",
+    "tags": ["core"],
+    "links": [
+      { "target": "entity", "type": "Concept", "label": "创建对象" }
+    ]
+  },
+  {
+    "id": "entity",
+    "label": "Entity",
+    "description": "表示数据库表映射的类。",
+    "tags": ["model"],
+    "links": [
+      { "target": "dbset", "type": "Concept", "label": "由DbSet管理" }
+    ]
+  },
+  {
+    "id": "dbset",
+    "label": "DbSet",
+    "description": "表示实体集合，用于查询和操作数据。",
+    "tags": ["core"],
+    "links": [
+      { "target": "linq", "type": "Action", "label": "支持查询" }
+    ]
+  },
+  {
+    "id": "dbconnection",
+    "label": "DbConnection",
+    "description": "表示数据库连接对象。",
+    "tags": ["database"],
+    "links": [
+      { "target": "connection-pool", "type": "Concept", "label": "使用连接池" }
+    ]
+  },
+  {
+    "id": "connection-pool",
+    "label": "Connection Pool",
+    "description": "管理数据库连接复用以提高性能。",
+    "tags": ["performance"],
+    "links": [
+      { "target": "datareader", "type": "Condition", "label": "被占用时阻塞" }
+    ]
+  },
+  {
+    "id": "transaction",
+    "label": "Transaction",
+    "description": "保证一组数据库操作的原子性。",
+    "tags": ["database"],
+    "links": [
+      { "target": "save-changes", "type": "Condition", "label": "用于提交" }
+    ]
+  },
+  {
+    "id": "lazy-loading",
+    "label": "Lazy Loading",
+    "description": "在访问导航属性时才加载相关数据。",
+    "tags": ["performance"],
+    "links": [
+      { "target": "n-plus-one", "type": "Condition", "label": "可能导致问题" }
+    ]
+  },
+  {
+    "id": "eager-loading",
+    "label": "Eager Loading",
+    "description": "通过Include提前加载相关数据。",
+    "tags": ["performance"],
+    "links": [
+      { "target": "entity", "type": "Action", "label": "加载关联数据" }
+    ]
+  },
+  {
+    "id": "n-plus-one",
+    "label": "N+1 Problem",
+    "description": "多次查询导致性能问题的常见反模式。",
+    "tags": ["performance"],
+    "links": [
+      { "target": "eager-loading", "type": "Action", "label": "可优化" }
+    ]
   }
 ]
