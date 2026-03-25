@@ -19,6 +19,25 @@ interface MultiGraphCategoryFile {
   }>;
 }
 
+function extractNodesFromMultiGraphObject(
+  raw: unknown,
+  graphId: string,
+  sourcePath: string
+): KnowledgeNodeFile[] | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const parsed = raw as MultiGraphCategoryFile;
+  if (!Array.isArray(parsed.graphs)) return null;
+
+  const matched = parsed.graphs.find((g) => g.graphId === graphId);
+  if (!matched) {
+    throw new Error(`${sourcePath}: graphId '${graphId}' not found.`);
+  }
+  if (!Array.isArray(matched.nodes)) {
+    throw new Error(`${sourcePath}: graph '${graphId}' nodes must be an array.`);
+  }
+  return matched.nodes;
+}
+
 export async function loadManifest(): Promise<Manifest> {
   const res = await fetch(`${BASE}graph-data/manifest.json`);
   if (!res.ok) {
@@ -103,11 +122,29 @@ export async function loadLocalGraphNodes(
   const legacyUrl = `${BASE}graph-data/${categoryId}/${graphId}/graph.json`;
   const legacyRes = await fetch(legacyUrl);
   if (legacyRes.ok) {
+    let legacyRaw: unknown;
     try {
-      return (await legacyRes.json()) as KnowledgeNodeFile[];
+      legacyRaw = (await legacyRes.json()) as unknown;
     } catch {
       throw new Error(`${categoryId}/${graphId}/graph.json: invalid JSON.`);
     }
+
+    if (Array.isArray(legacyRaw)) {
+      return legacyRaw as KnowledgeNodeFile[];
+    }
+
+    // Compatibility: if a multi-graph object was accidentally saved at legacy path,
+    // still resolve by graphId instead of failing with "must be JSON array".
+    const extracted = extractNodesFromMultiGraphObject(
+      legacyRaw,
+      graphId,
+      `graph-data/${categoryId}/${graphId}/graph.json`
+    );
+    if (extracted) return extracted;
+
+    throw new Error(
+      `graph-data/${categoryId}/${graphId}/graph.json must be a JSON array of nodes or a multi-graph object containing graphs[].`
+    );
   }
 
   // New path: graph-data/<category>/graph.json with { graphs: [...] }
@@ -126,19 +163,15 @@ export async function loadLocalGraphNodes(
     throw new Error(`${categoryId}/graph.json: invalid JSON.`);
   }
 
-  const graphs = parsed.graphs ?? [];
-  const matched = graphs.find((g) => g.graphId === graphId);
-  if (!matched) {
-    throw new Error(
-      `graph-data/${categoryId}/graph.json: graphId '${graphId}' not found.`
-    );
-  }
-  if (!Array.isArray(matched.nodes)) {
-    throw new Error(
-      `graph-data/${categoryId}/graph.json: graph '${graphId}' nodes must be an array.`
-    );
-  }
-  return matched.nodes;
+  const extracted = extractNodesFromMultiGraphObject(
+    parsed,
+    graphId,
+    `graph-data/${categoryId}/graph.json`
+  );
+  if (extracted) return extracted;
+  throw new Error(
+    `graph-data/${categoryId}/graph.json must be a multi-graph object with graphs[].`
+  );
 }
 
 export async function loadGraphData(
