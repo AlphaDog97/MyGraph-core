@@ -2,183 +2,640 @@
   {
     "id": "ef-core",
     "label": "EF Core",
-    "description": "轻量级跨平台的ORM框架，用于在.NET中操作数据库。",
-    "tags": ["orm", "framework"],
+    "description": "Entity Framework Core 是 .NET 的现代 ORM，用于将对象模型映射到关系型数据库。",
+    "tags": ["Core", "ORM"],
     "links": [
-      { "target": "dbcontext", "type": "Concept", "label": "核心组件" },
-      { "target": "linq", "type": "Concept", "label": "使用查询语言" }
+      { "target": "dbcontext", "type": "Concept", "label": "核心入口" },
+      { "target": "entity", "type": "Concept", "label": "管理实体" },
+      { "target": "change-tracker", "type": "Concept", "label": "跟踪状态" },
+      { "target": "linq-query", "type": "Concept", "label": "支持查询" },
+      { "target": "migrations", "type": "Action", "label": "演进数据库结构" },
+      { "target": "provider", "type": "Concept", "label": "依赖数据库提供程序" },
+      { "target": "model-building", "type": "Concept", "label": "构建模型" },
+      { "target": "transactions", "type": "Concept", "label": "支持事务" }
     ]
   },
   {
     "id": "dbcontext",
     "label": "DbContext",
-    "description": "EF Core 的核心类，用于管理实体与数据库连接。",
-    "tags": ["core", "lifecycle"],
+    "description": "DbContext 是 EF Core 的工作单元和查询入口，负责协调跟踪、查询与保存。",
+    "tags": ["Core", "API"],
     "links": [
-      { "target": "change-tracker", "type": "Concept", "label": "包含" },
-      { "target": "dbconnection", "type": "Concept", "label": "管理连接" }
-    ]
-  },
-  {
-    "id": "change-tracker",
-    "label": "Change Tracker",
-    "description": "用于跟踪实体状态并生成更新操作。",
-    "tags": ["tracking", "core"],
-    "links": [
-      { "target": "entity-state", "type": "Concept", "label": "维护状态" }
-    ]
-  },
-  {
-    "id": "entity-state",
-    "label": "Entity State",
-    "description": "表示实体在上下文中的状态，如 Added、Modified、Deleted。",
-    "tags": ["tracking"],
-    "links": [
-      { "target": "save-changes", "type": "Action", "label": "影响提交行为" }
-    ]
-  },
-  {
-    "id": "save-changes",
-    "label": "SaveChanges",
-    "description": "将上下文中的更改持久化到数据库。",
-    "tags": ["operation", "database"],
-    "links": [
-      { "target": "transaction", "type": "Concept", "label": "使用事务" }
-    ]
-  },
-  {
-    "id": "linq",
-    "label": "LINQ",
-    "description": "用于构建查询表达式并转换为SQL。",
-    "tags": ["query", "language"],
-    "links": [
-      { "target": "expression-tree", "type": "Concept", "label": "生成表达式树" }
-    ]
-  },
-  {
-    "id": "expression-tree",
-    "label": "Expression Tree",
-    "description": "表示LINQ查询的结构化表达，用于转换为SQL。",
-    "tags": ["query"],
-    "links": [
-      { "target": "query-translation", "type": "Action", "label": "参与转换" }
-    ]
-  },
-  {
-    "id": "query-translation",
-    "label": "Query Translation",
-    "description": "将表达式树转换为SQL语句的过程。",
-    "tags": ["query", "database"],
-    "links": [
-      { "target": "sql-generation", "type": "Concept", "label": "生成SQL" }
-    ]
-  },
-  {
-    "id": "sql-generation",
-    "label": "SQL Generation",
-    "description": "根据查询生成对应的SQL语句。",
-    "tags": ["database"],
-    "links": [
-      { "target": "dbcommand", "type": "Action", "label": "执行命令" }
-    ]
-  },
-  {
-    "id": "dbcommand",
-    "label": "DbCommand",
-    "description": "用于执行SQL语句的数据库命令对象。",
-    "tags": ["database"],
-    "links": [
-      { "target": "datareader", "type": "Action", "label": "返回结果" }
-    ]
-  },
-  {
-    "id": "datareader",
-    "label": "DataReader",
-    "description": "用于逐行读取数据库结果的流式读取器。",
-    "tags": ["database", "performance"],
-    "links": [
-      { "target": "materialization", "type": "Action", "label": "生成实体" }
-    ]
-  },
-  {
-    "id": "materialization",
-    "label": "Materialization",
-    "description": "将数据库数据转换为实体对象的过程。",
-    "tags": ["core"],
-    "links": [
-      { "target": "entity", "type": "Concept", "label": "创建对象" }
-    ]
-  },
-  {
-    "id": "entity",
-    "label": "Entity",
-    "description": "表示数据库表映射的类。",
-    "tags": ["model"],
-    "links": [
-      { "target": "dbset", "type": "Concept", "label": "由DbSet管理" }
+      { "target": "dbset", "type": "Concept", "label": "暴露集合" },
+      { "target": "savechanges", "type": "Action", "label": "提交更改" },
+      { "target": "change-tracker", "type": "Concept", "label": "持有跟踪器" },
+      { "target": "database-facade", "type": "Concept", "label": "提供数据库接口" },
+      { "target": "lifetime-and-thread-safety", "type": "Condition", "label": "受生命周期约束" },
+      { "target": "connection-management", "type": "Concept", "label": "管理连接" }
     ]
   },
   {
     "id": "dbset",
     "label": "DbSet",
-    "description": "表示实体集合，用于查询和操作数据。",
-    "tags": ["core"],
+    "description": "DbSet 表示某一实体类型的集合，是查询和增删改的主要入口。",
+    "tags": ["Core", "API"],
     "links": [
-      { "target": "linq", "type": "Action", "label": "支持查询" }
+      { "target": "entity", "type": "Description", "label": "承载实体类型" },
+      { "target": "linq-query", "type": "Action", "label": "参与 LINQ 查询" },
+      { "target": "add-update-remove", "type": "Action", "label": "执行增删改入口" }
     ]
   },
   {
-    "id": "dbconnection",
-    "label": "DbConnection",
-    "description": "表示数据库连接对象。",
-    "tags": ["database"],
+    "id": "entity",
+    "label": "Entity",
+    "description": "实体是映射到数据库表或视图的领域对象。",
+    "tags": ["Core", "Model"],
     "links": [
-      { "target": "connection-pool", "type": "Concept", "label": "使用连接池" }
+      { "target": "key-and-primary-key", "type": "Concept", "label": "定义主键" },
+      { "target": "property-mapping", "type": "Description", "label": "映射属性" },
+      { "target": "relationships", "type": "Concept", "label": "定义关系" },
+      { "target": "shadow-property", "type": "Concept", "label": "可包含影子属性" },
+      { "target": "owned-entity", "type": "Concept", "label": "可拆分为拥有类型" }
     ]
   },
   {
-    "id": "connection-pool",
-    "label": "Connection Pool",
-    "description": "管理数据库连接复用以提高性能。",
-    "tags": ["performance"],
+    "id": "change-tracker",
+    "label": "Change Tracker",
+    "description": "Change Tracker 负责识别实体状态变化并为保存生成正确的数据库操作。",
+    "tags": ["Core", "Tracking"],
     "links": [
-      { "target": "datareader", "type": "Condition", "label": "被占用时阻塞" }
+      { "target": "entity-state", "type": "Concept", "label": "维护实体状态" },
+      { "target": "identity-resolution", "type": "Concept", "label": "执行身份解析" },
+      { "target": "detect-changes", "type": "Action", "label": "检测更改" },
+      { "target": "tracking-vs-no-tracking", "type": "Condition", "label": "受跟踪模式影响" }
     ]
   },
   {
-    "id": "transaction",
-    "label": "Transaction",
-    "description": "保证一组数据库操作的原子性。",
-    "tags": ["database"],
+    "id": "entity-state",
+    "label": "Entity State",
+    "description": "实体状态表示实体当前在上下文中的生命周期位置，如 Added、Modified 或 Deleted。",
+    "tags": ["Tracking", "Model"],
     "links": [
-      { "target": "save-changes", "type": "Condition", "label": "用于提交" }
+      { "target": "savechanges", "type": "Action", "label": "决定保存行为" }
     ]
   },
   {
-    "id": "lazy-loading",
-    "label": "Lazy Loading",
-    "description": "在访问导航属性时才加载相关数据。",
-    "tags": ["performance"],
+    "id": "detect-changes",
+    "label": "DetectChanges",
+    "description": "DetectChanges 会扫描已跟踪实体以识别属性和关系变化。",
+    "tags": ["Tracking", "Performance"],
     "links": [
-      { "target": "n-plus-one", "type": "Condition", "label": "可能导致问题" }
+      { "target": "savechanges", "type": "Action", "label": "保存前通常触发" },
+      { "target": "batch-operations", "type": "Condition", "label": "大量操作时需关注成本" }
+    ]
+  },
+  {
+    "id": "tracking-vs-no-tracking",
+    "label": "Tracking vs No-Tracking",
+    "description": "跟踪查询会缓存并跟踪实体，无跟踪查询则更轻量且适合只读场景。",
+    "tags": ["Tracking", "Performance"],
+    "links": [
+      { "target": "asnotracking", "type": "Action", "label": "通过 API 启用无跟踪" },
+      { "target": "identity-resolution", "type": "Condition", "label": "可配合身份解析" }
+    ]
+  },
+  {
+    "id": "identity-resolution",
+    "label": "Identity Resolution",
+    "description": "身份解析确保同一个主键在同一上下文中对应唯一对象实例。",
+    "tags": ["Tracking", "Performance"],
+    "links": [
+      { "target": "key-and-primary-key", "type": "Condition", "label": "依赖键值识别" }
+    ]
+  },
+  {
+    "id": "linq-query",
+    "label": "LINQ Query",
+    "description": "LINQ 查询是 EF Core 的核心查询模型，会被翻译成数据库命令。",
+    "tags": ["Core", "Query"],
+    "links": [
+      { "target": "iqueryable-and-expression-tree", "type": "Description", "label": "基于表达式树" },
+      { "target": "query-translation", "type": "Action", "label": "翻译为 SQL" },
+      { "target": "deferred-execution", "type": "Condition", "label": "遵循延迟执行" },
+      { "target": "client-vs-server-evaluation", "type": "Condition", "label": "涉及执行位置" },
+      { "target": "materialization", "type": "Action", "label": "结果物化为对象" }
+    ]
+  },
+  {
+    "id": "iqueryable-and-expression-tree",
+    "label": "IQueryable 与表达式树",
+    "description": "IQueryable 保存查询表达式而不是结果，使提供程序能够分析和翻译查询。",
+    "tags": ["Query", "API"],
+    "links": [
+      { "target": "query-translation", "type": "Action", "label": "供翻译器解析" }
+    ]
+  },
+  {
+    "id": "deferred-execution",
+    "label": "Deferred Execution",
+    "description": "延迟执行表示查询在枚举或终结操作发生前不会真正访问数据库。",
+    "tags": ["Query", "Performance"],
+    "links": [
+      { "target": "tolist-and-async-terminals", "type": "Action", "label": "由终结操作触发" }
+    ]
+  },
+  {
+    "id": "query-translation",
+    "label": "Query Translation",
+    "description": "查询翻译器会把 LINQ 表达式转换为具体数据库方言下的命令树和 SQL。",
+    "tags": ["Query", "ORM"],
+    "links": [
+      { "target": "provider", "type": "Condition", "label": "取决于提供程序能力" },
+      { "target": "sql-generation", "type": "Action", "label": "生成 SQL" }
+    ]
+  },
+  {
+    "id": "sql-generation",
+    "label": "SQL Generation",
+    "description": "SQL 生成阶段将翻译后的查询模型输出为可执行的 SQL 语句及参数。",
+    "tags": ["Query", "ORM"],
+    "links": [
+      { "target": "parameterization", "type": "Description", "label": "通常进行参数化" },
+      { "target": "compiled-queries", "type": "Action", "label": "可被缓存复用" }
+    ]
+  },
+  {
+    "id": "materialization",
+    "label": "Materialization",
+    "description": "物化过程会把数据读取器中的行转换成实体或投影对象。",
+    "tags": ["Query", "ORM"],
+    "links": [
+      { "target": "data-reader", "type": "Condition", "label": "依赖数据读取器" },
+      { "target": "projection", "type": "Condition", "label": "受投影形状影响" }
+    ]
+  },
+  {
+    "id": "client-vs-server-evaluation",
+    "label": "客户端与服务端求值",
+    "description": "EF Core 优先将查询逻辑下推到数据库，无法翻译的部分可能导致异常或转为客户端处理。",
+    "tags": ["Query", "Performance"],
+    "links": [
+      { "target": "projection", "type": "Action", "label": "通过投影减少客户端计算" },
+      { "target": "performance-pitfalls", "type": "Description", "label": "不当求值会带来性能问题" }
+    ]
+  },
+  {
+    "id": "projection",
+    "label": "Projection",
+    "description": "投影通过 Select 只获取所需列或构造 DTO，以减少传输与物化成本。",
+    "tags": ["Query", "Performance"],
+    "links": [
+      { "target": "dto-and-anonymous-types", "type": "Description", "label": "可投影到 DTO 或匿名类型" }
+    ]
+  },
+  {
+    "id": "dto-and-anonymous-types",
+    "label": "DTO 与匿名类型",
+    "description": "DTO 和匿名类型常用于只读查询结果，避免不必要的实体跟踪和字段加载。",
+    "tags": ["Query", "Model"],
+    "links": []
+  },
+  {
+    "id": "tolist-and-async-terminals",
+    "label": "ToList 与异步终结操作",
+    "description": "ToList、First、Any、Count 及其异步版本会触发查询真正执行。",
+    "tags": ["Query", "API"],
+    "links": [
+      { "target": "async-queries", "type": "Action", "label": "支持异步执行" }
+    ]
+  },
+  {
+    "id": "async-queries",
+    "label": "Async Queries",
+    "description": "异步查询通过 ToListAsync 等 API 避免阻塞线程并提升服务端吞吐。",
+    "tags": ["Query", "API"],
+    "links": [
+      { "target": "lifetime-and-thread-safety", "type": "Condition", "label": "仍需单上下文串行使用" }
+    ]
+  },
+  {
+    "id": "data-reader",
+    "label": "DataReader",
+    "description": "DataReader 是底层的只进只读结果流读取器，用于高效逐行读取数据库返回结果。",
+    "tags": ["ORM", "Performance"],
+    "links": [
+      { "target": "connection-management", "type": "Condition", "label": "读取期间占用连接" }
+    ]
+  },
+  {
+    "id": "provider",
+    "label": "Provider",
+    "description": "提供程序负责适配具体数据库方言、类型系统与执行能力。",
+    "tags": ["Core", "ORM"],
+    "links": [
+      { "target": "sql-server-provider", "type": "Concept", "label": "常见实现" },
+      { "target": "sqlite-provider", "type": "Concept", "label": "轻量实现" },
+      { "target": "npgsql-provider", "type": "Concept", "label": "PostgreSQL 实现" },
+      { "target": "inmemory-provider", "type": "Concept", "label": "测试用实现" }
+    ]
+  },
+  {
+    "id": "sql-server-provider",
+    "label": "SQL Server Provider",
+    "description": "SQL Server 提供程序支持 SQL Server 特性并生成对应方言的 SQL。",
+    "tags": ["ORM", "API"],
+    "links": []
+  },
+  {
+    "id": "sqlite-provider",
+    "label": "SQLite Provider",
+    "description": "SQLite 提供程序适合轻量存储与测试，但功能集与服务器型数据库存在差异。",
+    "tags": ["ORM", "API"],
+    "links": []
+  },
+  {
+    "id": "npgsql-provider",
+    "label": "Npgsql Provider",
+    "description": "Npgsql 提供程序为 PostgreSQL 提供类型映射、翻译与数据库特性支持。",
+    "tags": ["ORM", "API"],
+    "links": []
+  },
+  {
+    "id": "inmemory-provider",
+    "label": "InMemory Provider",
+    "description": "InMemory 提供程序主要用于测试，但其行为不等价于真实关系型数据库。",
+    "tags": ["ORM", "Testing"],
+    "links": [
+      { "target": "testing-strategies", "type": "Description", "label": "常用于测试替身" }
+    ]
+  },
+  {
+    "id": "model-building",
+    "label": "Model Building",
+    "description": "模型构建定义实体、键、关系、约束与数据库映射规则。",
+    "tags": ["Core", "Model"],
+    "links": [
+      { "target": "conventions", "type": "Concept", "label": "默认约定" },
+      { "target": "data-annotations", "type": "Concept", "label": "支持特性配置" },
+      { "target": "fluent-api", "type": "Concept", "label": "支持流式配置" },
+      { "target": "model-snapshot", "type": "Action", "label": "生成模型快照" }
+    ]
+  },
+  {
+    "id": "conventions",
+    "label": "Conventions",
+    "description": "约定优于配置，EF Core 会根据命名和类型自动推断部分映射规则。",
+    "tags": ["Model", "API"],
+    "links": [
+      { "target": "fluent-api", "type": "Condition", "label": "可被显式配置覆盖" }
+    ]
+  },
+  {
+    "id": "data-annotations",
+    "label": "Data Annotations",
+    "description": "数据注解通过特性在实体类上声明映射和验证相关元数据。",
+    "tags": ["Model", "API"],
+    "links": [
+      { "target": "fluent-api", "type": "Condition", "label": "复杂场景常由 Fluent API 补充" }
+    ]
+  },
+  {
+    "id": "fluent-api",
+    "label": "Fluent API",
+    "description": "Fluent API 在 OnModelCreating 中集中定义精细的模型映射和行为。",
+    "tags": ["Model", "API"],
+    "links": [
+      { "target": "key-and-primary-key", "type": "Action", "label": "配置键" },
+      { "target": "relationships", "type": "Action", "label": "配置关系" },
+      { "target": "indexes", "type": "Action", "label": "配置索引" },
+      { "target": "value-converters", "type": "Action", "label": "配置值转换" },
+      { "target": "owned-entity", "type": "Action", "label": "配置拥有类型" }
+    ]
+  },
+  {
+    "id": "key-and-primary-key",
+    "label": "键与主键",
+    "description": "键用于唯一标识实体实例，主键是最常见的实体标识方式。",
+    "tags": ["Model", "ORM"],
+    "links": [
+      { "target": "composite-key", "type": "Concept", "label": "可组合多个字段" }
+    ]
+  },
+  {
+    "id": "composite-key",
+    "label": "Composite Key",
+    "description": "复合键使用多个属性共同标识实体，常见于关联实体或遗留库模型。",
+    "tags": ["Model", "ORM"],
+    "links": []
+  },
+  {
+    "id": "property-mapping",
+    "label": "属性映射",
+    "description": "属性映射定义 CLR 属性与数据库列、类型、长度和约束之间的关系。",
+    "tags": ["Model", "ORM"],
+    "links": [
+      { "target": "value-converters", "type": "Concept", "label": "可使用值转换" },
+      { "target": "concurrency-token", "type": "Condition", "label": "可标记并发令牌" }
+    ]
+  },
+  {
+    "id": "relationships",
+    "label": "Relationships",
+    "description": "关系映射定义实体之间的一对一、一对多和多对多关联。",
+    "tags": ["Model", "ORM"],
+    "links": [
+      { "target": "navigation-properties", "type": "Description", "label": "通过导航访问" },
+      { "target": "foreign-key", "type": "Concept", "label": "依赖外键" },
+      { "target": "many-to-many", "type": "Concept", "label": "支持多对多" },
+      { "target": "cascade-delete", "type": "Condition", "label": "可配置级联删除" }
+    ]
+  },
+  {
+    "id": "navigation-properties",
+    "label": "Navigation Properties",
+    "description": "导航属性在对象层面表达实体之间的关联，便于加载和遍历关系。",
+    "tags": ["Model", "API"],
+    "links": [
+      { "target": "loading-strategies", "type": "Action", "label": "由加载策略填充" }
+    ]
+  },
+  {
+    "id": "foreign-key",
+    "label": "Foreign Key",
+    "description": "外键表示关系中的依赖端引用，决定关联约束和连接条件。",
+    "tags": ["Model", "ORM"],
+    "links": []
+  },
+  {
+    "id": "many-to-many",
+    "label": "Many-to-Many",
+    "description": "多对多关系允许两个实体集合互相关联，可显式或隐式使用连接实体。",
+    "tags": ["Model", "ORM"],
+    "links": [
+      { "target": "join-entity", "type": "Concept", "label": "可使用连接实体" }
+    ]
+  },
+  {
+    "id": "join-entity",
+    "label": "Join Entity",
+    "description": "连接实体显式表示多对多中间表，并可承载额外业务字段。",
+    "tags": ["Model", "ORM"],
+    "links": []
+  },
+  {
+    "id": "cascade-delete",
+    "label": "Cascade Delete",
+    "description": "级联删除规定主实体删除时相关依赖实体的处理方式。",
+    "tags": ["Model", "Performance"],
+    "links": []
+  },
+  {
+    "id": "owned-entity",
+    "label": "Owned Entity",
+    "description": "拥有类型表示从属于聚合根的值对象，其生命周期依赖宿主实体。",
+    "tags": ["Model", "ORM"],
+    "links": []
+  },
+  {
+    "id": "shadow-property",
+    "label": "Shadow Property",
+    "description": "影子属性存在于模型中但不暴露在 CLR 类上，常用于外键或审计字段。",
+    "tags": ["Model", "ORM"],
+    "links": []
+  },
+  {
+    "id": "value-converters",
+    "label": "Value Converters",
+    "description": "值转换器用于在 CLR 类型与数据库存储类型之间进行双向转换。",
+    "tags": ["Model", "API"],
+    "links": []
+  },
+  {
+    "id": "indexes",
+    "label": "Indexes",
+    "description": "索引配置用于提升查询过滤、排序和唯一性约束的性能表现。",
+    "tags": ["Model", "Performance"],
+    "links": [
+      { "target": "performance-pitfalls", "type": "Description", "label": "索引不足会影响性能" }
+    ]
+  },
+  {
+    "id": "concurrency-token",
+    "label": "Concurrency Token",
+    "description": "并发令牌用于检测并发更新冲突，典型例子是 rowversion 或时间戳列。",
+    "tags": ["Model", "Performance"],
+    "links": [
+      { "target": "optimistic-concurrency", "type": "Concept", "label": "支撑乐观并发控制" }
+    ]
+  },
+  {
+    "id": "optimistic-concurrency",
+    "label": "Optimistic Concurrency",
+    "description": "乐观并发通过比较原始值与当前值来检测冲突，而不是长期持有锁。",
+    "tags": ["Performance", "ORM"],
+    "links": [
+      { "target": "savechanges", "type": "Condition", "label": "保存时可能抛出冲突" }
+    ]
+  },
+  {
+    "id": "savechanges",
+    "label": "SaveChanges",
+    "description": "SaveChanges 会根据已跟踪实体状态生成并执行插入、更新和删除命令。",
+    "tags": ["Core", "API"],
+    "links": [
+      { "target": "transactions", "type": "Condition", "label": "默认在事务中执行" },
+      { "target": "batch-operations", "type": "Action", "label": "可批量提交命令" },
+      { "target": "savechanges-interceptor", "type": "Action", "label": "可被拦截" }
+    ]
+  },
+  {
+    "id": "add-update-remove",
+    "label": "Add / Update / Remove",
+    "description": "这些 API 会改变上下文中的实体状态，从而影响后续保存生成的命令。",
+    "tags": ["API", "Tracking"],
+    "links": [
+      { "target": "entity-state", "type": "Description", "label": "改变实体状态" }
+    ]
+  },
+  {
+    "id": "transactions",
+    "label": "Transactions",
+    "description": "事务保证一组数据库操作要么全部成功，要么全部回滚。",
+    "tags": ["Core", "API"],
+    "links": [
+      { "target": "database-facade", "type": "Action", "label": "通过数据库接口控制" },
+      { "target": "execution-strategy-and-retry", "type": "Condition", "label": "与重试策略相关" }
+    ]
+  },
+  {
+    "id": "database-facade",
+    "label": "DatabaseFacade",
+    "description": "DatabaseFacade 暴露迁移、事务、连接和原始 SQL 等数据库级操作。",
+    "tags": ["API", "ORM"],
+    "links": [
+      { "target": "raw-sql", "type": "Action", "label": "执行原始 SQL" },
+      { "target": "migrations", "type": "Action", "label": "应用迁移" }
+    ]
+  },
+  {
+    "id": "connection-management",
+    "label": "Connection Management",
+    "description": "连接管理负责在查询和保存期间打开、复用并释放数据库连接。",
+    "tags": ["ORM", "Performance"],
+    "links": [
+      { "target": "lifetime-and-thread-safety", "type": "Condition", "label": "影响并发使用限制" }
+    ]
+  },
+  {
+    "id": "raw-sql",
+    "label": "Raw SQL",
+    "description": "原始 SQL 允许在保留 EF Core 管理能力的同时直接编写 SQL 语句。",
+    "tags": ["API", "Query"],
+    "links": [
+      { "target": "parameterization", "type": "Condition", "label": "需正确参数化" }
+    ]
+  },
+  {
+    "id": "parameterization",
+    "label": "Parameterization",
+    "description": "参数化可避免 SQL 注入并帮助数据库重用执行计划。",
+    "tags": ["Performance", "Query"],
+    "links": []
+  },
+  {
+    "id": "migrations",
+    "label": "Migrations",
+    "description": "迁移用于以代码形式版本化数据库结构并在不同环境中同步模型变化。",
+    "tags": ["Core", "Testing"],
+    "links": [
+      { "target": "migration-commands", "type": "Action", "label": "通过命令生成和应用" },
+      { "target": "model-snapshot", "type": "Description", "label": "依赖模型快照比较" },
+      { "target": "seed-data", "type": "Action", "label": "可配合初始化数据" }
+    ]
+  },
+  {
+    "id": "migration-commands",
+    "label": "Migration Commands",
+    "description": "迁移命令包括创建迁移、更新数据库和生成脚本等开发流程操作。",
+    "tags": ["Testing", "API"],
+    "links": []
+  },
+  {
+    "id": "model-snapshot",
+    "label": "Model Snapshot",
+    "description": "模型快照记录当前模型形态，用于后续比较差异并生成迁移。",
+    "tags": ["Testing", "Model"],
+    "links": []
+  },
+  {
+    "id": "seed-data",
+    "label": "Seed Data",
+    "description": "种子数据用于初始化系统所需的基础数据或测试基线数据。",
+    "tags": ["Testing", "Model"],
+    "links": []
+  },
+  {
+    "id": "loading-strategies",
+    "label": "Loading Strategies",
+    "description": "加载策略决定如何获取导航属性关联数据，包括预先、延迟或显式加载。",
+    "tags": ["Query", "Performance"],
+    "links": [
+      { "target": "eager-loading", "type": "Concept", "label": "预先加载" },
+      { "target": "lazy-loading", "type": "Concept", "label": "延迟加载" },
+      { "target": "explicit-loading", "type": "Concept", "label": "显式加载" }
     ]
   },
   {
     "id": "eager-loading",
     "label": "Eager Loading",
-    "description": "通过Include提前加载相关数据。",
-    "tags": ["performance"],
+    "description": "预先加载通过 Include 在单次查询中一并获取相关实体。",
+    "tags": ["Query", "Performance"],
     "links": [
-      { "target": "entity", "type": "Action", "label": "加载关联数据" }
+      { "target": "split-vs-single-query", "type": "Condition", "label": "可选择拆分或单查询" }
+    ]
+  },
+  {
+    "id": "lazy-loading",
+    "label": "Lazy Loading",
+    "description": "延迟加载会在首次访问导航属性时自动发送额外查询获取关联数据。",
+    "tags": ["Query", "Performance"],
+    "links": [
+      { "target": "n-plus-one", "type": "Condition", "label": "容易引发 N+1 问题" }
+    ]
+  },
+  {
+    "id": "explicit-loading",
+    "label": "Explicit Loading",
+    "description": "显式加载由开发者在需要时主动为某个实体或集合加载关联数据。",
+    "tags": ["Query", "API"],
+    "links": []
+  },
+  {
+    "id": "split-vs-single-query",
+    "label": "Split vs Single Query",
+    "description": "复杂 Include 可采用单查询或拆分查询，以在笛卡尔积和往返次数之间权衡。",
+    "tags": ["Performance", "Query"],
+    "links": []
+  },
+  {
+    "id": "compiled-queries",
+    "label": "Compiled Queries",
+    "description": "编译查询可缓存查询解析和翻译结果，适合高频、形状稳定的查询路径。",
+    "tags": ["Performance", "Query"],
+    "links": []
+  },
+  {
+    "id": "batch-operations",
+    "label": "Batch Operations",
+    "description": "批量操作通过合并多条数据库命令或减少往返次数来提升写入性能。",
+    "tags": ["Performance", "API"],
+    "links": [
+      { "target": "performance-pitfalls", "type": "Description", "label": "频繁保存会削弱批处理收益" }
     ]
   },
   {
     "id": "n-plus-one",
-    "label": "N+1 Problem",
-    "description": "多次查询导致性能问题的常见反模式。",
-    "tags": ["performance"],
+    "label": "N+1 Query Problem",
+    "description": "N+1 问题指先查询主集合，再为每个元素单独发起关联查询，导致大量数据库往返。",
+    "tags": ["Performance", "Query"],
     "links": [
-      { "target": "eager-loading", "type": "Action", "label": "可优化" }
+      { "target": "performance-pitfalls", "type": "Description", "label": "属于典型性能陷阱" }
+    ]
+  },
+  {
+    "id": "performance-pitfalls",
+    "label": "Performance Pitfalls",
+    "description": "性能陷阱包括过度跟踪、N+1、过早 ToList、客户端求值和索引缺失等问题。",
+    "tags": ["Performance", "ORM"],
+    "links": []
+  },
+  {
+    "id": "lifetime-and-thread-safety",
+    "label": "生命周期与线程安全",
+    "description": "DbContext 设计为短生命周期且非线程安全，通常按请求范围使用并避免并发访问。",
+    "tags": ["Performance", "Core"],
+    "links": []
+  },
+  {
+    "id": "execution-strategy-and-retry",
+    "label": "Execution Strategy 与重试",
+    "description": "执行策略可在短暂故障发生时自动重试数据库操作，以提升云环境下的健壮性。",
+    "tags": ["Performance", "API"],
+    "links": []
+  },
+  {
+    "id": "savechanges-interceptor",
+    "label": "SaveChanges Interceptor",
+    "description": "保存拦截器允许在保存前后注入审计、日志或业务规则逻辑。",
+    "tags": ["API", "ORM"],
+    "links": [
+      { "target": "interceptors-and-logging", "type": "Description", "label": "属于拦截与诊断机制" }
+    ]
+  },
+  {
+    "id": "interceptors-and-logging",
+    "label": "Interceptors 与 Logging",
+    "description": "拦截器和日志能力可用于观察 SQL、耗时、参数和上下文行为。",
+    "tags": ["API", "Performance"],
+    "links": []
+  },
+  {
+    "id": "testing-strategies",
+    "label": "Testing Strategies",
+    "description": "EF Core 测试策略包括使用真实数据库、SQLite、测试容器或替身提供程序。",
+    "tags": ["Testing", "Performance"],
+    "links": [
+      { "target": "sqlite-provider", "type": "Action", "label": "可用于轻量集成测试" }
     ]
   }
 ]
