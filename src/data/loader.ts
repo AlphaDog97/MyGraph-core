@@ -6,6 +6,7 @@ import {
   KnowledgeNodeFile,
   TagColorAssignment,
 } from "../domain/types";
+import { resolveEdgeTypeColor } from "../domain/edgeTypes";
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -123,6 +124,7 @@ export function toCytoscapeElements(
       source: e.source,
       target: e.target,
       label: e.label,
+      edgeColor: resolveEdgeTypeColor(e.type),
     },
   }));
   return [...nodeEls, ...edgeEls];
