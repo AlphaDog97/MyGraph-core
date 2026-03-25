@@ -1,20 +1,84 @@
-# Node Generation Prompt Template
+# Multi-Graph Prompt Template
 
-Copy the prompt below and send it to any AI model (ChatGPT, Claude, etc.). Replace the `{{TOPIC}}` placeholder with the subject area you want to map. The model will produce a single JSON array containing all nodes, which you save as `graph.json` inside a graph folder.
+Use these prompts when a single graph for one topic becomes too large or too tangled.  
+New default workflow: **first split one big topic into several subgraphs**, then generate one `graph.json` per subgraph.
 
 ---
 
-## Prompt (English)
+## Step 1: Topic Split Prompt (English)
 
 ```
-I'm building a visual knowledge graph. Please generate all nodes for the topic "{{TOPIC}}" as a single JSON array.
+I'm building a visual knowledge graph app. I don't want one giant graph for "{{TOPIC}}".
+Please split this topic into several smaller, cleaner subgraphs.
 
-Requirements:
+Output requirements:
+1. Return ONE JSON object with this shape:
+{
+  "topic": "{{TOPIC}}",
+  "categoryId": "<kebab-case-category-id>",
+  "subgraphs": [
+    {
+      "id": "<kebab-case-graph-id>",
+      "label": "<Human-readable graph name>",
+      "focus": "<What this subgraph covers>",
+      "mustInclude": ["<concept1>", "<concept2>"]
+    }
+  ]
+}
+2. Create 3–7 subgraphs.
+3. Each subgraph should be cohesive and narrowly focused.
+4. Minimize overlap between subgraphs.
+5. Together, all subgraphs should cover the topic comprehensively.
+6. Use practical, folder-safe IDs in kebab-case.
+7. Output JSON only (no markdown, no explanation).
+```
 
-1. Generate as many nodes as needed to thoroughly cover the key concepts, tools, or entities related to the topic. Don't limit yourself — include all important items.
-2. Output all nodes as ONE JSON array (not separate objects).
-3. Every node must follow this schema:
+---
 
+## Step 1：主题拆分提示词（中文版）
+
+```
+我正在构建一个可视化知识图谱应用，不希望把“{{主题}}”做成一个巨大且线条交错的单图。
+请先把这个主题拆成多个更清晰的小图。
+
+输出要求：
+1. 只输出一个 JSON 对象，格式如下：
+{
+  "topic": "{{主题}}",
+  "categoryId": "<kebab-case-分类id>",
+  "subgraphs": [
+    {
+      "id": "<kebab-case-图id>",
+      "label": "<图名称>",
+      "focus": "<这个子图聚焦什么>",
+      "mustInclude": ["<概念1>", "<概念2>"]
+    }
+  ]
+}
+2. 拆分为 3–7 个子图。
+3. 每个子图必须主题集中、边界清晰。
+4. 子图之间尽量减少重复内容。
+5. 所有子图合起来要完整覆盖该主题。
+6. id 使用 kebab-case，方便直接作为文件夹名称。
+7. 只输出 JSON，不要 markdown，不要解释文字。
+```
+
+---
+
+## Step 2: Per-Subgraph Node Prompt (English)
+
+Use this prompt **once per subgraph** from Step 1.
+
+```
+Generate nodes for ONE subgraph of "{{TOPIC}}".
+Subgraph ID: "{{SUBGRAPH_ID}}"
+Subgraph Label: "{{SUBGRAPH_LABEL}}"
+Subgraph Focus: "{{SUBGRAPH_FOCUS}}"
+Must-Include Concepts: {{MUST_INCLUDE_ARRAY}}
+
+Return exactly ONE JSON array (this will be saved as graph.json).
+
+Schema for every node:
 {
   "id": "<url-safe-unique-id>",
   "label": "<Short Display Name>",
@@ -29,105 +93,80 @@ Requirements:
   ]
 }
 
-Field rules:
-- "id": lowercase, URL-safe, unique across all nodes (e.g. "react", "machine-learning").
-- "label": human-readable display name (e.g. "React", "Machine Learning").
-- "description": a concise sentence describing the node.
-- "tags": 1–3 tags that categorize this node. Reuse tags across nodes for meaningful filtering.
-- "links": outbound relationships to other nodes in this array. Each link needs:
-  - "target": the id of the target node (must exist in the array).
-  - "type": MUST be one of: "Concept", "Description", "Condition", "Action".
-  - "label": a short human-readable description (e.g. "bundled by", "runs on").
-
-Additional guidelines:
-- Links must only reference IDs that exist in the array you produce.
-- Every node should have at least one inbound or outbound link (connected graph).
-- Use 4–7 distinct tags total.
-- Restrict all relationship types to this fixed set only: "Concept", "Description", "Condition", "Action".
-- Structure the graph as a radial hierarchy (center → outer layers):
-  - Put broad, high-level concepts near the center (core/foundation nodes).
-  - Put specialized, derived, or implementation details in outer layers.
-  - Prefer edges that point from inner/core nodes to outer/derived nodes.
-  - Avoid linking outer-layer nodes directly back to inner/core hubs.
-  - Avoid skip-layer links (e.g., center directly to far outer ring). Prefer links only between adjacent layers.
-- Output the entire array as a single JSON code block.
-
-Please generate the nodes now.
+Rules:
+1. Include all must-include concepts.
+2. Keep this graph focused only on this subgraph scope.
+3. "id" must be lowercase, URL-safe, and unique within this array.
+4. "links.target" must reference an existing node in this same array.
+5. Relationship "type" must be one of: "Concept", "Description", "Condition", "Action".
+6. Use 4–7 tags total in this subgraph.
+7. Ensure every node has at least one inbound or outbound link.
+8. Prefer clean layered structure (core -> related -> detailed), and avoid unnecessary cross-links.
+9. Output JSON array only (no markdown).
 ```
 
 ---
 
-## Prompt（中文版）
+## Step 2：单个子图生成提示词（中文版）
+
+对 Step 1 生成的每个子图，分别执行一次。
 
 ```
-我正在构建一个可视化知识图谱。请为以下主题生成所有节点，输出为一个 JSON 数组："{{主题}}"。
+请为“{{主题}}”中的一个子图生成节点。
+子图 ID："{{子图ID}}"
+子图名称："{{子图名称}}"
+子图焦点："{{子图焦点}}"
+必须包含概念：{{必须包含概念数组}}
 
-要求：
+只返回一个 JSON 数组（将直接保存为 graph.json）。
 
-1. 生成足够多的节点来全面覆盖该主题下的关键概念、工具或实体，不要限制数量，重要的内容都应该包含进来。
-2. 将所有节点输出为一个 JSON 数组（不是单独的对象）。
-3. 每个节点必须遵循以下格式：
-
+每个节点必须符合：
 {
   "id": "<url安全的唯一标识>",
-  "label": "<简短的显示名称>",
-  "description": "<一句话描述。>",
+  "label": "<简短显示名>",
+  "description": "<一句话描述>",
   "tags": ["<标签1>", "<标签2>"],
   "links": [
     {
       "target": "<另一个节点的id>",
       "type": "<关系类型>",
-      "label": "<可读的边标签>"
+      "label": "<可读的关系文字>"
     }
   ]
 }
 
-字段规则：
-- "id"：小写、URL 安全、在所有节点中唯一（例如 "react"、"machine-learning"）。
-- "label"：人类可读的显示名称（例如 "React"、"机器学习"）。
-- "description"：简洁的一句话描述。
-- "tags"：1–3 个分类标签。请在多个节点间复用标签。
-- "links"：指向数组中其他节点的关系。每个 link 需要：
-  - "target"：目标节点的 id（必须存在于数组中）。
-  - "type"：必须且只能是以下四种之一："Concept"、"Description"、"Condition"、"Action"。
-  - "label"：简短的人类可读关系描述（例如 "依赖于"、"运行在"）。
-
-额外要求：
-- links 中引用的节点 ID 必须存在于数组中。
-- 构建一个连通图：每个节点至少要有一条入边或出边。
-- 总共使用 4–7 个不同标签。
-- 关系类型只允许使用固定四种："Concept"、"Description"、"Condition"、"Action"。
-- 图结构尽量按“中心 → 外围”的层次扩散：
-  - 更大、更基础、更抽象的概念放在中心层（核心节点）。
-  - 细分、派生、实现层面的概念放在外层。
-  - 尽量让关系从中心层指向外层。
-  - 避免外层节点再直接连回中心核心节点。
-  - 避免跨层跳连（例如中心层直接连到最外层），优先只连接相邻层。
-- 将整个数组输出为一个 JSON 代码块。
-
-请现在生成这些节点。
+规则：
+1. 必须覆盖“必须包含概念”中的全部内容。
+2. 内容只聚焦当前子图范围，不要扩展到其他子图。
+3. "id" 必须小写、URL 安全，并在当前数组内唯一。
+4. "links.target" 必须引用当前数组内真实存在的节点 id。
+5. "type" 只能是："Concept"、"Description"、"Condition"、"Action"。
+6. 当前子图总共使用 4–7 个标签。
+7. 每个节点至少有一条入边或出边。
+8. 结构尽量分层（核心 -> 相关 -> 细节），避免不必要的交叉连线。
+9. 只输出 JSON 数组，不要 markdown。
 ```
 
 ---
 
 ## Usage / 使用方法
 
-1. Copy the prompt above (English or Chinese), replace `{{TOPIC}}` / `{{主题}}` with your subject.
-2. Send it to your preferred AI model.
-3. Create a folder structure: `graph-data/<category>/<graph-name>/`
-4. Save the returned JSON array as `graph.json` inside that folder.
-5. Rebuild or refresh the app — the new graph will appear in the category dropdown.
+1. Run **Step 1** prompt to get subgraph planning JSON.
+2. Create a category folder using `categoryId`: `graph-data/<categoryId>/`.
+3. For each item in `subgraphs`, run **Step 2** prompt once.
+4. Save each returned array as:
+   - `graph-data/<categoryId>/<subgraph.id>/graph.json`
+5. Rebuild or refresh the app.
 
 ### Folder structure example
 
 ```
 graph-data/
-├── web-development/
-│   ├── frontend-stack/
-│   │   └── graph.json       ← paste the AI output here
-│   └── backend-stack/
-│       └── graph.json
-└── data-science/
-    └── ml-pipeline/
+└── web-development/
+    ├── frontend-core/
+    │   └── graph.json
+    ├── build-tooling/
+    │   └── graph.json
+    └── testing-quality/
         └── graph.json
 ```
