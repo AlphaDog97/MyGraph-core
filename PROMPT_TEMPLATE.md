@@ -48,7 +48,8 @@ Additional guidelines:
   - Put broad, high-level concepts near the center (core/foundation nodes).
   - Put specialized, derived, or implementation details in outer layers.
   - Prefer edges that point from inner/core nodes to outer/derived nodes.
-  - Avoid linking outer-layer nodes directly back to inner/core hubs unless absolutely necessary.
+  - Avoid linking outer-layer nodes directly back to inner/core hubs.
+  - Avoid skip-layer links (e.g., center directly to far outer ring). Prefer links only between adjacent layers.
 - Output the entire array as a single JSON code block.
 
 Please generate the nodes now.
@@ -100,7 +101,8 @@ Please generate the nodes now.
   - 更大、更基础、更抽象的概念放在中心层（核心节点）。
   - 细分、派生、实现层面的概念放在外层。
   - 尽量让关系从中心层指向外层。
-  - 除非必要，避免外层节点再直接连回中心核心节点。
+  - 避免外层节点再直接连回中心核心节点。
+  - 避免跨层跳连（例如中心层直接连到最外层），优先只连接相邻层。
 - 将整个数组输出为一个 JSON 代码块。
 
 请现在生成这些节点。

@@ -250,13 +250,14 @@ polished typography, subtle motion, `prefers-reduced-motion` support.
 
 ### Layout strategy
 
-Use a directed `breadthfirst` layout by default so users can read the graph
-from root concepts outward in a clear layered flow:
+Use an onion-style `concentric` layout by default so users can read the graph
+from center concepts outward ring by ring:
 
 - auto-detect root nodes (in-degree `0`) and fall back to highest out-degree
   when no strict root exists,
-- expand layers with a larger spacing factor for less crowding,
-- include node labels in overlap calculations to keep rows tidy.
+- compute directed depth from roots and map each depth to a dedicated ring,
+- keep ring spacing wider (`minNodeSpacing`, `spacingFactor`) and include
+  labels in overlap calculations for cleaner separation.
 
 Keep `fit` behavior resilient by allowing deeper zoom-out bounds and forcing a
 final `fit` on `layoutstop`, so larger datasets remain visible when loaded.

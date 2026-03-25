@@ -111,20 +111,71 @@ function resolveLayoutRoots(graph: KnowledgeGraph): string[] {
   return fallback.slice(0, 1).map((node) => node.id);
 }
 
-function buildLayout(noMotion: boolean, roots: string[]): cytoscape.LayoutOptions {
+function resolveNodeDepths(
+  graph: KnowledgeGraph,
+  roots: string[]
+): { depthById: Map<string, number>; maxDepth: number } {
+  const outgoing = new Map<string, string[]>();
+  for (const node of graph.nodes) outgoing.set(node.id, []);
+  for (const edge of graph.edges) {
+    outgoing.set(edge.source, [...(outgoing.get(edge.source) ?? []), edge.target]);
+  }
+
+  const depthById = new Map<string, number>();
+  const queue: string[] = [];
+  for (const root of roots) {
+    depthById.set(root, 0);
+    queue.push(root);
+  }
+
+  for (let i = 0; i < queue.length; i++) {
+    const nodeId = queue[i];
+    const depth = depthById.get(nodeId) ?? 0;
+    for (const next of outgoing.get(nodeId) ?? []) {
+      if (!depthById.has(next)) {
+        depthById.set(next, depth + 1);
+        queue.push(next);
+      }
+    }
+  }
+
+  let maxDepth = 0;
+  for (const value of depthById.values()) {
+    maxDepth = Math.max(maxDepth, value);
+  }
+
+  for (const node of graph.nodes) {
+    if (!depthById.has(node.id)) {
+      maxDepth += 1;
+      depthById.set(node.id, maxDepth);
+    }
+  }
+
+  return { depthById, maxDepth };
+}
+
+function buildLayout(
+  noMotion: boolean,
+  depthById: Map<string, number>,
+  maxDepth: number
+): cytoscape.LayoutOptions {
   return {
-    name: "breadthfirst",
-    directed: true,
-    roots,
-    circle: false,
-    grid: false,
+    name: "concentric",
     fit: true,
     padding: 64,
     animate: !noMotion,
     animationDuration: 600,
     avoidOverlap: true,
-    spacingFactor: 1.9,
+    spacingFactor: 1.55,
     nodeDimensionsIncludeLabels: true,
+    equidistant: true,
+    startAngle: -Math.PI / 2,
+    sweep: 2 * Math.PI,
+    clockwise: true,
+    minNodeSpacing: 70,
+    concentric: (node: cytoscape.NodeSingular) =>
+      maxDepth - (depthById.get(node.id()) ?? maxDepth),
+    levelWidth: () => 1,
   } as cytoscape.LayoutOptions;
 }
 
@@ -143,12 +194,14 @@ export default function GraphCanvas({
 
     const elements = toCytoscapeElements(graph, tagColors);
     const noMotion = prefersReducedMotion();
+    const roots = resolveLayoutRoots(graph);
+    const { depthById, maxDepth } = resolveNodeDepths(graph, roots);
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: buildLayout(noMotion, resolveLayoutRoots(graph)),
+      layout: buildLayout(noMotion, depthById, maxDepth),
       minZoom: 0.05,
       maxZoom: 4,
     });
