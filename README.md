@@ -30,6 +30,18 @@ graph-data/
 - `graph.json` holds a **JSON array** with all nodes for that graph.
 - `manifest.json` is generated automatically at build time — do not edit it manually.
 
+Alternative category-level format is also supported:
+
+```
+graph-data/
+└── ef-core/
+    └── graph.json
+```
+
+In this mode, `graph-data/<category>/graph.json` is a JSON object with `graphs[]`,
+and each `graphs[i].nodes` is the node array for one graph. The app automatically
+maps each `graphId` to a selectable graph in the UI.
+
 ## Graph file format
 
 Each `graph.json` is a JSON array of node objects:
