@@ -15,6 +15,8 @@ const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {
   return [
@@ -50,9 +52,7 @@ function buildStyles(noMotion: boolean): any[] {
         "line-color": "data(edgeColor)",
         "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
-        "curve-style": "taxi",
-        "taxi-direction": "downward",
-        "taxi-turn": 24,
+        "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
         "font-size": "10px",
@@ -160,6 +160,9 @@ function buildLayout(
   maxDepth: number,
   compact = false
 ): cytoscape.LayoutOptions {
+  const spacingFactor = compact ? 1.08 : 1.28;
+  const minNodeSpacing = compact ? 30 : 54;
+
   return {
     name: "concentric",
     fit: true,
@@ -167,13 +170,13 @@ function buildLayout(
     animate: !noMotion,
     animationDuration: 600,
     avoidOverlap: true,
-    spacingFactor: compact ? 1.15 : 1.55,
+    spacingFactor,
     nodeDimensionsIncludeLabels: true,
     equidistant: true,
     startAngle: -Math.PI / 2,
     sweep: 2 * Math.PI,
     clockwise: true,
-    minNodeSpacing: compact ? 36 : 70,
+    minNodeSpacing,
     concentric: (node: cytoscape.NodeSingular) =>
       maxDepth - (depthById.get(node.id()) ?? maxDepth),
     levelWidth: () => 1,
@@ -203,13 +206,13 @@ export default function GraphCanvas({
       elements,
       style: buildStyles(noMotion),
       layout: buildLayout(noMotion, depthById, maxDepth),
-      minZoom: 0.01,
+      minZoom: COMPACT_LAYOUT_ZOOM_THRESHOLD,
       maxZoom: 4,
     });
 
     cy.one("layoutstop", () => {
       cy.fit(cy.elements(), 40);
-      if (cy.zoom() <= 0.011) {
+      if (cy.zoom() <= COMPACT_LAYOUT_ZOOM_THRESHOLD) {
         cy.one("layoutstop", () => {
           cy.fit(cy.elements(), 32);
         });
