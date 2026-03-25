@@ -1,7 +1,8 @@
-import { Manifest } from "../domain/types";
+import { ManifestCategory, ManifestGraph } from "../domain/types";
 
 interface Props {
-  manifest: Manifest;
+  categories: ManifestCategory[];
+  graphs: ManifestGraph[];
   categoryId: string;
   graphId: string;
   onCategoryChange: (categoryId: string) => void;
@@ -9,14 +10,13 @@ interface Props {
 }
 
 export default function GraphSelector({
-  manifest,
+  categories,
+  graphs,
   categoryId,
   graphId,
   onCategoryChange,
   onGraphChange,
 }: Props) {
-  const category = manifest.categories.find((c) => c.id === categoryId);
-
   return (
     <div className="graph-selector">
       <select
@@ -25,9 +25,9 @@ export default function GraphSelector({
         onChange={(e) => onCategoryChange(e.target.value)}
         aria-label="Select category"
       >
-        {manifest.categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.label}
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.label}
           </option>
         ))}
       </select>
@@ -40,9 +40,9 @@ export default function GraphSelector({
         onChange={(e) => onGraphChange(e.target.value)}
         aria-label="Select graph"
       >
-        {category?.graphs.map((g) => (
-          <option key={g.id} value={g.id}>
-            {g.label}
+        {graphs.map((graph) => (
+          <option key={graph.id} value={graph.id}>
+            {graph.label}
           </option>
         ))}
       </select>
