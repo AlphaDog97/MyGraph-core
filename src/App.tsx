@@ -9,6 +9,7 @@ import {
 } from "./domain/types";
 import {
   buildGraphFromRaw,
+  loadCategoryGraphs,
   loadLocalGraphNodes,
   loadManifest,
 } from "./data/loader";
@@ -35,12 +36,15 @@ import ErrorDisplay from "./components/ErrorDisplay";
 import AuthControls from "./auth/AuthControls";
 import { useAuth } from "./auth/AuthProvider";
 
+type GraphOption = { id: string; label: string };
+
 type AppState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | {
       status: "ready";
       manifest: Manifest;
+      graphOptions: GraphOption[];
       categoryId: string;
       graphId: string;
       graph: KnowledgeGraph;
@@ -151,6 +155,14 @@ export default function App() {
     [storageMode, user]
   );
 
+  const resolveGraphOptions = useCallback(async (categoryId: string) => {
+    const graphs = await loadCategoryGraphs(categoryId);
+    return graphs.map((graph) => ({
+      id: graph.graphId,
+      label: graph.graphLabel,
+    }));
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -165,7 +177,8 @@ export default function App() {
 
         const lastViewed = loadLastViewed();
         let catId = manifest.categories[0].id;
-        let gId = manifest.categories[0].graphs[0]?.id;
+        let graphOptions = await resolveGraphOptions(catId);
+        let gId = graphOptions[0]?.id;
 
         if (lastViewed) {
           const cat = manifest.categories.find(
@@ -173,8 +186,9 @@ export default function App() {
           );
           if (cat) {
             catId = cat.id;
-            const gr = cat.graphs.find((g) => g.id === lastViewed.graphId);
-            gId = gr ? gr.id : cat.graphs[0]?.id;
+            graphOptions = await resolveGraphOptions(catId);
+            const gr = graphOptions.find((g) => g.id === lastViewed.graphId);
+            gId = gr ? gr.id : graphOptions[0]?.id;
           }
         }
 
@@ -191,6 +205,7 @@ export default function App() {
         setState({
           status: "ready",
           manifest,
+          graphOptions,
           categoryId: catId,
           graphId: gId,
           graph,
@@ -202,7 +217,7 @@ export default function App() {
         });
       }
     })();
-  }, [resolveGraph]);
+  }, [resolveGraph, resolveGraphOptions]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
@@ -211,15 +226,22 @@ export default function App() {
         return { ...prev, status: "loading" as const } as AppState;
       });
       try {
-        const graph = await resolveGraph(catId, gId);
-        saveLastViewed({ categoryId: catId, graphId: gId });
+        const graphOptions = await resolveGraphOptions(catId);
+        const selectedGraph =
+          graphOptions.find((graph) => graph.id === gId) ?? graphOptions[0];
+        if (!selectedGraph) {
+          throw new Error(`Category '${catId}' has no graphs.`);
+        }
+        const graph = await resolveGraph(catId, selectedGraph.id);
+        saveLastViewed({ categoryId: catId, graphId: selectedGraph.id });
         setSelectedNode(null);
         setSearchQuery("");
         setState({
           status: "ready",
           manifest,
+          graphOptions,
           categoryId: catId,
-          graphId: gId,
+          graphId: selectedGraph.id,
           graph,
         });
       } catch (err) {
@@ -229,15 +251,15 @@ export default function App() {
         });
       }
     },
-    [resolveGraph]
+    [resolveGraph, resolveGraphOptions]
   );
 
   const handleCategoryChange = useCallback(
     (newCatId: string) => {
       if (state.status !== "ready") return;
       const cat = state.manifest.categories.find((c) => c.id === newCatId);
-      if (!cat || cat.graphs.length === 0) return;
-      switchGraph(state.manifest, newCatId, cat.graphs[0].id);
+      if (!cat) return;
+      switchGraph(state.manifest, newCatId, "");
     },
     [state, switchGraph]
   );
@@ -323,9 +345,9 @@ export default function App() {
       alert(
         `graph.json has been downloaded.\n\n` +
           `To complete the move:\n` +
-          `1. Move the folder graph-data/${state.categoryId}/${state.graphId}/ ` +
-          `to graph-data/${targetCategoryId}/${state.graphId}/\n` +
-          `2. Commit and redeploy.`
+          `1. Open graph-data/${targetCategoryId}/graph.json and add/update the graph entry for '${state.graphId}'.\n` +
+          `2. Remove the graph entry from graph-data/${state.categoryId}/graph.json.\n` +
+          `3. Commit and redeploy.`
       );
     },
     [state]
@@ -350,8 +372,8 @@ export default function App() {
         message: "All graphs have been removed. Add data to graph-data/ and redeploy.",
       });
       alert(
-        `To permanently delete this graph, remove the folder:\n` +
-          `graph-data/${categoryId}/${graphId}/\n` +
+        `To permanently delete this graph, remove it from:\n` +
+          `graph-data/${categoryId}/graph.json\n` +
           `Then commit and redeploy.`
       );
       return;
@@ -362,8 +384,8 @@ export default function App() {
 
     alert(
       `Graph removed from view.\n\n` +
-        `To permanently delete, remove the folder:\n` +
-        `graph-data/${categoryId}/${graphId}/\n` +
+        `To permanently delete, remove it from:\n` +
+        `graph-data/${categoryId}/graph.json\n` +
         `Then commit and redeploy.`
     );
 
@@ -383,7 +405,11 @@ export default function App() {
     return <ErrorDisplay error={state.message} />;
   }
 
-  const { manifest, categoryId, graphId, graph } = state;
+  const { manifest, graphOptions, categoryId, graphId, graph } = state;
+  const categoryOptions = manifest.categories.map((category) => ({
+    ...category,
+    graphs: [],
+  }));
   const modeText =
     storageMode.type === "cloud"
       ? `Cloud mode · ${storageMode.email}`
@@ -398,7 +424,8 @@ export default function App() {
       </div>
       <div className="toolbar">
         <GraphSelector
-          manifest={manifest}
+          categories={categoryOptions}
+          graphs={graphOptions}
           categoryId={categoryId}
           graphId={graphId}
           onCategoryChange={handleCategoryChange}

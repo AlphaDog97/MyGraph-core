@@ -6,17 +6,41 @@
       "graphs": [
         {
           "id": "ml-pipeline",
-          "label": "Ml Pipeline"
+          "label": "ML Pipeline"
         }
       ]
     },
     {
-      "id": "web-development",
-      "label": "Web Development",
+      "id": "ef-core",
+      "label": "Ef Core",
       "graphs": [
         {
+          "id": "change-tracker",
+          "label": "Change Tracker"
+        },
+        {
           "id": "dbcontext",
-          "label": "Frontend Stack"
+          "label": "DbContext"
+        },
+        {
+          "id": "migrations",
+          "label": "Migrations"
+        },
+        {
+          "id": "modeling",
+          "label": "Modeling"
+        },
+        {
+          "id": "performance",
+          "label": "Performance Optimization"
+        },
+        {
+          "id": "querying",
+          "label": "Querying"
+        },
+        {
+          "id": "relationships-loading",
+          "label": "Relationships & Loading"
         }
       ]
     }

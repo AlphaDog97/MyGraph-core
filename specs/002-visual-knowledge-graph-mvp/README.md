@@ -51,16 +51,10 @@ visible legend, and basic graph management operations (move, delete).
 /
 ├── graph-data/
 │   ├── manifest.json                  ← auto-generated catalog of all categories/graphs
-│   ├── web-development/               ← category folder
-│   │   ├── frontend-stack/            ← graph folder
-│   │   │   └── graph.json             ← all nodes for this graph in one file
-│   │   └── backend-stack/
-│   │       └── graph.json
+│   ├── ef-core/                       ← category folder
+│   │   └── graph.json                 ← includes graphs[]; each graph has graphLabel + nodes[]
 │   └── data-science/
-│       ├── ml-pipeline/
-│       │   └── graph.json
-│       └── data-engineering/
-│           └── graph.json
+│       └── graph.json
 ├── src/
 │   ├── domain/
 │   ├── data/
@@ -69,37 +63,37 @@ visible legend, and basic graph management operations (move, delete).
 └── .github/workflows/
 ```
 
-- `graph-data/<category>/<graph>/graph.json` is the user-managed source file
-  for one knowledge graph.
-- Each `graph.json` contains **all nodes** for that graph as a JSON array.
+- `graph-data/<category>/graph.json` is the user-managed source file for one
+  category.
+- Each category file contains `graphs[]`, and each graph entry includes
+  `graphId`, `graphLabel`, and `nodes`.
 - The build-time manifest enumerates every category and graph so the app can
   render navigation UI without scanning directories at runtime.
 
 ### Graph file format
 
-Each graph is one JSON file containing an array of node objects.
+Each category file contains multiple graph entries.
 
-Example `graph-data/web-development/frontend-stack/graph.json`:
+Example `graph-data/ef-core/graph.json`:
 
 ```json
-[
-  {
-    "id": "react",
-    "label": "React",
-    "description": "UI library for building component-driven interfaces.",
-    "tags": ["frontend", "ui-framework"],
-    "links": [
-      { "target": "vite", "type": "used-with", "label": "bundled by" }
-    ]
-  },
-  {
-    "id": "vite",
-    "label": "Vite",
-    "description": "Next-generation frontend build tool.",
-    "tags": ["tooling", "build"],
-    "links": []
-  }
-]
+{
+  "categoryId": "ef-core",
+  "graphs": [
+    {
+      "graphId": "dbcontext",
+      "graphLabel": "DbContext",
+      "nodes": [
+        {
+          "id": "dbcontext",
+          "label": "DbContext",
+          "tags": ["core", "session"],
+          "links": []
+        }
+      ]
+    }
+  ]
+}
 ```
 
 Node fields remain the same as before:
@@ -147,9 +141,9 @@ The toolbar includes a category dropdown placed **before** the search bar.
 Navigation flow:
 
 1. On load, the app reads the manifest and populates the category dropdown.
-2. Selecting a category shows a second dropdown listing its graphs.
-3. Selecting a graph loads `graph-data/<category>/<graph>/graph.json` and
-   renders it.
+2. Selecting a category loads `graph-data/<category>/graph.json`.
+3. The second dropdown is populated from `graphs[].graphLabel`.
+4. Selecting a graph loads its `nodes` and renders it.
 4. The app remembers the last viewed category and graph in browser storage.
 5. On first visit, the first category and first graph are selected by default.
 
@@ -173,14 +167,13 @@ commit and redeploy to make changes permanent.
 
 The app supports two explicit persistence modes shown in the toolbar:
 
-- **Local mode (guest):** continue using repository `graph-data/*/*/graph.json`
+- **Local mode (guest):** continue using repository `graph-data/<category>/graph.json`
   as the source of truth, and save edits by downloading `graph.json`.
 - **Cloud mode (logged-in email):** when a valid Appwrite email session exists,
   reads can use Appwrite Tables row data and saves write back to Appwrite
-  Tables for the current `<category>/<graph>`.
+  Tables for the current `<category>/<graphId>`.
 
-If cloud read fails, the loader falls back to local `graph-data` data so the
-graph remains usable.
+Cloud reads use Appwrite data in signed-in mode; local category files remain the source for bootstrap loading and parity checks.
 
 ### Runtime tag color editor
 
@@ -213,7 +206,7 @@ Updated shapes:
 1. Fetch `graph-data/manifest.json` on startup.
 2. Populate category and graph dropdowns from the manifest.
 3. When a graph is selected, fetch
-   `graph-data/<category>/<graph>/graph.json`.
+   `graph-data/<category>/graph.json`.
 4. Parse the JSON array into `KnowledgeNodeFile[]`.
 5. Validate required fields and enforce unique node IDs within the graph.
 6. Convert into `KnowledgeNode` instances.
@@ -295,11 +288,11 @@ Unchanged: Vite build, correct `base`, static-only, GitHub Actions workflow.
 
 Include two sample categories with at least one graph each:
 
-1. `web-development/frontend-stack/` — frontend technologies
-2. `data-science/ml-pipeline/` — machine learning concepts
+1. `ef-core/graph.json` — EF Core concept graphs
+2. `data-science/graph.json` — machine learning concepts
 
-Update `PROMPT_TEMPLATE.md` to reflect the single-file-per-graph format:
-all nodes for one topic go into a single JSON array, not separate files.
+Update `PROMPT_TEMPLATE.md` to reflect category-level graph files:
+one `graph-data/<category>/graph.json` containing `graphs[]`.
 
 Update `README.md` with the new folder structure and navigation instructions.
 
@@ -327,19 +320,18 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Add search, highlight/dim behavior, and reset/fit controls.
 - [x] Add node detail side panel with editing and JSON download.
 - [x] Configure GitHub Actions deployment to GitHub Pages.
-- [ ] Restructure `graph-data/` to `<category>/<graph>/graph.json` format with
-      all nodes in a single JSON array per graph.
+- [x] Restructure `graph-data/` to `<category>/graph.json` format with
+      `graphs[]` entries and per-graph `nodes` arrays.
 - [ ] Update the Vite plugin to generate a hierarchical manifest from the new
       folder structure.
-- [ ] Update the data loader to fetch a single `graph.json` per graph instead
-      of individual node files.
-- [ ] Add category dropdown and graph dropdown to the toolbar.
+- [x] Update the data loader to fetch `graph-data/<category>/graph.json` and
+      resolve selected graph nodes from `graphs[]`.
+- [x] Add category dropdown and graph dropdown to the toolbar.
 - [ ] Implement last-viewed persistence so the app reopens the same graph.
 - [ ] Add graph management menu with move-to-category and delete actions.
-- [ ] Create sample data for two categories: `web-development/frontend-stack`
-      and `data-science/ml-pipeline`.
-- [ ] Update `PROMPT_TEMPLATE.md` for single-file-per-graph format.
-- [ ] Update `README.md` with new folder structure and navigation docs.
+- [x] Create sample data for two categories: `ef-core` and `data-science`.
+- [x] Update `PROMPT_TEMPLATE.md` for category-level graph format.
+- [x] Update `README.md` with new folder structure and navigation docs.
 - [x] Add guest/local vs logged-in/cloud save modes with explicit UI status.
 - [x] Wire Appwrite Tables read/write for logged-in email sessions.
 - [x] Adjust graph layout strategy to reduce visible edge crossings in common directed graphs.
@@ -349,9 +341,9 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Run the local build successfully with the sample dataset.
 - [ ] Confirm the manifest lists all categories and graphs from `graph-data/`.
 - [ ] Confirm the category dropdown populates from the manifest.
-- [ ] Confirm selecting a category updates the graph dropdown.
-- [ ] Confirm selecting a graph loads and renders the correct `graph.json`.
-- [ ] Confirm switching between graphs in different categories works smoothly.
+- [x] Confirm selecting a category updates the graph dropdown.
+- [x] Confirm selecting a graph loads and renders the correct `graph.json`.
+- [x] Confirm switching between graphs in different categories works smoothly.
 - [ ] Confirm the last-viewed graph is restored on page reload.
 - [ ] Confirm the graph management menu appears for the selected graph.
 - [ ] Confirm "Move to category" shows a category picker and provides guidance.
@@ -361,7 +353,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm tag color editing updates legend and node borders immediately.
 - [x] Confirm edge line and label colors follow Concept/Description/Condition/Action mapping.
 - [ ] Confirm node style precedence: first color-assigned tag wins, gray
-      fallback.
+      when none is assigned.
 - [x] Confirm a dedicated relation legend is visible with all four edge types.
 - [ ] Confirm chosen tag colors persist across page refresh.
 - [ ] Confirm node detail panel opens on click with editable fields.
@@ -375,3 +367,4 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Confirm guest mode keeps JSON download save behavior.
 - [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
 - [x] Confirm save mode text is always visible in toolbar.
+- [x] Build verification: `npm run build` (2026-03-25).

@@ -15,36 +15,22 @@ Open the URL printed in the terminal (usually `http://localhost:5173/`).
 
 ```
 graph-data/
-├── web-development/               ← category folder
-│   ├── frontend-stack/            ← graph folder
-│   │   └── graph.json             ← all nodes for this graph
-│   └── backend-stack/
-│       └── graph.json
+├── ef-core/                       ← category folder
+│   └── graph.json                 ← category graph catalog (graphs[] + nodes[])
 └── data-science/                  ← another category
-    └── ml-pipeline/
-        └── graph.json
-```
-
-- Each **category** is a top-level folder inside `graph-data/`.
-- Each **graph** is a subfolder within a category, containing a single `graph.json`.
-- `graph.json` holds a **JSON array** with all nodes for that graph.
-- `manifest.json` is generated automatically at build time — do not edit it manually.
-
-Alternative category-level format is also supported:
-
-```
-graph-data/
-└── ef-core/
     └── graph.json
 ```
 
-In this mode, `graph-data/<category>/graph.json` is a JSON object with `graphs[]`,
-and each `graphs[i].nodes` is the node array for one graph. The app automatically
-maps each `graphId` to a selectable graph in the UI.
+- Each **category** is a top-level folder inside `graph-data/`.
+- Each category has one `graph-data/<category>/graph.json`.
+- This file is a JSON object containing `graphs[]`.
+- `graphs[i].graphLabel` is used as the graph selector display label.
+- `graphs[i].nodes` holds the node array for that graph.
+- `manifest.json` is generated automatically at build time — do not edit it manually.
 
 ## Graph file format
 
-Each `graph.json` is a JSON array of node objects:
+Each `graphs[i].nodes` in `graph-data/<category>/graph.json` is a JSON array of node objects:
 
 ```json
 [
@@ -90,7 +76,7 @@ Each `graph.json` is a JSON array of node objects:
 | `type`   | `string` | yes      | Machine-readable relation kind.   |
 | `label`  | `string` | no       | Human-readable edge label.        |
 
-Node IDs must be unique within each `graph.json`. They do not need to be unique across different graphs.
+Node IDs must be unique within each graph's `nodes` array. They do not need to be unique across different graphs.
 
 ## UI features
 
@@ -114,7 +100,6 @@ The toolbar shows an explicit save mode badge to avoid confusion:
 - **Local mode · Guest**: uses local `graph-data` files and downloads `graph.json` when saving node edits.
 - **Cloud mode · your-email@example.com**: if an Appwrite email session is active, node edits are saved with the normalized Appwrite multi-table schema.
 
-If cloud read fails, the app automatically falls back to local `graph-data` for loading.
 
 #### Appwrite Tables configuration
 

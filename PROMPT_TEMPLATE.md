@@ -99,11 +99,10 @@ Hard rules:
 ## Save Guide / 落盘方式
 
 1. Run prompt and get one JSON object.
-2. For each `graphs[i]`, save `nodes` into:
-   - `graph-data/<categoryId>/<graphId>/graph.json`
+2. Save the whole JSON object to:
+   - `graph-data/<categoryId>/graph.json`
 3. Example:
-   - `graph-data/ef-core/dbcontext/graph.json`
-   - `graph-data/ef-core/change-tracker/graph.json`
-   - `graph-data/ef-core/migrations/graph.json`
+   - `graph-data/ef-core/graph.json`
 
-Important: save only `nodes` array into each `graph.json` file.
+Important: keep `graphs[].graphLabel` for UI display names, and keep each graph's
+node list in `graphs[].nodes`.
