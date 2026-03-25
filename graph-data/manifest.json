@@ -15,7 +15,7 @@
       "label": "Web Development",
       "graphs": [
         {
-          "id": "frontend-stack",
+          "id": "dbcontext",
           "label": "Frontend Stack"
         }
       ]
