@@ -364,6 +364,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm an invalid `graph.json` produces a visible validation error.
 - [ ] Confirm zoom, pan, and reset/fit controls work.
 - [x] Confirm layout update reduces visible edge intersections in the sample graph.
+- [x] Confirm edge-angle upper bound was reduced by 10° (to 35°) while preserving readable autorotated labels.
 - [ ] Deploy to GitHub Pages and verify the graph loads correctly.
 - [x] Confirm guest mode keeps JSON download save behavior.
 - [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
