@@ -6,7 +6,7 @@ Use this template when you want one topic (e.g. `EF Core`) to be split into **mu
 
 ---
 
-## Step 1: Topic Split Prompt (English)
+## Step 1: Topic Split Prompt (English) 
 
 ```
 I'm building a visual knowledge graph project.
