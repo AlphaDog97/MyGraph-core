@@ -18,6 +18,9 @@ const prefersReducedMotion = () =>
 const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
 const LAYOUT_DEPTH_X_STEP = 240;
 const LAYOUT_Y_SCALE = 0.64;
+const MIN_EDGE_ANGLE_DEG = 30;
+const MAX_EDGE_ANGLE_DEG = 45;
+const SAME_DEPTH_MIN_VERTICAL_GAP = 76;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {
@@ -193,20 +196,104 @@ const TINY_ZOOM_THRESHOLD = 0.05;
 function runLayoutWithAdaptiveFit(
   cy: Core,
   noMotion: boolean,
+  graph: KnowledgeGraph,
   roots: string[],
   depthById: Map<string, number>,
   maxDepth: number
 ) {
+  const applyEdgeAngleConstraints = () => {
+    const minSlope = Math.tan((MIN_EDGE_ANGLE_DEG * Math.PI) / 180);
+    const maxSlope = Math.tan((MAX_EDGE_ANGLE_DEG * Math.PI) / 180);
+    const nodeById = new Map<string, cytoscape.NodeSingular>();
+    cy.nodes().forEach((n) => {
+      nodeById.set(n.id(), n);
+    });
+
+    const yById = new Map<string, number>();
+    cy.nodes().forEach((node) => {
+      yById.set(node.id(), node.position("y"));
+    });
+
+    const parentsById = new Map<string, string[]>();
+    for (const node of graph.nodes) parentsById.set(node.id, []);
+    for (const edge of graph.edges) {
+      const list = parentsById.get(edge.target);
+      if (list) list.push(edge.source);
+    }
+
+    const nodesByDepth = new Map<number, string[]>();
+    for (const node of graph.nodes) {
+      const depth = depthById.get(node.id) ?? 0;
+      const list = nodesByDepth.get(depth) ?? [];
+      list.push(node.id);
+      nodesByDepth.set(depth, list);
+    }
+
+    const depthOrder = [...nodesByDepth.keys()].sort((a, b) => a - b);
+    for (const depth of depthOrder) {
+      const ids = nodesByDepth.get(depth) ?? [];
+      ids.sort((a, b) => (yById.get(a) ?? 0) - (yById.get(b) ?? 0));
+
+      const placedYs: number[] = [];
+      for (let index = 0; index < ids.length; index += 1) {
+        const nodeId = ids[index];
+        const parentIds = (parentsById.get(nodeId) ?? []).filter((id) => (depthById.get(id) ?? 0) < depth);
+
+        let desiredY = yById.get(nodeId) ?? 0;
+        if (parentIds.length > 0) {
+          const candidates: number[] = [];
+          for (const parentId of parentIds) {
+            const parentDepth = depthById.get(parentId) ?? 0;
+            const parentY = yById.get(parentId) ?? 0;
+            const horizontalDepth = Math.max(1, depth - parentDepth);
+            const dx = horizontalDepth * LAYOUT_DEPTH_X_STEP;
+            const minDy = dx * minSlope;
+            const maxDy = dx * maxSlope;
+            const currentDy = desiredY - parentY;
+            const fallbackSign = index % 2 === 0 ? 1 : -1;
+            const sign = currentDy === 0 ? fallbackSign : currentDy > 0 ? 1 : -1;
+            const targetDyMagnitude = (minDy + maxDy) / 2;
+            candidates.push(parentY + sign * targetDyMagnitude);
+          }
+          desiredY = candidates.reduce((sum, y) => sum + y, 0) / candidates.length;
+        }
+
+        const nearestPlaced = placedYs.length > 0 ? placedYs[placedYs.length - 1] : null;
+        if (nearestPlaced !== null && Math.abs(desiredY - nearestPlaced) < SAME_DEPTH_MIN_VERTICAL_GAP) {
+          desiredY = nearestPlaced + SAME_DEPTH_MIN_VERTICAL_GAP;
+        }
+
+        yById.set(nodeId, desiredY);
+        placedYs.push(desiredY);
+      }
+    }
+
+    cy.batch(() => {
+      for (const node of graph.nodes) {
+        const nodeEl = nodeById.get(node.id);
+        if (!nodeEl) continue;
+        const depth = depthById.get(node.id) ?? 0;
+        const newY = yById.get(node.id) ?? nodeEl.position("y");
+        nodeEl.position({
+          x: depth * LAYOUT_DEPTH_X_STEP,
+          y: newY,
+        });
+      }
+    });
+  };
+
   const fitToAll = (padding: number) => {
     cy.fit(cy.elements(), padding);
     cy.center(cy.elements());
   };
 
   cy.one("layoutstop", () => {
+    applyEdgeAngleConstraints();
     fitToAll(40);
 
     if (cy.zoom() <= TINY_ZOOM_THRESHOLD) {
       cy.one("layoutstop", () => {
+        applyEdgeAngleConstraints();
         fitToAll(24);
       });
       cy.layout(buildLayout(noMotion, roots, depthById, maxDepth, true)).run();
@@ -241,7 +328,7 @@ export default function GraphCanvas({
       maxZoom: 4,
     });
 
-    runLayoutWithAdaptiveFit(cy, noMotion, roots, depthById, maxDepth);
+    runLayoutWithAdaptiveFit(cy, noMotion, graph, roots, depthById, maxDepth);
 
     cy.on("tap", "node", (evt) => {
       const nodeId = evt.target.id();
