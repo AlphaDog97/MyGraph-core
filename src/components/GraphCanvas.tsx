@@ -5,6 +5,7 @@ import { toCytoscapeElements } from "../data/loader";
 
 interface Props {
   graph: KnowledgeGraph;
+  transitionKey: string;
   tagColors: TagColorAssignment;
   searchQuery: string;
   cyRef: React.MutableRefObject<Core | null>;
@@ -237,7 +238,7 @@ function planNodePositions(
 }
 
 function buildLayout(
-  noMotion: boolean,
+  _noMotion: boolean,
   positions: Map<string, cytoscape.Position>,
   compact = false
 ): cytoscape.LayoutOptions {
@@ -246,8 +247,8 @@ function buildLayout(
     name: "preset",
     fit: true,
     padding: compact ? 30 : 44,
-    animate: !noMotion,
-    animationDuration: noMotion ? 0 : 350,
+    animate: false,
+    animationDuration: 0,
     positions: (node: cytoscape.NodeSingular) => {
       const planned = positions.get(node.id()) ?? { x: 0, y: 0 };
       return {
@@ -284,6 +285,7 @@ function runLayoutWithAdaptiveFit(
 
 export default function GraphCanvas({
   graph,
+  transitionKey,
   tagColors,
   searchQuery,
   cyRef,
@@ -404,6 +406,8 @@ export default function GraphCanvas({
 
   return (
     <div
+      key={transitionKey}
+      className="graph-switch-surface"
       ref={containerRef}
       style={{
         width: "100%",
