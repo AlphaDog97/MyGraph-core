@@ -287,6 +287,7 @@ function runLayoutWithAdaptiveFit(
 
 export default function GraphCanvas({
   graph,
+  transitionKey,
   tagColors,
   searchQuery,
   cyRef,
@@ -404,6 +405,30 @@ export default function GraphCanvas({
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, [cyRef]);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+    const container = containerRef.current;
+    if (!cy || !container) return;
+
+    const rerenderAfterSwitch = () => {
+      cy.resize();
+      cy.fit(cy.elements(), 40);
+    };
+    const computedStyle = window.getComputedStyle(container);
+    const animationDuration = Number.parseFloat(computedStyle.animationDuration || "0");
+    const animationName = computedStyle.animationName;
+
+    if (animationName === "none" || animationDuration <= 0) {
+      rerenderAfterSwitch();
+      return;
+    }
+
+    container.addEventListener("animationend", rerenderAfterSwitch, { once: true });
+    return () => {
+      container.removeEventListener("animationend", rerenderAfterSwitch);
+    };
+  }, [transitionKey, cyRef]);
 
   return (
     <div
