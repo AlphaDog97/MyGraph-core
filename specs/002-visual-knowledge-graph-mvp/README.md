@@ -335,6 +335,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Add guest/local vs logged-in/cloud save modes with explicit UI status.
 - [x] Wire Appwrite Tables read/write for logged-in email sessions.
 - [x] Adjust graph layout strategy to reduce visible edge crossings in common directed graphs.
+- [x] Constrain rendered edge tilt angles to avoid near-vertical labels and improve edge-label readability.
 
 ## Test
 
@@ -368,3 +369,5 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
 - [x] Confirm save mode text is always visible in toolbar.
 - [x] Build verification: `npm run build` (2026-03-25).
+- [x] Confirm layout keeps most edge slopes in diagonal/horizontal-friendly ranges (avoids near-90°) for label readability.
+- [x] Confirm post-layout node positioning enforces configured edge-angle bounds even in sparse vertical edge outliers.
