@@ -16,7 +16,7 @@ const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
+const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.1;
 const LAYOUT_DEPTH_X_STEP = 260;
 const BASE_VERTICAL_GAP = 88;
 const DEGREE_GAP_WEIGHT = 10;
@@ -54,10 +54,12 @@ function buildStyles(noMotion: boolean): any[] {
     {
       selector: "edge",
       style: {
-        width: 1.5,
+        width: 2.4,
+        opacity: 0.95,
         "line-color": "data(edgeColor)",
         "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
+        "arrow-scale": 0.95,
         "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
@@ -259,7 +261,7 @@ function buildLayout(
   } as cytoscape.LayoutOptions;
 }
 
-const TINY_ZOOM_THRESHOLD = 0.05;
+const TINY_ZOOM_THRESHOLD = 0.1;
 
 function runLayoutWithAdaptiveFit(
   cy: Core,
