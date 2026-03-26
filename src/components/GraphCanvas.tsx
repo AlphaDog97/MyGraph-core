@@ -16,6 +16,8 @@ const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
+const LAYOUT_DEPTH_X_STEP = 240;
+const LAYOUT_Y_SCALE = 0.64;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {
@@ -158,6 +160,7 @@ function buildLayout(
   return {
     name: "breadthfirst",
     directed: true,
+    direction: "rightward",
     circle: false,
     roots,
     fit: true,
@@ -172,6 +175,13 @@ function buildLayout(
     sweep: 2 * Math.PI,
     clockwise: true,
     minNodeSpacing,
+    transform: (node: cytoscape.NodeSingular, position: cytoscape.Position) => {
+      const depth = depthById.get(node.id()) ?? 0;
+      return {
+        x: depth * LAYOUT_DEPTH_X_STEP + position.x * 0.1,
+        y: position.y * LAYOUT_Y_SCALE,
+      };
+    },
     concentric: (node: cytoscape.NodeSingular) =>
       maxDepth - (depthById.get(node.id()) ?? maxDepth),
     levelWidth: () => 1,
