@@ -337,6 +337,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Adjust graph layout strategy to reduce visible edge crossings in common directed graphs.
 - [x] Constrain rendered edge tilt angles to avoid near-vertical labels and improve edge-label readability.
 - [x] Pre-plan node coordinates before render using depth lanes + degree-aware vertical spacing.
+- [x] Replace graph-switch layout tween with depth-staggered reveal so transitions feel intentional without top-left fly-in.
 
 ## Test
 
@@ -375,3 +376,6 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [ ] Confirm edges are visible immediately after initial graph render (without requiring edge click repaint).
 - [x] Confirm layout keeps most edge slopes in diagonal/horizontal-friendly ranges (avoids near-90°) for label readability.
 - [x] Confirm node positions are computed before render and high-degree nodes receive larger vertical spacing gaps.
+- [x] Confirm graph switch animation reveals nodes/edges by depth tiers instead of a global top-left-leaning tween.
+- [ ] `lean-spec list` *(blocked: CLI unavailable in container)*.
+- [ ] `lean-spec validate` *(blocked: CLI unavailable in container)*.
