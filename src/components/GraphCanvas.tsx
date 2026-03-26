@@ -458,15 +458,6 @@ export default function GraphCanvas({
       matched.connectedEdges().connectedNodes().removeClass("dimmed");
     });
 
-    if (q) {
-      const matched = cy.nodes(".highlighted");
-      if (matched.length > 0) {
-        cy.animate({
-          fit: { eles: matched, padding: 60 },
-          duration: prefersReducedMotion() ? 0 : 400,
-        });
-      }
-    }
   }, [searchQuery, graph, cyRef]);
 
   useEffect(() => {
