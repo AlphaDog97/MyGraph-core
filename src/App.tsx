@@ -468,6 +468,7 @@ export default function App() {
         >
           <GraphCanvas
             graph={graph}
+            transitionKey={graphId}
             tagColors={tagColors}
             searchQuery={searchQuery}
             cyRef={cyRef}
