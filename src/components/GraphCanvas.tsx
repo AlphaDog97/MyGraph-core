@@ -5,6 +5,7 @@ import { toCytoscapeElements } from "../data/loader";
 
 interface Props {
   graph: KnowledgeGraph;
+  transitionKey: string;
   tagColors: TagColorAssignment;
   searchQuery: string;
   cyRef: React.MutableRefObject<Core | null>;
@@ -284,6 +285,7 @@ function runLayoutWithAdaptiveFit(
 
 export default function GraphCanvas({
   graph,
+  transitionKey,
   tagColors,
   searchQuery,
   cyRef,
