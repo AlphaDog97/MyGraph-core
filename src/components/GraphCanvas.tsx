@@ -284,6 +284,78 @@ function runLayoutWithAdaptiveFit(
   });
 }
 
+function runDepthStaggerReveal(
+  cy: Core,
+  graph: KnowledgeGraph,
+  depthById: Map<string, number>,
+  noMotion: boolean
+): number[] {
+  if (noMotion) return [];
+
+  const nodeIdsByDepth = new Map<number, string[]>();
+  let maxDepth = 0;
+
+  for (const node of graph.nodes) {
+    const depth = depthById.get(node.id) ?? 0;
+    const bucket = nodeIdsByDepth.get(depth) ?? [];
+    bucket.push(node.id);
+    nodeIdsByDepth.set(depth, bucket);
+    if (depth > maxDepth) maxDepth = depth;
+  }
+
+  const edgeIdsByDepth = new Map<number, string[]>();
+  for (const edge of graph.edges) {
+    const depth = Math.max(depthById.get(edge.source) ?? 0, depthById.get(edge.target) ?? 0);
+    const bucket = edgeIdsByDepth.get(depth) ?? [];
+    bucket.push(edge.id);
+    edgeIdsByDepth.set(depth, bucket);
+  }
+
+  cy.batch(() => {
+    cy.nodes().forEach((node) => {
+      node.style("opacity", 0);
+    });
+    cy.edges().forEach((edge) => {
+      edge.style("opacity", 0);
+    });
+  });
+
+  const timers: number[] = [];
+  const DEPTH_DELAY_MS = 90;
+  const NODE_FADE_MS = 220;
+  const EDGE_FADE_MS = 180;
+
+  for (let depth = 0; depth <= maxDepth; depth += 1) {
+    const timer = window.setTimeout(() => {
+      if (cy.destroyed()) return;
+
+      const nodeSelector = (nodeIdsByDepth.get(depth) ?? [])
+        .map((id) => `#${CSS.escape(id)}`)
+        .join(", ");
+      const edgeSelector = (edgeIdsByDepth.get(depth) ?? [])
+        .map((id) => `#${CSS.escape(id)}`)
+        .join(", ");
+
+      if (nodeSelector) {
+        cy.$(nodeSelector).animate(
+          { style: { opacity: 1 } },
+          { duration: NODE_FADE_MS, queue: false }
+        );
+      }
+
+      if (edgeSelector) {
+        cy.$(edgeSelector).animate(
+          { style: { opacity: 0.95 } },
+          { duration: EDGE_FADE_MS, queue: false }
+        );
+      }
+    }, depth * DEPTH_DELAY_MS);
+    timers.push(timer);
+  }
+
+  return timers;
+}
+
 export default function GraphCanvas({
   graph,
   tagColors,
@@ -292,9 +364,12 @@ export default function GraphCanvas({
   onNodeSelect,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const revealTimerRef = useRef<number[]>([]);
 
   const initCy = useCallback(() => {
     if (!containerRef.current) return;
+    revealTimerRef.current.forEach((timer) => window.clearTimeout(timer));
+    revealTimerRef.current = [];
     if (cyRef.current) cyRef.current.destroy();
 
     const elements = toCytoscapeElements(graph, tagColors);
@@ -313,6 +388,7 @@ export default function GraphCanvas({
     });
 
     runLayoutWithAdaptiveFit(cy, noMotion, plannedPositions);
+    revealTimerRef.current = runDepthStaggerReveal(cy, graph, depthById, noMotion);
 
     cy.on("tap", "node", (evt) => {
       const nodeId = evt.target.id();
@@ -337,6 +413,8 @@ export default function GraphCanvas({
   useEffect(() => {
     initCy();
     return () => {
+      revealTimerRef.current.forEach((timer) => window.clearTimeout(timer));
+      revealTimerRef.current = [];
       cyRef.current?.destroy();
       cyRef.current = null;
     };
