@@ -371,5 +371,8 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Confirm logged-in email mode shows cloud badge and attempts Tables save.
 - [x] Confirm save mode text is always visible in toolbar.
 - [x] Build verification: `npm run build` (2026-03-25).
+- [x] Build verification: `npm run build` (2026-03-26).
+- [ ] Confirm edges are visible immediately after initial graph render (without requiring edge click repaint).
+- [ ] Confirm edges remain visible immediately after graph switch fade animation completes.
 - [x] Confirm layout keeps most edge slopes in diagonal/horizontal-friendly ranges (avoids near-90°) for label readability.
 - [x] Confirm node positions are computed before render and high-degree nodes receive larger vertical spacing gaps.

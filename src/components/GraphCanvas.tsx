@@ -16,7 +16,7 @@ const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
+const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.1;
 const LAYOUT_DEPTH_X_STEP = 260;
 const BASE_VERTICAL_GAP = 88;
 const DEGREE_GAP_WEIGHT = 10;
@@ -54,10 +54,12 @@ function buildStyles(noMotion: boolean): any[] {
     {
       selector: "edge",
       style: {
-        width: 1.5,
+        width: 2.4,
+        opacity: 0.95,
         "line-color": "data(edgeColor)",
         "target-arrow-color": "data(edgeColor)",
         "target-arrow-shape": "triangle",
+        "arrow-scale": 0.95,
         "curve-style": "bezier",
         label: "data(label)",
         "font-family": "Inter, system-ui, sans-serif",
@@ -259,7 +261,7 @@ function buildLayout(
   } as cytoscape.LayoutOptions;
 }
 
-const TINY_ZOOM_THRESHOLD = 0.05;
+const TINY_ZOOM_THRESHOLD = 0.1;
 
 function runLayoutWithAdaptiveFit(
   cy: Core,
@@ -285,6 +287,7 @@ function runLayoutWithAdaptiveFit(
 
 export default function GraphCanvas({
   graph,
+  transitionKey,
   tagColors,
   searchQuery,
   cyRef,
@@ -402,6 +405,30 @@ export default function GraphCanvas({
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, [cyRef]);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+    const container = containerRef.current;
+    if (!cy || !container) return;
+
+    const rerenderAfterSwitch = () => {
+      cy.resize();
+      cy.fit(cy.elements(), 40);
+    };
+    const computedStyle = window.getComputedStyle(container);
+    const animationDuration = Number.parseFloat(computedStyle.animationDuration || "0");
+    const animationName = computedStyle.animationName;
+
+    if (animationName === "none" || animationDuration <= 0) {
+      rerenderAfterSwitch();
+      return;
+    }
+
+    container.addEventListener("animationend", rerenderAfterSwitch, { once: true });
+    return () => {
+      container.removeEventListener("animationend", rerenderAfterSwitch);
+    };
+  }, [transitionKey, cyRef]);
 
   return (
     <div
