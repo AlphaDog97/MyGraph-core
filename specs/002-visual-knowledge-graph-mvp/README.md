@@ -243,21 +243,21 @@ polished typography, subtle motion, `prefers-reduced-motion` support.
 
 ### Layout strategy
 
-Use an onion-style `concentric` layout by default so users can read the graph
-from center concepts outward ring by ring:
+Use a pre-render, layered `preset` layout so node positions are planned from
+graph structure before Cytoscape paints:
 
 - auto-detect root nodes (in-degree `0`) and fall back to highest out-degree
   when no strict root exists,
-- compute directed depth from roots and map each depth to a dedicated ring,
-- keep ring spacing wider (`minNodeSpacing`, `spacingFactor`) and include
-  labels in overlap calculations for cleaner separation.
+- compute directed depth from roots and assign each depth to a fixed horizontal
+  lane (`x = depth * step`),
+- sort nodes within each lane by parent barycenter and node degree to keep
+  related nodes vertically aligned,
+- increase lane-internal vertical gaps for higher-degree nodes to reduce
+  node-label and edge-label collisions.
 
-If the first radial fit still lands at the minimum zoom bound, rerun a compact
-concentric pass with tighter spacing and refit to ensure the graph remains
-visibly rendered instead of appearing blank.
-
-Keep `fit` behavior resilient by allowing deeper zoom-out bounds and forcing a
-final `fit` on `layoutstop`, so larger datasets remain visible when loaded.
+After the planned coordinates are applied, run a `fit`; if the viewport still
+lands at the minimum zoom bound, rerun a compact scaled pass and refit so large
+graphs remain visible instead of appearing blank.
 
 
 ### Search behavior
@@ -336,6 +336,7 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Wire Appwrite Tables read/write for logged-in email sessions.
 - [x] Adjust graph layout strategy to reduce visible edge crossings in common directed graphs.
 - [x] Constrain rendered edge tilt angles to avoid near-vertical labels and improve edge-label readability.
+- [x] Pre-plan node coordinates before render using depth lanes + degree-aware vertical spacing.
 
 ## Test
 
@@ -371,3 +372,4 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Confirm save mode text is always visible in toolbar.
 - [x] Build verification: `npm run build` (2026-03-25).
 - [x] Confirm layout keeps most edge slopes in diagonal/horizontal-friendly ranges (avoids near-90°) for label readability.
+- [x] Confirm node positions are computed before render and high-degree nodes receive larger vertical spacing gaps.

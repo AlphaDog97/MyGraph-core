@@ -16,11 +16,9 @@ const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
-const LAYOUT_DEPTH_X_STEP = 240;
-const LAYOUT_Y_SCALE = 0.64;
-const MIN_EDGE_ANGLE_DEG = 30;
-const MAX_EDGE_ANGLE_DEG = 35;
-const SAME_DEPTH_MIN_VERTICAL_GAP = 76;
+const LAYOUT_DEPTH_X_STEP = 260;
+const BASE_VERTICAL_GAP = 88;
+const DEGREE_GAP_WEIGHT = 10;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {
@@ -118,13 +116,38 @@ function resolveLayoutRoots(graph: KnowledgeGraph): string[] {
   return fallback.slice(0, 1).map((node) => node.id);
 }
 
-function buildDepthMap(graph: KnowledgeGraph, roots: string[]): { depthById: Map<string, number>; maxDepth: number } {
+interface GraphMetrics {
+  indegree: Map<string, number>;
+  outdegree: Map<string, number>;
+  parentsById: Map<string, string[]>;
+  childrenById: Map<string, string[]>;
+}
+
+function buildGraphMetrics(graph: KnowledgeGraph): GraphMetrics {
+  const indegree = new Map<string, number>();
+  const outdegree = new Map<string, number>();
+  const parentsById = new Map<string, string[]>();
   const childrenById = new Map<string, string[]>();
-  for (const node of graph.nodes) childrenById.set(node.id, []);
-  for (const edge of graph.edges) {
-    const children = childrenById.get(edge.source);
-    if (children) children.push(edge.target);
+
+  for (const node of graph.nodes) {
+    indegree.set(node.id, 0);
+    outdegree.set(node.id, 0);
+    parentsById.set(node.id, []);
+    childrenById.set(node.id, []);
   }
+
+  for (const edge of graph.edges) {
+    indegree.set(edge.target, (indegree.get(edge.target) ?? 0) + 1);
+    outdegree.set(edge.source, (outdegree.get(edge.source) ?? 0) + 1);
+    parentsById.get(edge.target)?.push(edge.source);
+    childrenById.get(edge.source)?.push(edge.target);
+  }
+
+  return { indegree, outdegree, parentsById, childrenById };
+}
+
+function buildDepthMap(graph: KnowledgeGraph, roots: string[]): { depthById: Map<string, number>; maxDepth: number } {
+  const { childrenById } = buildGraphMetrics(graph);
 
   const depthById = new Map<string, number>();
   const queue: Array<{ id: string; depth: number }> = roots.map((id) => ({ id, depth: 0 }));
@@ -150,44 +173,88 @@ function buildDepthMap(graph: KnowledgeGraph, roots: string[]): { depthById: Map
   return { depthById, maxDepth };
 }
 
+function planNodePositions(
+  graph: KnowledgeGraph,
+  depthById: Map<string, number>,
+  maxDepth: number
+): Map<string, cytoscape.Position> {
+  const metrics = buildGraphMetrics(graph);
+  const nodesByDepth = new Map<number, string[]>();
+  for (const node of graph.nodes) {
+    const depth = depthById.get(node.id) ?? 0;
+    const list = nodesByDepth.get(depth) ?? [];
+    list.push(node.id);
+    nodesByDepth.set(depth, list);
+  }
+
+  const orderById = new Map<string, number>();
+  const positions = new Map<string, cytoscape.Position>();
+
+  for (let depth = 0; depth <= maxDepth; depth += 1) {
+    const nodeIds = nodesByDepth.get(depth) ?? [];
+
+    nodeIds.sort((a, b) => {
+      const parentsA = metrics.parentsById.get(a) ?? [];
+      const parentsB = metrics.parentsById.get(b) ?? [];
+
+      const avgParentIndexA =
+        parentsA.length > 0
+          ? parentsA.reduce((sum, parentId) => sum + (orderById.get(parentId) ?? 0), 0) / parentsA.length
+          : Number.POSITIVE_INFINITY;
+      const avgParentIndexB =
+        parentsB.length > 0
+          ? parentsB.reduce((sum, parentId) => sum + (orderById.get(parentId) ?? 0), 0) / parentsB.length
+          : Number.POSITIVE_INFINITY;
+      if (avgParentIndexA !== avgParentIndexB) return avgParentIndexA - avgParentIndexB;
+
+      const degreeA = (metrics.indegree.get(a) ?? 0) + (metrics.outdegree.get(a) ?? 0);
+      const degreeB = (metrics.indegree.get(b) ?? 0) + (metrics.outdegree.get(b) ?? 0);
+      if (degreeA !== degreeB) return degreeB - degreeA;
+
+      return a.localeCompare(b);
+    });
+
+    const verticalGaps = nodeIds.map((id) => {
+      const degree = (metrics.indegree.get(id) ?? 0) + (metrics.outdegree.get(id) ?? 0);
+      return BASE_VERTICAL_GAP + degree * DEGREE_GAP_WEIGHT;
+    });
+
+    const totalHeight =
+      verticalGaps.reduce((sum, gap) => sum + gap, 0) - (verticalGaps[verticalGaps.length - 1] ?? BASE_VERTICAL_GAP);
+    let y = -totalHeight / 2;
+
+    nodeIds.forEach((nodeId, index) => {
+      orderById.set(nodeId, index);
+      positions.set(nodeId, {
+        x: depth * LAYOUT_DEPTH_X_STEP,
+        y,
+      });
+      y += verticalGaps[index] ?? BASE_VERTICAL_GAP;
+    });
+  }
+
+  return positions;
+}
+
 function buildLayout(
   noMotion: boolean,
-  roots: string[],
-  depthById: Map<string, number>,
-  maxDepth: number,
+  positions: Map<string, cytoscape.Position>,
   compact = false
 ): cytoscape.LayoutOptions {
-  const spacingFactor = compact ? 1.08 : 1.28;
-  const minNodeSpacing = compact ? 30 : 54;
-
+  const scale = compact ? 0.86 : 1;
   return {
-    name: "breadthfirst",
-    directed: true,
-    direction: "rightward",
-    circle: false,
-    roots,
+    name: "preset",
     fit: true,
     padding: compact ? 30 : 44,
     animate: !noMotion,
-    animationDuration: 600,
-    avoidOverlap: true,
-    spacingFactor,
-    nodeDimensionsIncludeLabels: true,
-    equidistant: true,
-    startAngle: -Math.PI / 2,
-    sweep: 2 * Math.PI,
-    clockwise: true,
-    minNodeSpacing,
-    transform: (node: cytoscape.NodeSingular, position: cytoscape.Position) => {
-      const depth = depthById.get(node.id()) ?? 0;
+    animationDuration: noMotion ? 0 : 350,
+    positions: (node: cytoscape.NodeSingular) => {
+      const planned = positions.get(node.id()) ?? { x: 0, y: 0 };
       return {
-        x: depth * LAYOUT_DEPTH_X_STEP + position.x * 0.1,
-        y: position.y * LAYOUT_Y_SCALE,
+        x: planned.x * scale,
+        y: planned.y * scale,
       };
     },
-    concentric: (node: cytoscape.NodeSingular) =>
-      maxDepth - (depthById.get(node.id()) ?? maxDepth),
-    levelWidth: () => 1,
   } as cytoscape.LayoutOptions;
 }
 
@@ -196,107 +263,21 @@ const TINY_ZOOM_THRESHOLD = 0.05;
 function runLayoutWithAdaptiveFit(
   cy: Core,
   noMotion: boolean,
-  graph: KnowledgeGraph,
-  roots: string[],
-  depthById: Map<string, number>,
-  maxDepth: number
+  positions: Map<string, cytoscape.Position>
 ) {
-  const applyEdgeAngleConstraints = () => {
-    const minSlope = Math.tan((MIN_EDGE_ANGLE_DEG * Math.PI) / 180);
-    const maxSlope = Math.tan((MAX_EDGE_ANGLE_DEG * Math.PI) / 180);
-    const nodeById = new Map<string, cytoscape.NodeSingular>();
-    cy.nodes().forEach((n) => {
-      nodeById.set(n.id(), n);
-    });
-
-    const yById = new Map<string, number>();
-    cy.nodes().forEach((node) => {
-      yById.set(node.id(), node.position("y"));
-    });
-
-    const parentsById = new Map<string, string[]>();
-    for (const node of graph.nodes) parentsById.set(node.id, []);
-    for (const edge of graph.edges) {
-      const list = parentsById.get(edge.target);
-      if (list) list.push(edge.source);
-    }
-
-    const nodesByDepth = new Map<number, string[]>();
-    for (const node of graph.nodes) {
-      const depth = depthById.get(node.id) ?? 0;
-      const list = nodesByDepth.get(depth) ?? [];
-      list.push(node.id);
-      nodesByDepth.set(depth, list);
-    }
-
-    const depthOrder = [...nodesByDepth.keys()].sort((a, b) => a - b);
-    for (const depth of depthOrder) {
-      const ids = nodesByDepth.get(depth) ?? [];
-      ids.sort((a, b) => (yById.get(a) ?? 0) - (yById.get(b) ?? 0));
-
-      const placedYs: number[] = [];
-      for (let index = 0; index < ids.length; index += 1) {
-        const nodeId = ids[index];
-        const parentIds = (parentsById.get(nodeId) ?? []).filter((id) => (depthById.get(id) ?? 0) < depth);
-
-        let desiredY = yById.get(nodeId) ?? 0;
-        if (parentIds.length > 0) {
-          const candidates: number[] = [];
-          for (const parentId of parentIds) {
-            const parentDepth = depthById.get(parentId) ?? 0;
-            const parentY = yById.get(parentId) ?? 0;
-            const horizontalDepth = Math.max(1, depth - parentDepth);
-            const dx = horizontalDepth * LAYOUT_DEPTH_X_STEP;
-            const minDy = dx * minSlope;
-            const maxDy = dx * maxSlope;
-            const currentDy = desiredY - parentY;
-            const fallbackSign = index % 2 === 0 ? 1 : -1;
-            const sign = currentDy === 0 ? fallbackSign : currentDy > 0 ? 1 : -1;
-            const targetDyMagnitude = (minDy + maxDy) / 2;
-            candidates.push(parentY + sign * targetDyMagnitude);
-          }
-          desiredY = candidates.reduce((sum, y) => sum + y, 0) / candidates.length;
-        }
-
-        const nearestPlaced = placedYs.length > 0 ? placedYs[placedYs.length - 1] : null;
-        if (nearestPlaced !== null && Math.abs(desiredY - nearestPlaced) < SAME_DEPTH_MIN_VERTICAL_GAP) {
-          desiredY = nearestPlaced + SAME_DEPTH_MIN_VERTICAL_GAP;
-        }
-
-        yById.set(nodeId, desiredY);
-        placedYs.push(desiredY);
-      }
-    }
-
-    cy.batch(() => {
-      for (const node of graph.nodes) {
-        const nodeEl = nodeById.get(node.id);
-        if (!nodeEl) continue;
-        const depth = depthById.get(node.id) ?? 0;
-        const newY = yById.get(node.id) ?? nodeEl.position("y");
-        nodeEl.position({
-          x: depth * LAYOUT_DEPTH_X_STEP,
-          y: newY,
-        });
-      }
-    });
-  };
-
   const fitToAll = (padding: number) => {
     cy.fit(cy.elements(), padding);
     cy.center(cy.elements());
   };
 
   cy.one("layoutstop", () => {
-    applyEdgeAngleConstraints();
     fitToAll(40);
 
     if (cy.zoom() <= TINY_ZOOM_THRESHOLD) {
       cy.one("layoutstop", () => {
-        applyEdgeAngleConstraints();
         fitToAll(24);
       });
-      cy.layout(buildLayout(noMotion, roots, depthById, maxDepth, true)).run();
+      cy.layout(buildLayout(noMotion, positions, true)).run();
     }
   });
 }
@@ -318,17 +299,18 @@ export default function GraphCanvas({
     const noMotion = prefersReducedMotion();
     const roots = resolveLayoutRoots(graph);
     const { depthById, maxDepth } = buildDepthMap(graph, roots);
+    const plannedPositions = planNodePositions(graph, depthById, maxDepth);
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       style: buildStyles(noMotion),
-      layout: buildLayout(noMotion, roots, depthById, maxDepth),
+      layout: buildLayout(noMotion, plannedPositions),
       minZoom: COMPACT_LAYOUT_ZOOM_THRESHOLD,
       maxZoom: 4,
     });
 
-    runLayoutWithAdaptiveFit(cy, noMotion, graph, roots, depthById, maxDepth);
+    runLayoutWithAdaptiveFit(cy, noMotion, plannedPositions);
 
     cy.on("tap", "node", (evt) => {
       const nodeId = evt.target.id();
