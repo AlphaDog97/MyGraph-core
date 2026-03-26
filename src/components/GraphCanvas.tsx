@@ -18,9 +18,6 @@ const prefersReducedMotion = () =>
 const COMPACT_LAYOUT_ZOOM_THRESHOLD = 0.05;
 const LAYOUT_DEPTH_X_STEP = 240;
 const LAYOUT_Y_SCALE = 0.64;
-const MIN_EDGE_ANGLE_DEG = 30;
-const MAX_EDGE_ANGLE_DEG = 45;
-const SAME_DEPTH_MIN_VERTICAL_GAP = 76;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildStyles(noMotion: boolean): any[] {

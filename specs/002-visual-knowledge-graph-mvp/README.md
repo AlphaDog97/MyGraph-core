@@ -370,4 +370,3 @@ Update `README.md` with the new folder structure and navigation instructions.
 - [x] Confirm save mode text is always visible in toolbar.
 - [x] Build verification: `npm run build` (2026-03-25).
 - [x] Confirm layout keeps most edge slopes in diagonal/horizontal-friendly ranges (avoids near-90°) for label readability.
-- [x] Confirm post-layout node positioning enforces configured edge-angle bounds even in sparse vertical edge outliers.
