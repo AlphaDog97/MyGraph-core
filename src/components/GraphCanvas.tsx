@@ -285,7 +285,6 @@ function runLayoutWithAdaptiveFit(
 
 export default function GraphCanvas({
   graph,
-  transitionKey,
   tagColors,
   searchQuery,
   cyRef,
