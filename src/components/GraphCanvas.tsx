@@ -406,7 +406,6 @@ export default function GraphCanvas({
 
   return (
     <div
-      key={transitionKey}
       className="graph-switch-surface"
       ref={containerRef}
       style={{

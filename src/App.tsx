@@ -467,6 +467,7 @@ export default function App() {
           className={`graph-canvas-wrapper${selectedNode ? " with-panel" : ""}`}
         >
           <GraphCanvas
+            key={graphId}
             graph={graph}
             transitionKey={graphId}
             tagColors={tagColors}
