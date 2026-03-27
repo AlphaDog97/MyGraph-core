@@ -33,6 +33,9 @@ npm package entry, then complete npm publish readiness checks.
 - [x] Remove Appwrite-dependent UI/data/auth runtime wiring.
 - [x] Add npm packaging outputs and exports for core modules.
 - [x] Update docs to reflect new core-package direction.
+- [x] Refresh dark/light mode toggle icons to a friendlier rounded style.
+- [x] Align repository licensing from ISC to MIT (`package.json` + `LICENSE`).
+- [x] Rework README structure for onboarding: project intro → why this library → quick start → application flow.
 - [ ] Add `.npmignore` or `files` review checklist to prevent accidental publish of non-package assets.
 - [ ] Add `prepublishOnly` script to guarantee `build:lib` runs before publish.
 - [x] Add repository metadata fields (`repository`, `homepage`, `bugs`, `keywords`) in `package.json`.
@@ -44,6 +47,9 @@ npm package entry, then complete npm publish readiness checks.
 - [x] Static inspection: `package.json` exports map points to `dist/index.js` + `dist/lib.d.ts`.
 - [x] Static inspection: `src/lib.ts` exports reusable domain/data modules.
 - [x] Static inspection: `package.json` now includes author/keywords/repository/homepage/bugs metadata.
-- [x] Static inspection: root `LICENSE` file now matches ISC license declaration.
+- [x] Static inspection: root `LICENSE` file now matches MIT license declaration.
+- [x] Visual inspection: theme toggle uses updated moon/sun icon paths in toolbar.
+- [x] Manual doc QA: README now follows intro → value proposition → quick start → AI-template usage flow.
 - [x] `npm pack --dry-run` reviewed for publish payload.
+- [x] `npm run build`
 - [ ] Publish smoke test from fresh consumer project.
