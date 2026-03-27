@@ -33,6 +33,7 @@ and renders an interactive Cytoscape graph with search and node details.
 ## Plan
 
 - [x] Implement manifest-driven category + graph selector.
+- [x] Replace native category/graph `<select>` controls with a React component library dropdown for consistent UI styling.
 - [x] Implement graph loading, validation, and Cytoscape transformation.
 - [x] Implement search, node detail panel, and graph legend UI.
 - [x] Keep editing/export flow local-only.
@@ -41,6 +42,7 @@ and renders an interactive Cytoscape graph with search and node details.
 
 - [x] Manual inspection: `src/data/loader.ts` validates category and graph schema.
 - [x] Manual inspection: `src/components/GraphSelector.tsx` and `src/App.tsx` wire category/graph switching.
+- [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
 
 ## Notes
