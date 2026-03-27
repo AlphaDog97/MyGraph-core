@@ -420,17 +420,45 @@ export default function App() {
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="toolbar-actions">
-          <button
-            className="btn btn-secondary"
-            onClick={handleThemeToggle}
-            aria-label={
-              theme === "light"
-                ? "Switch to dark mode"
-                : "Switch to light mode"
-            }
-          >
-            {theme === "light" ? "Dark mode" : "Light mode"}
-          </button>
+          {theme === "light" ? (
+            <button
+              className="btn btn-secondary btn-icon"
+              onClick={handleThemeToggle}
+              aria-label="Switch to dark mode"
+              title="Switch to dark mode"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+                className="btn-icon-svg"
+              >
+                <path
+                  fill="currentColor"
+                  d="M21 13.7A9 9 0 1 1 10.3 3a1 1 0 0 1 1.18 1.3 7 7 0 0 0 8.52 8.52A1 1 0 0 1 21 13.7Z"
+                />
+              </svg>
+            </button>
+          ) : (
+            <button
+              className="btn btn-secondary btn-icon"
+              onClick={handleThemeToggle}
+              aria-label="Switch to light mode"
+              title="Switch to light mode"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+                className="btn-icon-svg"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 5a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm0 11a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1Zm7-5a1 1 0 0 1 0 2h-1a1 1 0 1 1 0-2h1ZM7 12a1 1 0 0 1-1 1H5a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1Zm9.95-4.95a1 1 0 0 1 1.41 1.41l-.7.71a1 1 0 1 1-1.42-1.41l.71-.71ZM7.46 16.54a1 1 0 0 1 0 1.41l-.71.71a1 1 0 0 1-1.41-1.41l.7-.71a1 1 0 0 1 1.42 0Zm11.2 2.12a1 1 0 0 1-1.41 0l-.71-.7a1 1 0 0 1 1.41-1.42l.71.71a1 1 0 0 1 0 1.41ZM7.46 7.46a1 1 0 0 1-1.42 0l-.7-.71a1 1 0 0 1 1.41-1.41l.71.7a1 1 0 0 1 0 1.42ZM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"
+                />
+              </svg>
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view
           </button>
