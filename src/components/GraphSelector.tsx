@@ -32,14 +32,15 @@ export default function GraphSelector({
       ...base,
       minHeight: 36,
       borderRadius: 8,
-      borderColor: state.isFocused ? "#5a67d8" : "#e2e8f0",
+      backgroundColor: "var(--color-input-bg)",
+      borderColor: state.isFocused ? "#5a67d8" : "var(--color-border)",
       boxShadow: state.isFocused ? "0 0 0 3px rgba(90, 103, 216, 0.12)" : "none",
       fontSize: 13,
       fontWeight: 500,
-      color: "#2d3748",
+      color: "var(--color-text)",
       cursor: "pointer",
       "&:hover": {
-        borderColor: state.isFocused ? "#5a67d8" : "#cbd5e0",
+        borderColor: state.isFocused ? "#5a67d8" : "var(--color-border-strong)",
       },
     }),
     valueContainer: (base) => ({
@@ -51,12 +52,14 @@ export default function GraphSelector({
     }),
     dropdownIndicator: (base) => ({
       ...base,
-      color: "#718096",
+      color: "var(--color-muted)",
       paddingRight: 8,
       paddingLeft: 4,
     }),
     menu: (base) => ({
       ...base,
+      backgroundColor: "var(--color-panel-bg)",
+      border: "1px solid var(--color-border)",
       borderRadius: 8,
       overflow: "hidden",
       zIndex: 60,
@@ -65,16 +68,16 @@ export default function GraphSelector({
       ...base,
       fontSize: 13,
       backgroundColor: state.isSelected
-        ? "rgba(90, 103, 216, 0.12)"
+        ? "var(--color-option-selected-bg)"
         : state.isFocused
-          ? "#edf2f7"
-          : "#fff",
-      color: "#2d3748",
+          ? "var(--color-option-hover-bg)"
+          : "var(--color-panel-bg)",
+      color: "var(--color-text)",
       cursor: "pointer",
     }),
     singleValue: (base) => ({
       ...base,
-      color: "#2d3748",
+      color: "var(--color-text)",
     }),
   };
 

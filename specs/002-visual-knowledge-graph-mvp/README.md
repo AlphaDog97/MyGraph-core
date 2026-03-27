@@ -37,6 +37,7 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Implement graph loading, validation, and Cytoscape transformation.
 - [x] Implement search, node detail panel, and graph legend UI.
 - [x] Add persistent light/dark theme support with toolbar toggle and CSS variable-based styling.
+- [x] Refine dark-theme neutral palette for dropdowns, menus, legends, and detail/edit panels to reduce glare and improve contrast consistency.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -45,6 +46,7 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/components/GraphSelector.tsx` and `src/App.tsx` wire category/graph switching.
 - [x] Manual inspection: `src/App.tsx` handles theme preference initialization, persistence, and root `data-theme` synchronization.
 - [x] Manual inspection: `src/styles.css` defines light/dark CSS variables and applies them to major panels and inputs.
+- [x] Manual inspection: `src/styles.css` and `src/components/GraphSelector.tsx` use shared CSS variables for react-select, menus, legends, and detail/edit panel neutrals under dark theme.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
 
