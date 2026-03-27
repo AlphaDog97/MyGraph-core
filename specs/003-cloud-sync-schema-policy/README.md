@@ -1,51 +1,32 @@
 ---
-status: complete
+status: archived
 created: '2026-03-24'
 tags:
   - backend
   - database
-  - auth
-  - sync
+  - appwrite
 priority: high
 created_at: '2026-03-24T00:00:00+00:00'
 ---
 
-# Cloud Sync Schema & Permission Policy
+# Cloud Sync Schema & Permission Policy (Archived)
 
-> **Status**: complete · **Priority**: high · **Created**: 2026-03-24
+> **Status**: archived · **Priority**: high · **Created**: 2026-03-24
 
 ## Overview
 
-Confirm the initial cloud data model naming and permission defaults so backend
-setup can proceed without ambiguity.
+This spec is archived. Appwrite cloud sync schema policy is out of scope for
+this repository's current npm-core-package direction.
 
 ## Design
 
-### Table naming
-
-Use the following table names as the canonical identifiers:
-
-- `graphs`
-- `nodes`
-- `edges`
-- `node_tags`
-- `user_preferences`
-
-### Permission policy
-
-- Public graph read access for anonymous users: **enabled**.
-- Unauthenticated cloud sync for edits: **disabled**.
-  - Guest users may export/download JSON locally, but cannot write edits to
-    cloud storage until authenticated.
+- Canonical behavior is now local graph data loading and export.
+- No active cloud table schema is maintained in this repo.
 
 ## Plan
 
-- [x] Confirm canonical table naming.
-- [x] Confirm anonymous read policy for published graphs.
-- [x] Confirm guest edit behavior is local-download only.
+- [x] Archive legacy cloud policy spec.
 
 ## Test
 
-- [x] Policy decisions captured in a committed spec for implementation teams.
-- [x] Table names are documented exactly once with canonical spelling.
-
+- [x] Static inspection: current root files do not include active Appwrite schema artifacts.

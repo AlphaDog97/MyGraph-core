@@ -37,5 +37,21 @@
       "types": "./dist/lib.d.ts",
       "import": "./dist/index.js"
     }
+  },
+  "author": "MyGraph Team",
+  "keywords": [
+    "knowledge-graph",
+    "graph",
+    "cytoscape",
+    "typescript",
+    "visualization"
+  ],
+  "homepage": "https://github.com/mygraph/MyGraph-core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mygraph/MyGraph-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mygraph/MyGraph-core/issues"
   }
 }

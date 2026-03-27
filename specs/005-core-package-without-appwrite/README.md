@@ -1,43 +1,49 @@
 ---
-status: complete
+status: in-progress
 created: '2026-03-27'
 tags:
   - core
   - packaging
   - cleanup
+  - npm
 priority: high
 created_at: '2026-03-27T00:00:00+00:00'
 ---
 
 # Core Package without Appwrite
 
-> **Status**: complete · **Priority**: high · **Created**: 2026-03-27
+> **Status**: in-progress · **Priority**: high · **Created**: 2026-03-27
 
 ## Overview
 
 Turn this repository into a reusable core package by removing Appwrite-specific
 runtime dependencies and exposing reusable graph-domain/data modules through an
-npm package entry.
+npm package entry, then complete npm publish readiness checks.
 
 ## Design
 
-- Remove Appwrite cloud persistence and auth integration from runtime UI flow.
-- Keep local graph loading and graph editing download workflow unchanged.
-- Add package export entry (`src/lib.ts`) for reusable domain/data APIs.
-- Add dedicated library build configuration to emit JS bundle + `.d.ts` files.
-- Remove the repository-local Cursor LeanSpec skill so workflow guidance is docs-first.
+- Runtime and exports remain Appwrite-free.
+- Package entry is `src/lib.ts`, build output in `dist/`.
+- Keep demo app for local verification while ensuring npm consumers can import
+  from `@mygraph/core` with stable typings.
+- Add release-readiness guardrails for npm publication.
 
 ## Plan
 
 - [x] Remove Appwrite-dependent UI/data/auth runtime wiring.
-- [x] Remove Appwrite config and schema artifacts from repository root paths.
 - [x] Add npm packaging outputs and exports for core modules.
-- [x] Run project build and type checks for app + library targets.
 - [x] Update docs to reflect new core-package direction.
-- [x] Remove `.cursor/skills/leanspec-sdd` and update AGENTS guidance.
+- [ ] Add `.npmignore` or `files` review checklist to prevent accidental publish of non-package assets.
+- [ ] Add `prepublishOnly` script to guarantee `build:lib` runs before publish.
+- [x] Add repository metadata fields (`repository`, `homepage`, `bugs`, `keywords`) in `package.json`.
+- [x] Verify LICENSE content matches `package.json` license identifier.
+- [ ] Prepare automated release flow (versioning + changelog + npm token CI).
 
 ## Test
 
-- [x] `npm run build`
-- [x] `npm run build:lib`
-- [ ] `lean-spec validate` *(blocked: CLI unavailable in container)*
+- [x] Static inspection: `package.json` exports map points to `dist/index.js` + `dist/lib.d.ts`.
+- [x] Static inspection: `src/lib.ts` exports reusable domain/data modules.
+- [x] Static inspection: `package.json` now includes author/keywords/repository/homepage/bugs metadata.
+- [x] Static inspection: root `LICENSE` file now matches ISC license declaration.
+- [x] `npm pack --dry-run` reviewed for publish payload.
+- [ ] Publish smoke test from fresh consumer project.

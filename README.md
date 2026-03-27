@@ -1,4 +1,4 @@
-# MyGraph Core
+# MyGraph-core
 
 一个以知识图谱为核心的数据与渲染基础仓库：
 

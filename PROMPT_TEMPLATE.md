@@ -1,18 +1,16 @@
-# Concept-Per-Graph Prompt Template
+# MyGraph Graph Data Prompt Template (Latest)
 
-Use this template when you want one topic (e.g. `EF Core`) to be split into **multiple independent graphs**.
-
-> Target outcome: each core concept becomes its own `graph.json`, and there are **no links across different graphs**.
+用于生成与当前代码（`src/data/loader.ts`）兼容的 `graph-data/<categoryId>/graph.json`。
 
 ---
 
-## Step 1: Topic Split Prompt (English) 
+## Prompt (EN)
 
-```
-I'm building a visual knowledge graph project.
-For topic "{{TOPIC}}", generate multiple independent graphs (one graph per core concept), not one merged graph.
+```text
+Generate graph data for topic "{{TOPIC}}".
+Return JSON only (no markdown).
 
-Output format (JSON only, no markdown):
+Output schema:
 {
   "categoryId": "<kebab-case-topic-id>",
   "graphs": [
@@ -22,14 +20,14 @@ Output format (JSON only, no markdown):
       "nodes": [
         {
           "id": "<url-safe-unique-id>",
-          "label": "<Short Display Name>",
-          "description": "<One-sentence explanation.>",
+          "label": "<short display name>",
+          "description": "<optional one-sentence explanation>",
           "tags": ["<tag1>", "<tag2>"],
           "links": [
             {
-              "target": "<id-of-another-node>",
+              "target": "<another-node-id-in-same-graph>",
               "type": "<relationship-type>",
-              "label": "<human-readable edge label>"
+              "label": "<optional readable edge label>"
             }
           ]
         }
@@ -39,42 +37,43 @@ Output format (JSON only, no markdown):
 }
 
 Hard rules:
-1. Create 4–10 graphs for the topic.
-2. Each graph focuses on one core concept (example for EF Core: `dbcontext`, `change-tracker`, `migrations`, etc.).
-3. Links in one graph may only target nodes inside that same graph.
-4. No cross-graph links. Zero exceptions.
-5. Node `id` values must be unique within their own graph.
-6. Relationship `type` must be one of: "Concept", "Description", "Condition", "Action".
-7. Every node must have at least one inbound or outbound link within the same graph.
-8. Return JSON only.
+1) Create 4-10 graphs for the topic.
+2) Each graph focuses on one core concept.
+3) No cross-graph links; links must stay within the same graph.
+4) `graphId`, `graphLabel`, and `nodes` are required for each graph.
+5) Node required fields: `id`, `label`, `tags` (array of strings).
+6) `links` is optional; if present, every link must have non-empty `target` and `type`.
+7) Node IDs must be unique within each graph.
+8) Every node should have at least one inbound or outbound link inside its graph.
+9) Return JSON only.
 ```
 
 ---
 
-## Step 2：单个子图生成提示词（中文版）
+## 提示词（中文）
 
-```
-我正在构建一个可视化知识图谱项目。
-请把“{{主题}}”拆分成多个相互独立的图（每个核心概念一张图），不要生成一张合并大图。
+```text
+请为主题“{{主题}}”生成图谱数据。
+只输出 JSON（不要 markdown）。
 
-输出格式（只输出 JSON，不要 markdown）：
+输出结构：
 {
   "categoryId": "<kebab-case-主题id>",
   "graphs": [
     {
       "graphId": "<kebab-case-概念id>",
-      "graphLabel": "<概念名称>",
+      "graphLabel": "<概念显示名称>",
       "nodes": [
         {
-          "id": "<url安全唯一标识>",
-          "label": "<简短显示名>",
-          "description": "<一句话描述>",
+          "id": "<url安全唯一id>",
+          "label": "<简短名称>",
+          "description": "<可选一句话描述>",
           "tags": ["<标签1>", "<标签2>"],
           "links": [
             {
-              "target": "<另一个节点id>",
+              "target": "<同一张图里的节点id>",
               "type": "<关系类型>",
-              "label": "<可读关系文字>"
+              "label": "<可选关系文案>"
             }
           ]
         }
@@ -84,25 +83,21 @@ Hard rules:
 }
 
 硬性规则：
-1. 该主题生成 4–10 张图。
-2. 每张图只聚焦一个核心概念（例如 EF Core 可拆成 `dbcontext`、`change-tracker`、`migrations` 等）。
-3. 某张图内的 links 只能指向这张图内的节点。
-4. 严禁跨图链接（0 条，不能例外）。
-5. 节点 `id` 在各自图内必须唯一。
-6. `type` 只能是："Concept"、"Description"、"Condition"、"Action"。
-7. 每个节点至少有一条同图内的入边或出边。
-8. 只输出 JSON。
+1）一个主题生成 4-10 张图。
+2）每张图只聚焦一个核心概念。
+3）禁止跨图链接，links 只能指向当前 graph 内节点。
+4）每个 graph 必须有 `graphId`、`graphLabel`、`nodes`。
+5）节点必填字段：`id`、`label`、`tags`（字符串数组）。
+6）`links` 可选；若存在，每条 link 必须有非空 `target` 和 `type`。
+7）每张图内节点 `id` 必须唯一。
+8）每个节点至少有一条同图入边或出边。
+9）只输出 JSON。
 ```
 
 ---
 
-## Save Guide / 落盘方式
+## Save Guide
 
-1. Run prompt and get one JSON object.
-2. Save the whole JSON object to:
-   - `graph-data/<categoryId>/graph.json`
-3. Example:
-   - `graph-data/ef-core/graph.json`
-
-Important: keep `graphs[].graphLabel` for UI display names, and keep each graph's
-node list in `graphs[].nodes`.
+1. Save as `graph-data/<categoryId>/graph.json`.
+2. Ensure `graph-data/manifest.json` includes the new category and graph labels.
+3. Keep `graphs[].graphLabel` user-friendly for UI dropdown display.
