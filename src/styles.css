@@ -135,6 +135,26 @@ body {
   border-color: #cbd5e0;
 }
 
+.btn-icon {
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-icon:focus-visible {
+  outline: 2px solid #5a67d8;
+  outline-offset: 2px;
+}
+
+.btn-icon-svg {
+  width: 18px;
+  height: 18px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn {
     transition: none;
