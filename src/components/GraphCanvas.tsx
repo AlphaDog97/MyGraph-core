@@ -462,11 +462,12 @@ export default function GraphCanvas({
       const matched = cy.nodes(".highlighted");
       if (matched.length > 0) {
         cy.animate({
-          fit: { eles: matched, padding: 60 },
+          center: { eles: matched },
           duration: prefersReducedMotion() ? 0 : 400,
         });
       }
     }
+
   }, [searchQuery, graph, cyRef]);
 
   useEffect(() => {
