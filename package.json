@@ -11,7 +11,7 @@
     "build": "npm run build:app && npm run build:lib",
     "preview": "vite preview"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cytoscape": "^3.31.0",
     "react": "^19.1.0",

@@ -431,64 +431,67 @@ export default function App() {
           </button>
         </div>
         <div className="toolbar-actions-right">
-  <button
-    className="btn btn-secondary btn-icon"
-    onClick={handleThemeToggle}
-    aria-label={
-      theme === "light" ? "Switch to dark mode" : "Switch to light mode"
-    }
-    title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
-  >
-    {theme === "light" ? (
-      // Moon
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        focusable="false"
-        className="btn-icon-svg"
-      >
-        <path
-          fill="currentColor"
-          d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 1 0 11.5 11.5Z"
-        />
-      </svg>
-    ) : (
-      // Sun
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        focusable="false"
-        className="btn-icon-svg"
-      >
-        <path
-          fill="currentColor"
-          d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm0-16a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1Zm0 16a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1Zm10-6a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1ZM5 12a1 1 0 0 1-1 1H2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1Zm12.95 6.54a1 1 0 0 1 0 1.41l-1.41 1.41a1 1 0 0 1-1.41-1.41l1.41-1.41a1 1 0 0 1 1.41 0ZM8.87 7.46a1 1 0 0 1 0 1.41L7.46 10.3a1 1 0 1 1-1.41-1.41l1.41-1.42a1 1 0 0 1 1.41 0Zm9.08 2.84a1 1 0 0 1-1.41 0l-1.41-1.42a1 1 0 0 1 1.41-1.41l1.41 1.41a1 1 0 0 1 0 1.42Zm-9.08 9.08a1 1 0 0 1-1.41 0L6.04 17.96a1 1 0 0 1 1.41-1.41l1.42 1.41a1 1 0 0 1 0 1.42Z"
-        />
-      </svg>
-    )}
-  </button>
+          <button
+            className="btn btn-secondary btn-icon"
+            onClick={handleThemeToggle}
+            aria-label={
+              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+            }
+            title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
+          >
+            {theme === "light" ? (
+              // Moon (rounded/cute style)
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+                className="btn-icon-svg"
+              >
+                <path
+                  fill="currentColor"
+                  d="M14.6 2.2a.9.9 0 0 0-1 1.2 7.8 7.8 0 1 1-9.2 9.2.9.9 0 0 0-1.2-1A9.6 9.6 0 1 0 14.6 2.2Z"
+                />
+                <circle cx="16.8" cy="7.2" r="1" fill="currentColor" />
+                <circle cx="19.4" cy="10" r=".8" fill="currentColor" />
+              </svg>
+            ) : (
+              // Sun (rounded/rays style)
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+                className="btn-icon-svg"
+              >
+                <circle cx="12" cy="12" r="4.5" fill="currentColor" />
+                <path
+                  fill="currentColor"
+                  d="M12 2.4a1 1 0 0 1 1 1v1.7a1 1 0 1 1-2 0V3.4a1 1 0 0 1 1-1Zm0 16.5a1 1 0 0 1 1 1v1.7a1 1 0 1 1-2 0v-1.7a1 1 0 0 1 1-1ZM21.6 11a1 1 0 1 1 0 2h-1.7a1 1 0 1 1 0-2h1.7ZM5.1 11a1 1 0 1 1 0 2H3.4a1 1 0 1 1 0-2h1.7Zm13.05-5.65a1 1 0 0 1 1.42 1.42l-1.2 1.2a1 1 0 1 1-1.41-1.42l1.19-1.2Zm-10.1 10.1a1 1 0 0 1 1.42 1.42l-1.2 1.19a1 1 0 1 1-1.41-1.41l1.19-1.2Zm11.52 2.61a1 1 0 0 1-1.42 1.41l-1.19-1.19a1 1 0 1 1 1.41-1.42l1.2 1.2ZM9.46 8.05a1 1 0 0 1-1.42 1.42l-1.19-1.2a1 1 0 1 1 1.41-1.41l1.2 1.19Z"
+                />
+              </svg>
+            )}
+          </button>
 
-  <a
-    className="btn btn-secondary btn-icon"
-    href="https://github.com/AlphaDog97/MyGraph-core"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Open GitHub repository"
-    title="Open GitHub repository"
-  >
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      focusable="false"
-      className="btn-icon-svg"
-    >
-      <path
-        fill="currentColor"
-        d="M12 0.5a12 12 0 0 0-3.79 23.39c0.6 0.1 0.82-0.26 0.82-0.58v-2.03c-3.34 0.73-4.04-1.61-4.04-1.61-0.54-1.38-1.33-1.75-1.33-1.75-1.09-0.74 0.08-0.72 0.08-0.72 1.2 0.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.48 1 0.11-0.77 0.42-1.31 0.77-1.61-2.66-0.3-5.47-1.33-5.47-5.93 0-1.31 0.47-2.38 1.24-3.21-0.12-0.3-0.54-1.52 0.12-3.16 0 0 1.01-0.32 3.3 1.22a11.6 11.6 0 0 1 6 0c2.29-1.54 3.29-1.22 3.29-1.22 0.66 1.64 0.24 2.86 0.12 3.16 0.77 0.83 1.23 1.9 1.23 3.21 0 4.61-2.81 5.62-5.49 5.92 0.43 0.37 0.82 1.11 0.82 2.23v3.31c0 0.32 0.22 0.69 0.83 0.58A12 12 0 0 0 12 0.5Z"
-      />
-    </svg>
-	</a>
-</div>
+          <a
+            className="btn btn-secondary btn-icon"
+            href="https://github.com/AlphaDog97/MyGraph-core"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open GitHub repository"
+            title="Open GitHub repository"
+          >
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              focusable="false"
+              className="btn-icon-svg"
+            >
+              <path
+                fill="currentColor"
+                d="M12 0.5a12 12 0 0 0-3.79 23.39c0.6 0.1 0.82-0.26 0.82-0.58v-2.03c-3.34 0.73-4.04-1.61-4.04-1.61-0.54-1.38-1.33-1.75-1.33-1.75-1.09-0.74 0.08-0.72 0.08-0.72 1.2 0.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.48 1 0.11-0.77 0.42-1.31 0.77-1.61-2.66-0.3-5.47-1.33-5.47-5.93 0-1.31 0.47-2.38 1.24-3.21-0.12-0.3-0.54-1.52 0.12-3.16 0 0 1.01-0.32 3.3 1.22a11.6 11.6 0 0 1 6 0c2.29-1.54 3.29-1.22 3.29-1.22 0.66 1.64 0.24 2.86 0.12 3.16 0.77 0.83 1.23 1.9 1.23 3.21 0 4.61-2.81 5.62-5.49 5.92 0.43 0.37 0.82 1.11 0.82 2.23v3.31c0 0.32 0.22 0.69 0.83 0.58A12 12 0 0 0 12 0.5Z"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
 
       <div className="graph-area">
