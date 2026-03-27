@@ -130,9 +130,16 @@ body {
   flex-shrink: 0;
 }
 
-.toolbar-actions {
+.toolbar-actions-left {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.toolbar-actions-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
   flex-shrink: 0;
 }
 
@@ -183,7 +190,6 @@ body {
 
 .btn-icon {
   width: 36px;
-  min-width: 36px;
   padding: 0;
   display: inline-flex;
   align-items: center;

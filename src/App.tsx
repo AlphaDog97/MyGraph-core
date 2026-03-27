@@ -419,7 +419,18 @@ export default function App() {
           onDelete={handleDeleteGraph}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <div className="toolbar-actions">
+        <div className="toolbar-actions-left">
+          <button className="btn btn-secondary" onClick={handleResetView}>
+            Fit view
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setEditorOpen(true)}
+          >
+            Edit tag colors
+          </button>
+        </div>
+        <div className="toolbar-actions-right">
           <button
             className="btn btn-secondary"
             onClick={handleThemeToggle}
@@ -430,15 +441,6 @@ export default function App() {
             }
           >
             {theme === "light" ? "Dark mode" : "Light mode"}
-          </button>
-          <button className="btn btn-secondary" onClick={handleResetView}>
-            Fit view
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setEditorOpen(true)}
-          >
-            Edit tag colors
           </button>
           <a
             className="btn btn-secondary btn-icon"
