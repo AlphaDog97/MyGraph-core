@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Core } from "cytoscape";
 import {
   Manifest,
@@ -19,11 +19,6 @@ import {
   loadLastViewed,
   saveLastViewed,
 } from "./data/tagStorage";
-import {
-  cloudEnabled,
-  loadCloudGraph,
-  saveCloudGraph,
-} from "./data/cloudStorage";
 import GraphCanvas from "./components/GraphCanvas";
 import GraphSelector from "./components/GraphSelector";
 import GraphManagementMenu from "./components/GraphManagementMenu";
@@ -33,8 +28,6 @@ import EdgeTypeLegend from "./components/EdgeTypeLegend";
 import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
-import AuthControls from "./auth/AuthControls";
-import { useAuth } from "./auth/AuthProvider";
 
 type GraphOption = { id: string; label: string };
 
@@ -49,10 +42,6 @@ type AppState =
       graphId: string;
       graph: KnowledgeGraph;
     };
-
-type StorageMode =
-  | { type: "local"; reason: "guest" | "cloud-not-configured" }
-  | { type: "cloud"; email: string };
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -85,11 +74,7 @@ function rebuildGraph(nodes: KnowledgeNode[]): KnowledgeGraph {
   return { nodes, edges, tags: [...tagSet].sort(), warnings };
 }
 
-function downloadGraphJson(
-  graph: KnowledgeGraph,
-  _categoryId: string,
-  _graphId: string
-) {
+function downloadGraphJson(graph: KnowledgeGraph) {
   const raw: KnowledgeNodeFile[] = graph.nodes.map((n) => {
     const obj: KnowledgeNodeFile = { id: n.id, label: n.label, tags: n.tags };
     if (n.description) obj.description = n.description;
@@ -117,17 +102,7 @@ function downloadGraphJson(
 }
 
 export default function App() {
-  const { loading: authLoading, user } = useAuth();
   const [state, setState] = useState<AppState>({ status: "loading" });
-  const storageMode = useMemo<StorageMode>(() => {
-    if (user?.email && cloudEnabled()) {
-      return { type: "cloud", email: user.email };
-    }
-    return {
-      type: "local",
-      reason: cloudEnabled() ? "guest" : "cloud-not-configured",
-    };
-  }, [user]);
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
@@ -137,22 +112,9 @@ export default function App() {
   const resolveGraph = useCallback(
     async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
       const localNodes = await loadLocalGraphNodes(categoryId, graphId);
-      const shouldUseCloud = storageMode.type === "cloud";
-      if (!shouldUseCloud) {
-        return buildGraphFromRaw(localNodes, categoryId, graphId);
-      }
-      try {
-        const cloudGraph = await loadCloudGraph(categoryId, graphId, user?.$id);
-        if (cloudGraph) {
-          return cloudGraph;
-        }
-        return buildGraphFromRaw(localNodes, categoryId, graphId);
-      } catch (err) {
-        console.warn("Cloud read failed; falling back to local graph-data.", err);
-        return buildGraphFromRaw(localNodes, categoryId, graphId);
-      }
+      return buildGraphFromRaw(localNodes, categoryId, graphId);
     },
-    [storageMode, user]
+    []
   );
 
   const resolveGraphOptions = useCallback(async (categoryId: string) => {
@@ -308,40 +270,18 @@ export default function App() {
       );
       const newGraph = rebuildGraph(newNodes);
 
-      if (storageMode.type === "cloud") {
-        if (!user) {
-          alert("Cloud save requires sign-in.");
-          return;
-        }
-        saveCloudGraph({
-          categoryId: state.categoryId,
-          graphId: state.graphId,
-          ownerUserId: user.$id,
-          visibility: "private",
-        }, newGraph)
-          .then(() => {
-            alert("Saved to Appwrite cloud.");
-          })
-          .catch((err) => {
-            console.error(err);
-            alert(
-              "Cloud save failed. Your update is kept in memory for this session only."
-            );
-          });
-      } else {
-        downloadGraphJson(newGraph, state.categoryId, state.graphId);
-      }
+      downloadGraphJson(newGraph);
 
       setState({ ...state, graph: newGraph });
       setSelectedNode(newNode);
     },
-    [state, storageMode, user]
+    [state]
   );
 
   const handleMoveGraph = useCallback(
     (targetCategoryId: string) => {
       if (state.status !== "ready") return;
-      downloadGraphJson(state.graph, targetCategoryId, state.graphId);
+      downloadGraphJson(state.graph);
       alert(
         `graph.json has been downloaded.\n\n` +
           `To complete the move:\n` +
@@ -396,7 +336,7 @@ export default function App() {
     return (
       <div className="app-loading">
         <div className="spinner" />
-        <p>{authLoading ? "Loading authentication…" : "Loading knowledge graph…"}</p>
+        <p>Loading knowledge graph…</p>
       </div>
     );
   }
@@ -410,18 +350,9 @@ export default function App() {
     ...category,
     graphs: [],
   }));
-  const modeText =
-    storageMode.type === "cloud"
-      ? `Cloud mode · ${storageMode.email}`
-      : storageMode.reason === "cloud-not-configured"
-        ? "Local mode · Cloud not configured"
-        : "Local mode · Guest";
 
   return (
     <div className="app-shell">
-      <div className="auth-toolbar">
-        <AuthControls />
-      </div>
       <div className="toolbar">
         <GraphSelector
           categories={categoryOptions}
@@ -439,16 +370,6 @@ export default function App() {
           onDelete={handleDeleteGraph}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <span
-          className={`storage-badge ${storageMode.type === "cloud" ? "is-cloud" : "is-local"}`}
-          title={
-            storageMode.type === "cloud"
-              ? "Changes are saved to Appwrite Tables."
-              : "Changes are saved locally by downloading graph.json."
-          }
-        >
-          {modeText}
-        </span>
         <div className="toolbar-actions">
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view
