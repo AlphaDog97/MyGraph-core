@@ -4,11 +4,6 @@
 
 This repository uses LeanSpec for spec-driven development.
 
-### Project-local skill
-
-- **Location**: `.cursor/skills/leanspec-sdd/SKILL.md`
-- **Use when**: planning features, coordinating multi-file changes, or documenting higher-risk edits
-
 ### Default process
 
 1. Review current specs with `lean-spec list`.
