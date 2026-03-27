@@ -36,12 +36,15 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Replace native category/graph `<select>` controls with a React component library dropdown for consistent UI styling.
 - [x] Implement graph loading, validation, and Cytoscape transformation.
 - [x] Implement search, node detail panel, and graph legend UI.
+- [x] Add persistent light/dark theme support with toolbar toggle and CSS variable-based styling.
 - [x] Keep editing/export flow local-only.
 
 ## Test
 
 - [x] Manual inspection: `src/data/loader.ts` validates category and graph schema.
 - [x] Manual inspection: `src/components/GraphSelector.tsx` and `src/App.tsx` wire category/graph switching.
+- [x] Manual inspection: `src/App.tsx` handles theme preference initialization, persistence, and root `data-theme` synchronization.
+- [x] Manual inspection: `src/styles.css` defines light/dark CSS variables and applies them to major panels and inputs.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
 

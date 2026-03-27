@@ -30,6 +30,21 @@ import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 
 type GraphOption = { id: string; label: string };
+type Theme = "light" | "dark";
+
+const THEME_STORAGE_KEY = "mygraph-theme";
+
+const getSystemTheme = (): Theme =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+
+const getInitialTheme = (): Theme => {
+  if (typeof window === "undefined") return "light";
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : getSystemTheme();
+};
 
 type AppState =
   | { status: "loading" }
@@ -107,6 +122,12 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [isThemeOverridden, setIsThemeOverridden] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return stored === "light" || stored === "dark";
+  });
   const cyRef = useRef<Core | null>(null);
 
   const resolveGraph = useCallback(
@@ -124,6 +145,29 @@ export default function App() {
       label: graph.graphLabel,
     }));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isThemeOverridden) {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+      return;
+    }
+    window.localStorage.removeItem(THEME_STORAGE_KEY);
+  }, [theme, isThemeOverridden]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || isThemeOverridden) return;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncTheme = (event: MediaQueryListEvent) => {
+      setTheme(event.matches ? "dark" : "light");
+    };
+    mediaQuery.addEventListener("change", syncTheme);
+    return () => mediaQuery.removeEventListener("change", syncTheme);
+  }, [isThemeOverridden]);
 
   useEffect(() => {
     (async () => {
@@ -261,6 +305,11 @@ export default function App() {
     setSelectedNode(node);
   }, []);
 
+  const handleThemeToggle = useCallback(() => {
+    setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
+    setIsThemeOverridden(true);
+  }, []);
+
   const handleNodeSave = useCallback(
     (updated: KnowledgeNodeFile) => {
       if (state.status !== "ready") return;
@@ -371,6 +420,17 @@ export default function App() {
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="toolbar-actions">
+          <button
+            className="btn btn-secondary"
+            onClick={handleThemeToggle}
+            aria-label={
+              theme === "light"
+                ? "Switch to dark mode"
+                : "Switch to light mode"
+            }
+          >
+            {theme === "light" ? "Dark mode" : "Light mode"}
+          </button>
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view
           </button>
