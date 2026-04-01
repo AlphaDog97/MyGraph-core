@@ -28,6 +28,7 @@ import EdgeTypeLegend from "./components/EdgeTypeLegend";
 import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
+import InlineGraphLoader from "./components/InlineGraphLoader";
 
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
@@ -57,6 +58,11 @@ type AppState =
       graphId: string;
       graph: KnowledgeGraph;
     };
+
+type InlineLoadState =
+  | { status: "ready" }
+  | { status: "loading" }
+  | { status: "error"; message: string };
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -123,6 +129,9 @@ export default function App() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<KnowledgeNode | null>(null);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [inlineLoadState, setInlineLoadState] = useState<InlineLoadState>({
+    status: "ready",
+  });
   const [isThemeOverridden, setIsThemeOverridden] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
@@ -242,6 +251,7 @@ export default function App() {
         saveLastViewed({ categoryId: catId, graphId: selectedGraph.id });
         setSelectedNode(null);
         setSearchQuery("");
+        setInlineLoadState({ status: "ready" });
         setState({
           status: "ready",
           manifest,
@@ -309,6 +319,31 @@ export default function App() {
     setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
     setIsThemeOverridden(true);
   }, []);
+
+  const handleInlineGraphLoad = useCallback(
+    async (rawText: string) => {
+      if (state.status !== "ready") return;
+      setInlineLoadState({ status: "loading" });
+      try {
+        const parsed = JSON.parse(rawText) as unknown;
+        const graph = buildGraphFromRaw(parsed, state.categoryId, state.graphId);
+        setState((prev) => {
+          if (prev.status !== "ready") return prev;
+          return { ...prev, graph };
+        });
+        setSearchQuery("");
+        setSelectedNode(null);
+        setInlineLoadState({ status: "ready" });
+      } catch (error) {
+        const message =
+          error instanceof SyntaxError
+            ? `JSON 解析失败：${error.message}`
+            : `Schema 校验失败：${(error as Error).message}`;
+        setInlineLoadState({ status: "error", message });
+      }
+    },
+    [state]
+  );
 
   const handleNodeSave = useCallback(
     (updated: KnowledgeNodeFile) => {
@@ -403,6 +438,13 @@ export default function App() {
   return (
     <div className="app-shell">
       <div className="toolbar">
+        <InlineGraphLoader
+          onLoad={handleInlineGraphLoad}
+          isLoading={inlineLoadState.status === "loading"}
+          errorMessage={
+            inlineLoadState.status === "error" ? inlineLoadState.message : null
+          }
+        />
         <GraphSelector
           categories={categoryOptions}
           graphs={graphOptions}
