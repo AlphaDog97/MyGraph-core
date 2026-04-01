@@ -12,6 +12,8 @@ import {
   loadCategoryGraphs,
   loadLocalGraphNodes,
   loadManifest,
+  parseInlineGraphJson,
+  ParsedInlineSource,
 } from "./data/loader";
 import {
   loadTagColors,
@@ -32,8 +34,10 @@ import InlineGraphLoader from "./components/InlineGraphLoader";
 
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
+type DataSourceMode = "local" | "inline";
 
 const THEME_STORAGE_KEY = "mygraph-theme";
+const INLINE_JSON_STORAGE_KEY = "mygraph-inline-json";
 
 const getSystemTheme = (): Theme =>
   typeof window !== "undefined" &&
@@ -132,6 +136,12 @@ export default function App() {
   const [inlineLoadState, setInlineLoadState] = useState<InlineLoadState>({
     status: "ready",
   });
+  const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("local");
+  const [inlineSource, setInlineSource] = useState<ParsedInlineSource | null>(null);
+  const [inlineInitialText, setInlineInitialText] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem(INLINE_JSON_STORAGE_KEY) ?? "";
+  });
   const [isThemeOverridden, setIsThemeOverridden] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
@@ -141,19 +151,44 @@ export default function App() {
 
   const resolveGraph = useCallback(
     async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
+      if (dataSourceMode === "inline") {
+        if (!inlineSource) {
+          throw new Error("Inline source is not available.");
+        }
+        const graphs = inlineSource.categoryGraphs[categoryId];
+        if (!graphs) {
+          throw new Error(`category '${categoryId}' not found.`);
+        }
+        const matched = graphs.find((graph) => graph.graphId === graphId);
+        if (!matched) {
+          throw new Error(`graphId '${graphId}' not found.`);
+        }
+        return buildGraphFromRaw(matched.nodes, categoryId, graphId);
+      }
       const localNodes = await loadLocalGraphNodes(categoryId, graphId);
       return buildGraphFromRaw(localNodes, categoryId, graphId);
     },
-    []
+    [dataSourceMode, inlineSource]
   );
 
-  const resolveGraphOptions = useCallback(async (categoryId: string) => {
-    const graphs = await loadCategoryGraphs(categoryId);
-    return graphs.map((graph) => ({
-      id: graph.graphId,
-      label: graph.graphLabel,
-    }));
-  }, []);
+  const resolveGraphOptions = useCallback(
+    async (categoryId: string) => {
+      if (dataSourceMode === "inline") {
+        const graphs = inlineSource?.categoryGraphs[categoryId];
+        if (!graphs) return [];
+        return graphs.map((graph) => ({
+          id: graph.graphId,
+          label: graph.graphLabel,
+        }));
+      }
+      const graphs = await loadCategoryGraphs(categoryId);
+      return graphs.map((graph) => ({
+        id: graph.graphId,
+        label: graph.graphLabel,
+      }));
+    },
+    [dataSourceMode, inlineSource]
+  );
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -217,6 +252,7 @@ export default function App() {
 
         const graph = await resolveGraph(catId, gId);
         saveLastViewed({ categoryId: catId, graphId: gId });
+        setDataSourceMode("local");
         setState({
           status: "ready",
           manifest,
@@ -251,7 +287,6 @@ export default function App() {
         saveLastViewed({ categoryId: catId, graphId: selectedGraph.id });
         setSelectedNode(null);
         setSearchQuery("");
-        setInlineLoadState({ status: "ready" });
         setState({
           status: "ready",
           manifest,
@@ -325,20 +360,42 @@ export default function App() {
       if (state.status !== "ready") return;
       setInlineLoadState({ status: "loading" });
       try {
-        const parsed = JSON.parse(rawText) as unknown;
-        const graph = buildGraphFromRaw(parsed, state.categoryId, state.graphId);
-        setState((prev) => {
-          if (prev.status !== "ready") return prev;
-          return { ...prev, graph };
+        const parsed = parseInlineGraphJson(rawText);
+        const firstCategory = parsed.manifestLike.categories[0];
+        const firstGraph = firstCategory?.graphs[0];
+        if (!firstCategory || !firstGraph) {
+          throw new Error("nodes must be an array");
+        }
+        const graphEntries = parsed.categoryGraphs[firstCategory.id];
+        const selected = graphEntries?.find((g) => g.graphId === firstGraph.id);
+        if (!selected) {
+          throw new Error(`graphId '${firstGraph.id}' not found.`);
+        }
+        const graph = buildGraphFromRaw(
+          selected.nodes,
+          firstCategory.id,
+          firstGraph.id
+        );
+
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(INLINE_JSON_STORAGE_KEY, rawText);
+        }
+        setInlineInitialText(rawText);
+        setInlineSource(parsed);
+        setDataSourceMode("inline");
+        setState({
+          status: "ready",
+          manifest: parsed.manifestLike,
+          graphOptions: firstCategory.graphs,
+          categoryId: firstCategory.id,
+          graphId: firstGraph.id,
+          graph,
         });
         setSearchQuery("");
         setSelectedNode(null);
         setInlineLoadState({ status: "ready" });
       } catch (error) {
-        const message =
-          error instanceof SyntaxError
-            ? `JSON 解析失败：${error.message}`
-            : `Schema 校验失败：${(error as Error).message}`;
+        const message = (error as Error).message;
         setInlineLoadState({ status: "error", message });
       }
     },
@@ -440,6 +497,7 @@ export default function App() {
       <div className="toolbar">
         <InlineGraphLoader
           onLoad={handleInlineGraphLoad}
+          initialText={inlineInitialText}
           isLoading={inlineLoadState.status === "loading"}
           errorMessage={
             inlineLoadState.status === "error" ? inlineLoadState.message : null

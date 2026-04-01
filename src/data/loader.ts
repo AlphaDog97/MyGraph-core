@@ -19,10 +19,86 @@ interface MultiGraphCategoryFile {
   }>;
 }
 
+export interface ParsedInlineSource {
+  manifestLike: Manifest;
+  categoryGraphs: Record<string, CategoryGraphEntry[]>;
+}
+
 export interface CategoryGraphEntry {
   graphId: string;
   graphLabel: string;
   nodes: KnowledgeNodeFile[];
+}
+
+export function parseInlineGraphJson(text: string): ParsedInlineSource {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error("invalid JSON");
+  }
+
+  if (Array.isArray(parsed)) {
+    const categoryId = "inline";
+    const graphId = "inline";
+    const graphLabel = "Inline";
+    return {
+      manifestLike: {
+        categories: [
+          {
+            id: categoryId,
+            label: "Inline",
+            graphs: [{ id: graphId, label: graphLabel }],
+          },
+        ],
+      },
+      categoryGraphs: {
+        [categoryId]: [{ graphId, graphLabel, nodes: parsed as KnowledgeNodeFile[] }],
+      },
+    };
+  }
+
+  if (typeof parsed !== "object" || parsed === null) {
+    throw new Error("nodes must be an array");
+  }
+
+  const payload = parsed as MultiGraphCategoryFile;
+  if (!Array.isArray(payload.graphs)) {
+    throw new Error("nodes must be an array");
+  }
+
+  const categoryId = payload.categoryId?.trim() || "inline";
+  const categoryEntries = payload.graphs.map((graph, index) => {
+    if (typeof graph.graphId !== "string" || graph.graphId.trim() === "") {
+      throw new Error(`graphs[${index}].graphId is required`);
+    }
+    if (!Array.isArray(graph.nodes)) {
+      throw new Error("nodes must be an array");
+    }
+    return {
+      graphId: graph.graphId,
+      graphLabel: graph.graphLabel?.trim() || "Inline",
+      nodes: graph.nodes,
+    };
+  });
+
+  return {
+    manifestLike: {
+      categories: [
+        {
+          id: categoryId,
+          label: "Inline",
+          graphs: categoryEntries.map((entry) => ({
+            id: entry.graphId,
+            label: entry.graphLabel,
+          })),
+        },
+      ],
+    },
+    categoryGraphs: {
+      [categoryId]: categoryEntries,
+    },
+  };
 }
 
 async function loadCategoryGraphFile(
