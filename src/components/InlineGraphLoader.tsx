@@ -2,16 +2,18 @@ import { FormEvent, useState } from "react";
 
 interface Props {
   onLoad: (rawText: string) => Promise<void> | void;
+  initialText?: string;
   isLoading?: boolean;
   errorMessage?: string | null;
 }
 
 export default function InlineGraphLoader({
   onLoad,
+  initialText = "",
   isLoading = false,
   errorMessage,
 }: Props) {
-  const [rawText, setRawText] = useState("");
+  const [rawText, setRawText] = useState(initialText);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
