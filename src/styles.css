@@ -236,13 +236,13 @@ body {
 
 .inline-graph-loader {
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
 
 .inline-graph-loader-input {
-  width: 280px;
+  width: 100%;
   min-height: 120px;
   max-height: 240px;
   resize: vertical;
@@ -266,8 +266,9 @@ body {
 .inline-graph-loader-actions {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
-  max-width: 280px;
+  max-width: 100%;
 }
 
 .inline-graph-loader-error {
@@ -432,6 +433,47 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+.inline-drawer {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100% - 32px);
+  padding: 14px;
+  background: color-mix(in srgb, var(--color-panel-bg) 96%, transparent);
+  border: 1px solid var(--color-toolbar-border);
+  border-radius: 12px;
+  box-shadow: var(--color-elevated-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: auto;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 220ms ease, opacity 220ms ease;
+  z-index: 9;
+}
+
+.inline-drawer.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .inline-drawer {
+    width: min(90vw, 420px);
+    left: 12px;
+    top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inline-drawer {
+    transition: none;
+  }
 }
 
 /* ─── Legend ─────────────────────────────────────────────────────── */
