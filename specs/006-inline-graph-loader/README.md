@@ -34,6 +34,8 @@ into the currently selected graph view without switching category/graph files.
 - [x] Wire loader into toolbar near `GraphSelector`.
 - [x] Implement app-level inline load state (`loading | error | ready`).
 - [x] Add stylesheet rules for textarea sizing, resize behavior, and error styles.
+- [x] Reposition loader from toolbar into a toggleable left-side drawer overlay.
+- [x] Keep inline parse/validation errors inside drawer UI to avoid full-page local dataset confusion.
 
 ## Test
 
@@ -42,4 +44,6 @@ into the currently selected graph view without switching category/graph files.
 - [x] Manual inspection: parse/schema errors are surfaced in component error area.
 - [x] Manual inspection: textarea uses `aria-label="Paste graph.json"` and fixed
       height with vertical resize.
+- [x] Manual inspection: toolbar has `JSON加载` button that toggles drawer open/closed.
+- [x] Manual inspection: inline load errors render inside drawer error panel.
 - [ ] `lean-spec validate` (CLI unavailable in environment)

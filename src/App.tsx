@@ -138,6 +138,7 @@ export default function App() {
   });
   const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("local");
   const [inlineSource, setInlineSource] = useState<ParsedInlineSource | null>(null);
+  const [isInlineDrawerOpen, setIsInlineDrawerOpen] = useState(false);
   const [inlineInitialText, setInlineInitialText] = useState<string>(() => {
     if (typeof window === "undefined") return "";
     return window.localStorage.getItem(INLINE_JSON_STORAGE_KEY) ?? "";
@@ -495,14 +496,6 @@ export default function App() {
   return (
     <div className="app-shell">
       <div className="toolbar">
-        <InlineGraphLoader
-          onLoad={handleInlineGraphLoad}
-          initialText={inlineInitialText}
-          isLoading={inlineLoadState.status === "loading"}
-          errorMessage={
-            inlineLoadState.status === "error" ? inlineLoadState.message : null
-          }
-        />
         <GraphSelector
           categories={categoryOptions}
           graphs={graphOptions}
@@ -520,6 +513,14 @@ export default function App() {
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="toolbar-actions-left">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
+            aria-expanded={isInlineDrawerOpen}
+            aria-controls="inline-loader-drawer"
+          >
+            JSON加载
+          </button>
           <button className="btn btn-secondary" onClick={handleResetView}>
             Fit view
           </button>
@@ -595,6 +596,21 @@ export default function App() {
       </div>
 
       <div className="graph-area">
+        <div
+          id="inline-loader-drawer"
+          className={`inline-drawer${isInlineDrawerOpen ? " open" : ""}`}
+          aria-hidden={!isInlineDrawerOpen}
+        >
+          <InlineGraphLoader
+            onLoad={handleInlineGraphLoad}
+            initialText={inlineInitialText}
+            isLoading={inlineLoadState.status === "loading"}
+            errorMessage={
+              inlineLoadState.status === "error" ? inlineLoadState.message : null
+            }
+          />
+        </div>
+
         <div
           className={`graph-canvas-wrapper${selectedNode ? " with-panel" : ""}`}
         >
