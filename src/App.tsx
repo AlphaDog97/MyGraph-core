@@ -215,6 +215,9 @@ export default function App() {
   }, [isThemeOverridden]);
 
   useEffect(() => {
+    if (dataSourceMode !== "local") {
+      return;
+    }
     (async () => {
       try {
         const manifest = await loadManifest();
@@ -269,7 +272,7 @@ export default function App() {
         });
       }
     })();
-  }, [resolveGraph, resolveGraphOptions]);
+  }, [dataSourceMode, resolveGraph, resolveGraphOptions]);
 
   const switchGraph = useCallback(
     async (manifest: Manifest, catId: string, gId: string) => {
