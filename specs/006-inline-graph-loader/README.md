@@ -46,4 +46,5 @@ into the currently selected graph view without switching category/graph files.
       height with vertical resize.
 - [x] Manual inspection: toolbar has `JSON加载` button that toggles drawer open/closed.
 - [x] Manual inspection: inline load errors render inside drawer error panel.
+- [x] Manual inspection: loading inline JSON no longer triggers a follow-up local bootstrap that can replace the view with `Category '...' has no graphs.`
 - [ ] `lean-spec validate` (CLI unavailable in environment)
