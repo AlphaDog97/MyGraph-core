@@ -26,6 +26,14 @@ export default function GraphSelector({
         onChange={(event) => onCategoryChange(event.target.value)}
         aria-label="Select category"
         minW="170px"
+        borderColor="var(--color-border)"
+        bg="var(--color-input-bg)"
+        color="var(--color-text)"
+        _hover={{ borderColor: "var(--color-border-strong)" }}
+        _focusVisible={{
+          borderColor: "#5a67d8",
+          boxShadow: "0 0 0 1px #5a67d8",
+        }}
       >
         {categories.map((category) => (
           <option key={category.id} value={category.id}>
@@ -34,7 +42,7 @@ export default function GraphSelector({
         ))}
       </Select>
 
-      <Text color="gray.500">/</Text>
+      <Text color="var(--color-muted)">/</Text>
 
       <Select
         size="sm"
@@ -42,6 +50,14 @@ export default function GraphSelector({
         onChange={(event) => onGraphChange(event.target.value)}
         aria-label="Select graph"
         minW="170px"
+        borderColor="var(--color-border)"
+        bg="var(--color-input-bg)"
+        color="var(--color-text)"
+        _hover={{ borderColor: "var(--color-border-strong)" }}
+        _focusVisible={{
+          borderColor: "#5a67d8",
+          boxShadow: "0 0 0 1px #5a67d8",
+        }}
       >
         {graphs.map((graph) => (
           <option key={graph.id} value={graph.id}>

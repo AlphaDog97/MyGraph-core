@@ -41,7 +41,7 @@ export default function GraphManagementMenu({
             Move to {category.label}
           </MenuItem>
         ))}
-        {otherCategories.length > 0 ? <Text px={3} py={1} color="gray.400">—</Text> : null}
+        {otherCategories.length > 0 ? <Text px={3} py={1} color="var(--color-muted)">—</Text> : null}
         <MenuItem color="red.500" onClick={onDelete}>
           Delete graph "{graphId}"
         </MenuItem>
