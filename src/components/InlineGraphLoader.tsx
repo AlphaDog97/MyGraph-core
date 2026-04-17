@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Box, Button, FormControl, FormErrorMessage, Textarea, VStack } from "@chakra-ui/react";
+import { Alert, Button, Input, Space } from "antd";
 
 interface Props {
   onLoad: (rawText: string) => Promise<void> | void;
@@ -22,24 +22,21 @@ export default function InlineGraphLoader({
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit}>
-      <VStack align="stretch" spacing={3}>
-      <FormControl isInvalid={Boolean(errorMessage)}>
-        <Textarea
+    <form onSubmit={handleSubmit}>
+      <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        <Input.TextArea
           value={rawText}
           onChange={(event) => setRawText(event.target.value)}
           placeholder="粘贴 graph.json 内容（JSON 数组）"
           aria-label="Paste graph.json"
-          minH="160px"
-          fontFamily="mono"
-          fontSize="xs"
+          autoSize={{ minRows: 8, maxRows: 18 }}
+          style={{ fontFamily: "monospace", fontSize: 12 }}
         />
-        {errorMessage ? <FormErrorMessage>{errorMessage}</FormErrorMessage> : null}
-      </FormControl>
-        <Button variant="outline" type="submit" isLoading={isLoading} loadingText="加载中…">
+        {errorMessage ? <Alert type="error" message={errorMessage} showIcon /> : null}
+        <Button htmlType="submit" loading={isLoading}>
           {isLoading ? "加载中…" : "加载图"}
         </Button>
-      </VStack>
-    </Box>
+      </Space>
+    </form>
   );
 }

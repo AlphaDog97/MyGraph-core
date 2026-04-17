@@ -1,11 +1,6 @@
-import {
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Text,
-} from "@chakra-ui/react";
+import { EllipsisOutlined } from "@ant-design/icons";
+import { Button, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 import { Manifest } from "../domain/types";
 
 interface Props {
@@ -25,27 +20,24 @@ export default function GraphManagementMenu({
 }: Props) {
   const otherCategories = manifest.categories.filter((c) => c.id !== categoryId);
 
+  const items: MenuProps["items"] = [
+    ...otherCategories.map((category) => ({
+      key: `move-${category.id}`,
+      label: `Move to ${category.label}`,
+      onClick: () => onMove(category.id),
+    })),
+    ...(otherCategories.length > 0 ? [{ type: "divider" as const }] : []),
+    {
+      key: "delete",
+      label: `Delete graph "${graphId}"`,
+      danger: true,
+      onClick: onDelete,
+    },
+  ];
+
   return (
-    <Menu>
-      <MenuButton
-        as={Button}
-        size="sm"
-        variant="outline"
-        aria-label="Graph actions"
-      >
-        ⋯
-      </MenuButton>
-      <MenuList>
-        {otherCategories.map((category) => (
-          <MenuItem key={category.id} onClick={() => onMove(category.id)}>
-            Move to {category.label}
-          </MenuItem>
-        ))}
-        {otherCategories.length > 0 ? <Text px={3} py={1} color="var(--color-muted)">—</Text> : null}
-        <MenuItem color="red.500" onClick={onDelete}>
-          Delete graph "{graphId}"
-        </MenuItem>
-      </MenuList>
-    </Menu>
+    <Dropdown menu={{ items }} trigger={["click"]}>
+      <Button size="small" icon={<EllipsisOutlined />} aria-label="Graph actions" />
+    </Dropdown>
   );
 }

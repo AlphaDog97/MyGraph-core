@@ -31,17 +31,8 @@ import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 import InlineGraphLoader from "./components/InlineGraphLoader";
-import {
-  Box,
-  Button,
-  HStack,
-  IconButton,
-  Link,
-  Spinner,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import { FaMoon, FaSun, FaGithub } from "react-icons/fa";
+import { Button, ConfigProvider, Flex, Layout, Spin, Switch, theme as antdTheme, Typography } from "antd";
+import { GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
@@ -490,10 +481,12 @@ export default function App() {
 
   if (state.status === "loading") {
     return (
-      <VStack h="100%" justify="center" spacing={4}>
-        <Spinner size="lg" />
-        <Text>Loading knowledge graph…</Text>
-      </VStack>
+      <div style={{ height: "100%", display: "grid", placeItems: "center" }}>
+        <Flex vertical align="center" gap={12}>
+          <Spin size="large" />
+          <Typography.Text>Loading knowledge graph…</Typography.Text>
+        </Flex>
+      </div>
     );
   }
 
@@ -508,151 +501,178 @@ export default function App() {
   }));
 
   return (
-    <VStack h="100%" w="100%" spacing={0} align="stretch">
-      <HStack
-        align="start"
-        spacing={3}
-        px={5}
-        py={3}
-        borderBottomWidth="1px"
-        backdropFilter="blur(8px)"
-      >
-        <GraphSelector
-          categories={categoryOptions}
-          graphs={graphOptions}
-          categoryId={categoryId}
-          graphId={graphId}
-          onCategoryChange={handleCategoryChange}
-          onGraphChange={handleGraphChange}
-        />
-        <GraphManagementMenu
-          manifest={manifest}
-          categoryId={categoryId}
-          graphId={graphId}
-          onMove={handleMoveGraph}
-          onDelete={handleDeleteGraph}
-        />
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <HStack spacing={2}>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
-            aria-expanded={isInlineDrawerOpen}
-            aria-controls="inline-loader-drawer"
-          >
-            JSON加载
-          </Button>
-          <Button size="sm" variant="outline" onClick={handleResetView}>
-            Fit view
-          </Button>
-          <Button
-            size="sm"
-            colorScheme="blue"
-            onClick={() => setEditorOpen(true)}
-          >
-            Edit tag colors
-          </Button>
-        </HStack>
-        <HStack spacing={2} ml="auto">
-          <IconButton
-            size="sm"
-            variant="outline"
-            onClick={handleThemeToggle}
-            aria-label={
-              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
-            }
-            title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
-            icon={theme === "light" ? <FaMoon /> : <FaSun />}
-          />
-
-          <IconButton
-            as={Link}
-            size="sm"
-            variant="outline"
-            href="https://github.com/AlphaDog97/MyGraph-core"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open GitHub repository"
-            title="Open GitHub repository"
-            icon={<FaGithub />}
-          />
-        </HStack>
-      </HStack>
-
-      <Box flex="1" position="relative">
-        <Box
-          id="inline-loader-drawer"
-          position="absolute"
-          left={0}
-          top={0}
-          bottom={0}
-          w={isInlineDrawerOpen ? "360px" : "0"}
-          overflow="hidden"
-          transition="width 0.2s ease"
-          borderRightWidth={isInlineDrawerOpen ? "1px" : "0"}
-          borderColor="var(--color-border)"
-          bg="var(--color-panel-bg)"
-          zIndex={5}
-          p={isInlineDrawerOpen ? 3 : 0}
-          aria-hidden={!isInlineDrawerOpen}
+    <ConfigProvider
+      theme={{
+        algorithm: theme === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+      }}
+    >
+      <Layout style={{ height: "100%", background: "transparent" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 12,
+            padding: "12px 20px",
+            borderBottom: "1px solid var(--color-border)",
+            backdropFilter: "blur(8px)",
+            flexWrap: "wrap",
+          }}
         >
-          <InlineGraphLoader
-            onLoad={handleInlineGraphLoad}
-            initialText={inlineInitialText}
-            isLoading={inlineLoadState.status === "loading"}
-            errorMessage={
-              inlineLoadState.status === "error" ? inlineLoadState.message : null
-            }
+          <GraphSelector
+            categories={categoryOptions}
+            graphs={graphOptions}
+            categoryId={categoryId}
+            graphId={graphId}
+            onCategoryChange={handleCategoryChange}
+            onGraphChange={handleGraphChange}
           />
-        </Box>
-
-        <Box position="absolute" inset={0}>
-          <GraphCanvas
-            graph={graph}
-            tagColors={tagColors}
-            searchQuery={searchQuery}
-            theme={theme}
-            cyRef={cyRef}
-            onNodeSelect={handleNodeSelect}
+          <GraphManagementMenu
+            manifest={manifest}
+            categoryId={categoryId}
+            graphId={graphId}
+            onMove={handleMoveGraph}
+            onDelete={handleDeleteGraph}
           />
-        </Box>
-        <HStack position="absolute" left={4} bottom={4} align="end" spacing={3} zIndex={3}>
-          <TagLegend tags={graph.tags} tagColors={tagColors} />
-          <EdgeTypeLegend />
-        </HStack>
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+          <Flex gap={8}>
+            <Button
+              size="small"
+              onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
+              aria-expanded={isInlineDrawerOpen}
+              aria-controls="inline-loader-drawer"
+            >
+              JSON加载
+            </Button>
+            <Button size="small" onClick={handleResetView}>
+              Fit view
+            </Button>
+            <Button size="small" type="primary" onClick={() => setEditorOpen(true)}>
+              Edit tag colors
+            </Button>
+          </Flex>
+          <Flex gap={8} style={{ marginLeft: "auto", alignItems: "center" }}>
+            <Switch
+              size="small"
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<SunOutlined />}
+              checked={theme === "dark"}
+              onChange={handleThemeToggle}
+              title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
+            />
 
-        {selectedNode && (
-          <NodeDetailPanel
-            node={selectedNode}
-            allNodeIds={graph.nodes.map((n) => n.id)}
-            onClose={() => {
-              setSelectedNode(null);
-              cyRef.current?.nodes().removeClass("selected-node");
+            <Button
+              size="small"
+              icon={<GithubOutlined />}
+              href="https://github.com/AlphaDog97/MyGraph-core"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open GitHub repository"
+              title="Open GitHub repository"
+            />
+          </Flex>
+        </div>
+
+        <Layout.Content style={{ flex: 1, position: "relative" }}>
+          <div
+            id="inline-loader-drawer"
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: isInlineDrawerOpen ? 360 : 0,
+              overflow: "hidden",
+              transition: "width 0.2s ease",
+              borderRight: isInlineDrawerOpen ? "1px solid var(--color-border)" : "0",
+              background: "var(--color-panel-bg)",
+              zIndex: 5,
+              padding: isInlineDrawerOpen ? 12 : 0,
             }}
-            onSave={handleNodeSave}
+            aria-hidden={!isInlineDrawerOpen}
+          >
+            <InlineGraphLoader
+              onLoad={handleInlineGraphLoad}
+              initialText={inlineInitialText}
+              isLoading={inlineLoadState.status === "loading"}
+              errorMessage={
+                inlineLoadState.status === "error" ? inlineLoadState.message : null
+              }
+            />
+          </div>
+
+          <div style={{ position: "absolute", inset: 0 }}>
+            <GraphCanvas
+              graph={graph}
+              tagColors={tagColors}
+              searchQuery={searchQuery}
+              theme={theme}
+              cyRef={cyRef}
+              onNodeSelect={handleNodeSelect}
+            />
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 16,
+              bottom: 16,
+              display: "flex",
+              alignItems: "end",
+              gap: 12,
+              zIndex: 3,
+            }}
+          >
+            <TagLegend tags={graph.tags} tagColors={tagColors} />
+            <EdgeTypeLegend />
+          </div>
+
+          {selectedNode && (
+            <NodeDetailPanel
+              node={selectedNode}
+              allNodeIds={graph.nodes.map((n) => n.id)}
+              onClose={() => {
+                setSelectedNode(null);
+                cyRef.current?.nodes().removeClass("selected-node");
+              }}
+              onSave={handleNodeSave}
+            />
+          )}
+        </Layout.Content>
+
+        {graph.warnings.length > 0 && (
+          <div
+            style={{
+              padding: 8,
+              borderTop: "1px solid var(--color-warning-border)",
+              background: "var(--color-warning-bg)",
+              display: "flex",
+              gap: 16,
+              overflowX: "auto",
+            }}
+          >
+            {graph.warnings.map((w, i) => (
+              <Typography.Text
+                key={i}
+                style={{
+                  fontSize: 12,
+                  color: "var(--color-warning-text)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ⚠ {w}
+              </Typography.Text>
+            ))}
+          </div>
+        )}
+
+        {editorOpen && (
+          <TagColorEditor
+            tags={graph.tags}
+            tagColors={tagColors}
+            onChange={handleTagColorChange}
+            onClose={() => setEditorOpen(false)}
           />
         )}
-      </Box>
-
-      {graph.warnings.length > 0 && (
-        <HStack p={2} borderTopWidth="1px" borderColor="var(--color-warning-border)" bg="var(--color-warning-bg)" spacing={4} overflowX="auto">
-          {graph.warnings.map((w, i) => (
-            <Text key={i} fontSize="xs" color="var(--color-warning-text)" whiteSpace="nowrap">
-              ⚠ {w}
-            </Text>
-          ))}
-        </HStack>
-      )}
-
-      {editorOpen && (
-        <TagColorEditor
-          tags={graph.tags}
-          tagColors={tagColors}
-          onChange={handleTagColorChange}
-          onClose={() => setEditorOpen(false)}
-        />
-      )}
-    </VStack>
+      </Layout>
+    </ConfigProvider>
   );
 }
