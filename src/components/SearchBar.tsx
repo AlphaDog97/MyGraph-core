@@ -1,4 +1,12 @@
 import { useRef, useEffect } from "react";
+import {
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+} from "@chakra-ui/react";
+import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 
 interface Props {
   value: string;
@@ -24,38 +32,27 @@ export default function SearchBar({ value, onChange }: Props) {
   }, [onChange]);
 
   return (
-    <div className="search-bar">
-      <svg
-        className="search-icon"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <input
+    <InputGroup maxW="320px">
+      <InputLeftElement pointerEvents="none">
+        <SearchIcon color="gray.400" />
+      </InputLeftElement>
+      <Input
         ref={inputRef}
-        type="text"
         placeholder='Search nodes… (press "/")'
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="search-input"
+        size="sm"
       />
       {value && (
-        <button
-          className="search-clear"
-          onClick={() => onChange("")}
-          aria-label="Clear search"
-        >
-          ×
-        </button>
+        <InputRightElement>
+          <IconButton
+            size="xs"
+            aria-label="Clear search"
+            icon={<CloseIcon />}
+            onClick={() => onChange("")}
+          />
+        </InputRightElement>
       )}
-    </div>
+    </InputGroup>
   );
 }

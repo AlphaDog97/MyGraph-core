@@ -31,6 +31,17 @@ import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 import InlineGraphLoader from "./components/InlineGraphLoader";
+import {
+  Box,
+  Button,
+  HStack,
+  IconButton,
+  Link,
+  Spinner,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { FaMoon, FaSun, FaGithub } from "react-icons/fa";
 
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
@@ -479,10 +490,10 @@ export default function App() {
 
   if (state.status === "loading") {
     return (
-      <div className="app-loading">
-        <div className="spinner" />
-        <p>Loading knowledge graph…</p>
-      </div>
+      <VStack h="100%" justify="center" spacing={4}>
+        <Spinner size="lg" />
+        <Text>Loading knowledge graph…</Text>
+      </VStack>
     );
   }
 
@@ -497,8 +508,15 @@ export default function App() {
   }));
 
   return (
-    <div className="app-shell">
-      <div className="toolbar">
+    <VStack h="100%" w="100%" spacing={0} align="stretch">
+      <HStack
+        align="start"
+        spacing={3}
+        px={5}
+        py={3}
+        borderBottomWidth="1px"
+        backdropFilter="blur(8px)"
+      >
         <GraphSelector
           categories={categoryOptions}
           graphs={graphOptions}
@@ -515,93 +533,67 @@ export default function App() {
           onDelete={handleDeleteGraph}
         />
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <div className="toolbar-actions-left">
-          <button
-            className="btn btn-secondary"
+        <HStack spacing={2}>
+          <Button
+            size="sm"
+            variant="outline"
             onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
             aria-expanded={isInlineDrawerOpen}
             aria-controls="inline-loader-drawer"
           >
             JSON加载
-          </button>
-          <button className="btn btn-secondary" onClick={handleResetView}>
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleResetView}>
             Fit view
-          </button>
-          <button
-            className="btn btn-primary"
+          </Button>
+          <Button
+            size="sm"
+            colorScheme="blue"
             onClick={() => setEditorOpen(true)}
           >
             Edit tag colors
-          </button>
-        </div>
-        <div className="toolbar-actions-right">
-          <button
-            className="btn btn-secondary btn-icon"
+          </Button>
+        </HStack>
+        <HStack spacing={2} ml="auto">
+          <IconButton
+            size="sm"
+            variant="outline"
             onClick={handleThemeToggle}
             aria-label={
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
             title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
-          >
-            {theme === "light" ? (
-              // Moon (rounded/cute style)
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                focusable="false"
-                className="btn-icon-svg"
-              >
-                <path
-                  fill="currentColor"
-                  d="M14.6 2.2a.9.9 0 0 0-1 1.2 7.8 7.8 0 1 1-9.2 9.2.9.9 0 0 0-1.2-1A9.6 9.6 0 1 0 14.6 2.2Z"
-                />
-                <circle cx="16.8" cy="7.2" r="1" fill="currentColor" />
-                <circle cx="19.4" cy="10" r=".8" fill="currentColor" />
-              </svg>
-            ) : (
-              // Sun (rounded/rays style)
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                focusable="false"
-                className="btn-icon-svg"
-              >
-                <circle cx="12" cy="12" r="4.5" fill="currentColor" />
-                <path
-                  fill="currentColor"
-                  d="M12 2.4a1 1 0 0 1 1 1v1.7a1 1 0 1 1-2 0V3.4a1 1 0 0 1 1-1Zm0 16.5a1 1 0 0 1 1 1v1.7a1 1 0 1 1-2 0v-1.7a1 1 0 0 1 1-1ZM21.6 11a1 1 0 1 1 0 2h-1.7a1 1 0 1 1 0-2h1.7ZM5.1 11a1 1 0 1 1 0 2H3.4a1 1 0 1 1 0-2h1.7Zm13.05-5.65a1 1 0 0 1 1.42 1.42l-1.2 1.2a1 1 0 1 1-1.41-1.42l1.19-1.2Zm-10.1 10.1a1 1 0 0 1 1.42 1.42l-1.2 1.19a1 1 0 1 1-1.41-1.41l1.19-1.2Zm11.52 2.61a1 1 0 0 1-1.42 1.41l-1.19-1.19a1 1 0 1 1 1.41-1.42l1.2 1.2ZM9.46 8.05a1 1 0 0 1-1.42 1.42l-1.19-1.2a1 1 0 1 1 1.41-1.41l1.2 1.19Z"
-                />
-              </svg>
-            )}
-          </button>
+            icon={theme === "light" ? <FaMoon /> : <FaSun />}
+          />
 
-          <a
-            className="btn btn-secondary btn-icon"
+          <IconButton
+            as={Link}
+            size="sm"
+            variant="outline"
             href="https://github.com/AlphaDog97/MyGraph-core"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Open GitHub repository"
             title="Open GitHub repository"
-          >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              focusable="false"
-              className="btn-icon-svg"
-            >
-              <path
-                fill="currentColor"
-                d="M12 0.5a12 12 0 0 0-3.79 23.39c0.6 0.1 0.82-0.26 0.82-0.58v-2.03c-3.34 0.73-4.04-1.61-4.04-1.61-0.54-1.38-1.33-1.75-1.33-1.75-1.09-0.74 0.08-0.72 0.08-0.72 1.2 0.08 1.84 1.24 1.84 1.24 1.07 1.84 2.8 1.31 3.48 1 0.11-0.77 0.42-1.31 0.77-1.61-2.66-0.3-5.47-1.33-5.47-5.93 0-1.31 0.47-2.38 1.24-3.21-0.12-0.3-0.54-1.52 0.12-3.16 0 0 1.01-0.32 3.3 1.22a11.6 11.6 0 0 1 6 0c2.29-1.54 3.29-1.22 3.29-1.22 0.66 1.64 0.24 2.86 0.12 3.16 0.77 0.83 1.23 1.9 1.23 3.21 0 4.61-2.81 5.62-5.49 5.92 0.43 0.37 0.82 1.11 0.82 2.23v3.31c0 0.32 0.22 0.69 0.83 0.58A12 12 0 0 0 12 0.5Z"
-              />
-            </svg>
-          </a>
-        </div>
-      </div>
+            icon={<FaGithub />}
+          />
+        </HStack>
+      </HStack>
 
-      <div className="graph-area">
-        <div
+      <Box flex="1" position="relative">
+        <Box
           id="inline-loader-drawer"
-          className={`inline-drawer${isInlineDrawerOpen ? " open" : ""}`}
+          position="absolute"
+          left={0}
+          top={0}
+          bottom={0}
+          w={isInlineDrawerOpen ? "360px" : "0"}
+          overflow="hidden"
+          transition="width 0.2s ease"
+          borderRightWidth={isInlineDrawerOpen ? "1px" : "0"}
+          bg="white"
+          zIndex={5}
+          p={isInlineDrawerOpen ? 3 : 0}
           aria-hidden={!isInlineDrawerOpen}
         >
           <InlineGraphLoader
@@ -612,11 +604,9 @@ export default function App() {
               inlineLoadState.status === "error" ? inlineLoadState.message : null
             }
           />
-        </div>
+        </Box>
 
-        <div
-          className={`graph-canvas-wrapper${selectedNode ? " with-panel" : ""}`}
-        >
+        <Box position="absolute" inset={0}>
           <GraphCanvas
             graph={graph}
             tagColors={tagColors}
@@ -624,9 +614,11 @@ export default function App() {
             cyRef={cyRef}
             onNodeSelect={handleNodeSelect}
           />
-        </div>
-        <TagLegend tags={graph.tags} tagColors={tagColors} />
-        <EdgeTypeLegend />
+        </Box>
+        <HStack position="absolute" left={4} bottom={4} align="end" spacing={3} zIndex={3}>
+          <TagLegend tags={graph.tags} tagColors={tagColors} />
+          <EdgeTypeLegend />
+        </HStack>
 
         {selectedNode && (
           <NodeDetailPanel
@@ -639,16 +631,16 @@ export default function App() {
             onSave={handleNodeSave}
           />
         )}
-      </div>
+      </Box>
 
       {graph.warnings.length > 0 && (
-        <div className="warnings-bar">
+        <HStack p={2} borderTopWidth="1px" spacing={4} overflowX="auto">
           {graph.warnings.map((w, i) => (
-            <span key={i} className="warning-item">
+            <Text key={i} fontSize="xs" color="orange.700" whiteSpace="nowrap">
               ⚠ {w}
-            </span>
+            </Text>
           ))}
-        </div>
+        </HStack>
       )}
 
       {editorOpen && (
@@ -659,6 +651,6 @@ export default function App() {
           onClose={() => setEditorOpen(false)}
         />
       )}
-    </div>
+    </VStack>
   );
 }

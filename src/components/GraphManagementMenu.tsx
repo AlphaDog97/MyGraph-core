@@ -1,4 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  Button,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
 import { Manifest } from "../domain/types";
 
 interface Props {
@@ -16,92 +23,29 @@ export default function GraphManagementMenu({
   onMove,
   onDelete,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const [moveOpen, setMoveOpen] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setMoveOpen(false);
-        setConfirmDelete(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const otherCategories = manifest.categories.filter(
-    (c) => c.id !== categoryId
-  );
+  const otherCategories = manifest.categories.filter((c) => c.id !== categoryId);
 
   return (
-    <div className="mgmt-wrapper" ref={menuRef}>
-      <button
-        className="btn btn-secondary mgmt-trigger"
-        onClick={() => {
-          setOpen(!open);
-          setMoveOpen(false);
-          setConfirmDelete(false);
-        }}
+    <Menu>
+      <MenuButton
+        as={Button}
+        size="sm"
+        variant="outline"
         aria-label="Graph actions"
       >
         ⋯
-      </button>
-
-      {open && (
-        <div className="mgmt-menu">
-          {otherCategories.length > 0 && (
-            <button
-              className="mgmt-item"
-              onClick={() => {
-                setMoveOpen(!moveOpen);
-                setConfirmDelete(false);
-              }}
-            >
-              Move to category…
-            </button>
-          )}
-
-          {moveOpen && (
-            <div className="mgmt-submenu">
-              {otherCategories.map((c) => (
-                <button
-                  key={c.id}
-                  className="mgmt-item"
-                  onClick={() => {
-                    onMove(c.id);
-                    setOpen(false);
-                    setMoveOpen(false);
-                  }}
-                >
-                  → {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <button
-            className="mgmt-item mgmt-danger"
-            onClick={() => {
-              if (confirmDelete) {
-                onDelete();
-                setOpen(false);
-                setConfirmDelete(false);
-              } else {
-                setConfirmDelete(true);
-                setMoveOpen(false);
-              }
-            }}
-          >
-            {confirmDelete
-              ? `Confirm delete "${graphId}"?`
-              : "Delete graph…"}
-          </button>
-        </div>
-      )}
-    </div>
+      </MenuButton>
+      <MenuList>
+        {otherCategories.map((category) => (
+          <MenuItem key={category.id} onClick={() => onMove(category.id)}>
+            Move to {category.label}
+          </MenuItem>
+        ))}
+        {otherCategories.length > 0 ? <Text px={3} py={1} color="gray.400">—</Text> : null}
+        <MenuItem color="red.500" onClick={onDelete}>
+          Delete graph "{graphId}"
+        </MenuItem>
+      </MenuList>
+    </Menu>
   );
 }
