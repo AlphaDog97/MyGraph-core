@@ -1,5 +1,5 @@
 import { ManifestCategory, ManifestGraph } from "../domain/types";
-import { HStack, Select, Text } from "@chakra-ui/react";
+import { Select, Space, Typography } from "antd";
 
 interface Props {
   categories: ManifestCategory[];
@@ -19,52 +19,26 @@ export default function GraphSelector({
   onGraphChange,
 }: Props) {
   return (
-    <HStack spacing={2}>
+    <Space size={8}>
       <Select
-        size="sm"
+        size="small"
         value={categoryId}
-        onChange={(event) => onCategoryChange(event.target.value)}
+        onChange={onCategoryChange}
         aria-label="Select category"
-        minW="170px"
-        borderColor="var(--color-border)"
-        bg="var(--color-input-bg)"
-        color="var(--color-text)"
-        _hover={{ borderColor: "var(--color-border-strong)" }}
-        _focusVisible={{
-          borderColor: "#5a67d8",
-          boxShadow: "0 0 0 1px #5a67d8",
-        }}
-      >
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.label}
-          </option>
-        ))}
-      </Select>
+        style={{ minWidth: 170 }}
+        options={categories.map((category) => ({ value: category.id, label: category.label }))}
+      />
 
-      <Text color="var(--color-muted)">/</Text>
+      <Typography.Text type="secondary">/</Typography.Text>
 
       <Select
-        size="sm"
+        size="small"
         value={graphId}
-        onChange={(event) => onGraphChange(event.target.value)}
+        onChange={onGraphChange}
         aria-label="Select graph"
-        minW="170px"
-        borderColor="var(--color-border)"
-        bg="var(--color-input-bg)"
-        color="var(--color-text)"
-        _hover={{ borderColor: "var(--color-border-strong)" }}
-        _focusVisible={{
-          borderColor: "#5a67d8",
-          boxShadow: "0 0 0 1px #5a67d8",
-        }}
-      >
-        {graphs.map((graph) => (
-          <option key={graph.id} value={graph.id}>
-            {graph.label}
-          </option>
-        ))}
-      </Select>
-    </HStack>
+        style={{ minWidth: 170 }}
+        options={graphs.map((graph) => ({ value: graph.id, label: graph.label }))}
+      />
+    </Space>
   );
 }

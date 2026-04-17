@@ -34,6 +34,7 @@ and renders an interactive Cytoscape graph with search and node details.
 
 - [x] Implement manifest-driven category + graph selector.
 - [x] Replace native category/graph `<select>` controls with a React component library dropdown for consistent UI styling.
+- [x] Migrate all app and component UI primitives from Chakra UI to Ant Design components while preserving existing graph interactions and edit flows.
 - [x] Implement graph loading, validation, and Cytoscape transformation.
 - [x] Implement search, node detail panel, and graph legend UI.
 - [x] Add persistent light/dark theme support with toolbar toggle and CSS variable-based styling.
@@ -54,6 +55,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/components/GraphCanvas.tsx` adapts node/label colors by current app theme.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
+- [x] Manual inspection: `src/App.tsx` and `src/components/*` now use Ant Design components instead of Chakra UI primitives.
+- [x] `npm run build:app` after Ant Design migration.
 
 ## Notes
 

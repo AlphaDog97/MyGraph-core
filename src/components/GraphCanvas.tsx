@@ -1,6 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
 import cytoscape, { Core } from "cytoscape";
-import { Box } from "@chakra-ui/react";
 import { KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
 
@@ -490,13 +489,5 @@ export default function GraphCanvas({
     return () => resizeObserver.disconnect();
   }, [cyRef]);
 
-  return (
-    <Box
-      ref={containerRef}
-      position="absolute"
-      inset={0}
-      w="100%"
-      h="100%"
-    />
-  );
+  return <div ref={containerRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />;
 }

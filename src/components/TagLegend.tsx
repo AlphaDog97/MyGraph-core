@@ -1,5 +1,5 @@
+import { Card, List, Space, Typography } from "antd";
 import { TagColorAssignment } from "../domain/types";
-import { Box, HStack, List, ListItem, Text, VStack } from "@chakra-ui/react";
 
 interface Props {
   tags: string[];
@@ -12,33 +12,30 @@ export default function TagLegend({ tags, tagColors }: Props) {
   if (tags.length === 0) return null;
 
   return (
-    <VStack
-      align="stretch"
-      spacing={2}
-      p={3}
-      borderWidth="1px"
-      borderRadius="md"
-      borderColor="var(--color-border)"
-      bg="var(--color-elevated-bg)"
-      color="var(--color-text)"
-      minW="180px"
-    >
-      <Text fontSize="sm" fontWeight="semibold">
-        Tags
-      </Text>
-      <List spacing={1}>
-        {tags.map((tag) => {
+    <Card size="small" title="Tags" style={{ minWidth: 180 }}>
+      <List
+        size="small"
+        dataSource={tags}
+        renderItem={(tag) => {
           const color = tagColors[tag] ?? DEFAULT_SWATCH;
           return (
-            <ListItem key={tag}>
-              <HStack spacing={2}>
-                <Box w="10px" h="10px" borderRadius="full" bg={color} />
-                <Text fontSize="xs">{tag}</Text>
-              </HStack>
-            </ListItem>
+            <List.Item style={{ paddingInline: 0 }}>
+              <Space size={8}>
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 999,
+                    background: color,
+                    display: "inline-block",
+                  }}
+                />
+                <Typography.Text style={{ fontSize: 12 }}>{tag}</Typography.Text>
+              </Space>
+            </List.Item>
           );
-        })}
-      </List>
-    </VStack>
+        }}
+      />
+    </Card>
   );
 }

@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Code, VStack } from "@chakra-ui/react";
+import { Alert, Space, Typography } from "antd";
 
 interface Props {
   error: string;
@@ -6,19 +6,21 @@ interface Props {
 
 export default function ErrorDisplay({ error }: Props) {
   return (
-    <VStack h="100%" justify="center" p={6}>
-      <Alert status="error" maxW="720px" borderRadius="md" alignItems="start">
-        <AlertIcon />
-        <Box>
-          <AlertTitle>Dataset validation failed</AlertTitle>
-          <AlertDescription whiteSpace="pre-wrap" mt={2}>
-            {error}
-          </AlertDescription>
-          <AlertDescription mt={2}>
-            Check your files in <Code>graph-data/nodes/</Code> and redeploy.
-          </AlertDescription>
-        </Box>
-      </Alert>
-    </VStack>
+    <div style={{ height: "100%", display: "grid", placeItems: "center", padding: 24 }}>
+      <Alert
+        type="error"
+        showIcon
+        style={{ maxWidth: 720 }}
+        message="Dataset validation failed"
+        description={
+          <Space direction="vertical" size={8}>
+            <Typography.Text style={{ whiteSpace: "pre-wrap" }}>{error}</Typography.Text>
+            <Typography.Text>
+              Check your files in <Typography.Text code>graph-data/nodes/</Typography.Text> and redeploy.
+            </Typography.Text>
+          </Space>
+        }
+      />
+    </div>
   );
 }

@@ -1,12 +1,7 @@
 import { useRef, useEffect } from "react";
-import {
-  IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-} from "@chakra-ui/react";
-import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
+import { CloseCircleFilled, SearchOutlined } from "@ant-design/icons";
+import { Input } from "antd";
+import type { InputRef } from "antd";
 
 interface Props {
   value: string;
@@ -14,15 +9,15 @@ interface Props {
 }
 
 export default function SearchBar({ value, onChange }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "/" && document.activeElement !== inputRef.current) {
+      if (e.key === "/" && document.activeElement !== inputRef.current?.input) {
         e.preventDefault();
         inputRef.current?.focus();
       }
-      if (e.key === "Escape" && document.activeElement === inputRef.current) {
+      if (e.key === "Escape" && document.activeElement === inputRef.current?.input) {
         onChange("");
         inputRef.current?.blur();
       }
@@ -32,31 +27,22 @@ export default function SearchBar({ value, onChange }: Props) {
   }, [onChange]);
 
   return (
-    <InputGroup maxW="320px">
-      <InputLeftElement pointerEvents="none">
-        <SearchIcon color="var(--color-search-icon)" />
-      </InputLeftElement>
-      <Input
-        ref={inputRef}
-        placeholder='Search nodes… (press "/")'
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        size="sm"
-        bg="var(--color-input-bg)"
-        borderColor="var(--color-border)"
-        color="var(--color-text)"
-        _placeholder={{ color: "var(--color-search-placeholder)" }}
-      />
-      {value && (
-        <InputRightElement>
-          <IconButton
-            size="xs"
-            aria-label="Clear search"
-            icon={<CloseIcon />}
+    <Input
+      ref={inputRef}
+      placeholder='Search nodes… (press "/")'
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      size="small"
+      style={{ width: 320 }}
+      prefix={<SearchOutlined style={{ color: "var(--color-search-icon)" }} />}
+      suffix={
+        value ? (
+          <CloseCircleFilled
             onClick={() => onChange("")}
+            style={{ color: "var(--color-search-icon)", cursor: "pointer" }}
           />
-        </InputRightElement>
-      )}
-    </InputGroup>
+        ) : null
+      }
+    />
   );
 }

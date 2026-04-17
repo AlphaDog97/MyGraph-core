@@ -1,15 +1,4 @@
-import {
-  Button,
-  HStack,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Modal, Space, Typography } from "antd";
 import { TagColorAssignment } from "../domain/types";
 
 interface Props {
@@ -32,44 +21,46 @@ export default function TagColorEditor({
   onClose,
 }: Props) {
   return (
-    <Modal isOpen onClose={onClose} size="lg">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Edit tag colors</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={4}>
-          <VStack align="stretch" spacing={3}>
-            {tags.map((tag) => {
-              const current = tagColors[tag];
-              return (
-                <HStack key={tag} justify="space-between" align="center">
-                  <Text fontSize="sm">{tag}</Text>
-                  <HStack spacing={1}>
-                    {PRESET_COLORS.map((color) => (
-                      <Button
-                        key={color}
-                        size="xs"
-                        minW="20px"
-                        h="20px"
-                        p={0}
-                        borderRadius="full"
-                        bg={color}
-                        borderWidth={current === color ? "2px" : "1px"}
-                        borderColor={current === color ? "blackAlpha.700" : "transparent"}
-                        onClick={() => onChange(tag, color)}
-                        aria-label={`Set ${tag} to ${color}`}
-                      />
-                    ))}
-                    <Button size="xs" variant={!current ? "solid" : "outline"} onClick={() => onChange(tag, undefined)}>
-                      清除
-                    </Button>
-                  </HStack>
-                </HStack>
-              );
-            })}
-          </VStack>
-        </ModalBody>
-      </ModalContent>
+    <Modal open onCancel={onClose} footer={null} title="Edit tag colors" width={680}>
+      <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        {tags.map((tag) => {
+          const current = tagColors[tag];
+          return (
+            <div
+              key={tag}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              <Typography.Text>{tag}</Typography.Text>
+              <Space size={4} wrap>
+                {PRESET_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => onChange(tag, color)}
+                    aria-label={`Set ${tag} to ${color}`}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 999,
+                      background: color,
+                      border: current === color ? "2px solid rgba(0,0,0,0.65)" : "1px solid transparent",
+                      cursor: "pointer",
+                    }}
+                  />
+                ))}
+                <Button size="small" type={!current ? "primary" : "default"} onClick={() => onChange(tag, undefined)}>
+                  清除
+                </Button>
+              </Space>
+            </div>
+          );
+        })}
+      </Space>
     </Modal>
   );
 }

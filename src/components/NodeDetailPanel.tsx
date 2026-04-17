@@ -1,14 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  Button,
-  HStack,
-  Input,
-  Select,
-  Text,
-  Textarea,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Card, Input, Select, Space, Typography } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 import { KnowledgeNode, KnowledgeNodeFile } from "../domain/types";
 
 interface Props {
@@ -69,68 +61,84 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
   const otherNodeIds = allNodeIds.filter((id) => id !== node.id);
 
   return (
-    <Box
-      position="absolute"
-      right={4}
-      top={4}
-      w="360px"
-      maxH="calc(100% - 32px)"
-      overflowY="auto"
-      p={4}
-      borderWidth="1px"
-      borderRadius="md"
-      borderColor="var(--color-border)"
-      bg="var(--color-panel-bg)"
-      color="var(--color-text)"
+    <Card
+      size="small"
+      title="Node details"
+      extra={<Button size="small" type="text" icon={<CloseOutlined />} onClick={onClose} />}
+      style={{
+        position: "absolute",
+        right: 16,
+        top: 16,
+        width: 420,
+        maxHeight: "calc(100% - 32px)",
+        overflowY: "auto",
+        zIndex: 4,
+      }}
     >
-      <HStack justify="space-between" mb={3}>
-        <Text fontWeight="bold">Node details</Text>
-        <Button size="sm" variant="ghost" onClick={onClose}>×</Button>
-      </HStack>
-
-      <VStack align="stretch" spacing={3}>
-        <Box>
-          <Text fontSize="xs" color="var(--color-muted)">ID</Text>
-          <Text fontSize="sm">{node.id}</Text>
-        </Box>
-        <Box>
-          <Text fontSize="xs" color="var(--color-muted)">Label</Text>
-          <Input size="sm" value={label} onChange={(e) => setLabel(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
-        </Box>
-        <Box>
-          <Text fontSize="xs" color="var(--color-muted)">Description</Text>
-          <Textarea size="sm" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
-        </Box>
-        <Box>
-          <Text fontSize="xs" color="var(--color-muted)">Tags（逗号分隔）</Text>
-          <Input size="sm" value={tagsText} onChange={(e) => setTagsText(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
-        </Box>
-        <Box>
-          <HStack justify="space-between" mb={2}>
-            <Text fontSize="xs" color="var(--color-muted)">Links</Text>
-            <Button size="xs" onClick={addLink}>+ Add link</Button>
-          </HStack>
-          <VStack align="stretch" spacing={2}>
+      <Space direction="vertical" size={12} style={{ width: "100%" }}>
+        <div>
+          <Typography.Text type="secondary">ID</Typography.Text>
+          <div><Typography.Text>{node.id}</Typography.Text></div>
+        </div>
+        <div>
+          <Typography.Text type="secondary">Label</Typography.Text>
+          <Input size="small" value={label} onChange={(e) => setLabel(e.target.value)} />
+        </div>
+        <div>
+          <Typography.Text type="secondary">Description</Typography.Text>
+          <Input.TextArea
+            size="small"
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div>
+          <Typography.Text type="secondary">Tags（逗号分隔）</Typography.Text>
+          <Input size="small" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+        </div>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+            <Typography.Text type="secondary">Links</Typography.Text>
+            <Button size="small" onClick={addLink}>+ Add link</Button>
+          </div>
+          <Space direction="vertical" size={8} style={{ width: "100%" }}>
             {links.map((link, idx) => (
-              <HStack key={`${node.id}-link-${idx}`} spacing={2}>
-                <Select size="sm" value={link.target} onChange={(e) => handleLinkChange(idx, "target", e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)">
-                  <option value="">target…</option>
-                  {otherNodeIds.map((id) => <option key={id} value={id}>{id}</option>)}
-                </Select>
-                <Input size="sm" value={link.type} onChange={(e) => handleLinkChange(idx, "type", e.target.value)} placeholder="type" bg="var(--color-input-bg)" borderColor="var(--color-border)" />
-                <Input size="sm" value={link.label} onChange={(e) => handleLinkChange(idx, "label", e.target.value)} placeholder="label" bg="var(--color-input-bg)" borderColor="var(--color-border)" />
-                <Button size="xs" colorScheme="red" variant="ghost" onClick={() => removeLink(idx)}>×</Button>
-              </HStack>
+              <Space key={`${node.id}-link-${idx}`} size={8} style={{ width: "100%" }} wrap>
+                <Select
+                  size="small"
+                  value={link.target || undefined}
+                  onChange={(value) => handleLinkChange(idx, "target", value)}
+                  placeholder="target…"
+                  style={{ minWidth: 120 }}
+                  options={otherNodeIds.map((id) => ({ value: id, label: id }))}
+                />
+                <Input
+                  size="small"
+                  value={link.type}
+                  onChange={(e) => handleLinkChange(idx, "type", e.target.value)}
+                  placeholder="type"
+                  style={{ width: 100 }}
+                />
+                <Input
+                  size="small"
+                  value={link.label}
+                  onChange={(e) => handleLinkChange(idx, "label", e.target.value)}
+                  placeholder="label"
+                  style={{ width: 100 }}
+                />
+                <Button size="small" danger type="text" onClick={() => removeLink(idx)}>×</Button>
+              </Space>
             ))}
-          </VStack>
-        </Box>
-      </VStack>
+          </Space>
+        </div>
 
-      <HStack justify="flex-end" mt={4}>
-        <Button size="sm" colorScheme="blue" onClick={handleSave}>
-          Save
-        </Button>
-      </HStack>
-    </Box>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button size="small" type="primary" onClick={handleSave}>
+            Save
+          </Button>
+        </div>
+      </Space>
+    </Card>
   );
 }
