@@ -591,7 +591,8 @@ export default function App() {
           overflow="hidden"
           transition="width 0.2s ease"
           borderRightWidth={isInlineDrawerOpen ? "1px" : "0"}
-          bg="white"
+          borderColor="var(--color-border)"
+          bg="var(--color-panel-bg)"
           zIndex={5}
           p={isInlineDrawerOpen ? 3 : 0}
           aria-hidden={!isInlineDrawerOpen}
@@ -611,6 +612,7 @@ export default function App() {
             graph={graph}
             tagColors={tagColors}
             searchQuery={searchQuery}
+            theme={theme}
             cyRef={cyRef}
             onNodeSelect={handleNodeSelect}
           />
@@ -634,9 +636,9 @@ export default function App() {
       </Box>
 
       {graph.warnings.length > 0 && (
-        <HStack p={2} borderTopWidth="1px" spacing={4} overflowX="auto">
+        <HStack p={2} borderTopWidth="1px" borderColor="var(--color-warning-border)" bg="var(--color-warning-bg)" spacing={4} overflowX="auto">
           {graph.warnings.map((w, i) => (
-            <Text key={i} fontSize="xs" color="orange.700" whiteSpace="nowrap">
+            <Text key={i} fontSize="xs" color="var(--color-warning-text)" whiteSpace="nowrap">
               ⚠ {w}
             </Text>
           ))}

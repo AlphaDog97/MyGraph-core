@@ -90,6 +90,18 @@ body {
   color: var(--color-text);
 }
 
+select,
+input,
+textarea {
+  color: var(--color-text);
+}
+
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
 /* ─── Loading ───────────────────────────────────────────────────── */
 
 .app-loading {

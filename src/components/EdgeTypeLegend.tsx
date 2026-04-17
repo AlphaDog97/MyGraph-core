@@ -11,7 +11,9 @@ export default function EdgeTypeLegend() {
       p={3}
       borderWidth="1px"
       borderRadius="md"
-      bg="whiteAlpha.900"
+      borderColor="var(--color-border)"
+      bg="var(--color-elevated-bg)"
+      color="var(--color-text)"
       minW="180px"
     >
       <Text fontSize="sm" fontWeight="semibold">

@@ -69,7 +69,20 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
   const otherNodeIds = allNodeIds.filter((id) => id !== node.id);
 
   return (
-    <Box position="absolute" right={4} top={4} w="360px" maxH="calc(100% - 32px)" overflowY="auto" p={4} borderWidth="1px" borderRadius="md" bg="white">
+    <Box
+      position="absolute"
+      right={4}
+      top={4}
+      w="360px"
+      maxH="calc(100% - 32px)"
+      overflowY="auto"
+      p={4}
+      borderWidth="1px"
+      borderRadius="md"
+      borderColor="var(--color-border)"
+      bg="var(--color-panel-bg)"
+      color="var(--color-text)"
+    >
       <HStack justify="space-between" mb={3}>
         <Text fontWeight="bold">Node details</Text>
         <Button size="sm" variant="ghost" onClick={onClose}>×</Button>
@@ -77,35 +90,35 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
 
       <VStack align="stretch" spacing={3}>
         <Box>
-          <Text fontSize="xs" color="gray.500">ID</Text>
+          <Text fontSize="xs" color="var(--color-muted)">ID</Text>
           <Text fontSize="sm">{node.id}</Text>
         </Box>
         <Box>
-          <Text fontSize="xs" color="gray.500">Label</Text>
-          <Input size="sm" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <Text fontSize="xs" color="var(--color-muted)">Label</Text>
+          <Input size="sm" value={label} onChange={(e) => setLabel(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
         </Box>
         <Box>
-          <Text fontSize="xs" color="gray.500">Description</Text>
-          <Textarea size="sm" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Text fontSize="xs" color="var(--color-muted)">Description</Text>
+          <Textarea size="sm" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
         </Box>
         <Box>
-          <Text fontSize="xs" color="gray.500">Tags（逗号分隔）</Text>
-          <Input size="sm" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
+          <Text fontSize="xs" color="var(--color-muted)">Tags（逗号分隔）</Text>
+          <Input size="sm" value={tagsText} onChange={(e) => setTagsText(e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)" />
         </Box>
         <Box>
           <HStack justify="space-between" mb={2}>
-            <Text fontSize="xs" color="gray.500">Links</Text>
+            <Text fontSize="xs" color="var(--color-muted)">Links</Text>
             <Button size="xs" onClick={addLink}>+ Add link</Button>
           </HStack>
           <VStack align="stretch" spacing={2}>
             {links.map((link, idx) => (
               <HStack key={`${node.id}-link-${idx}`} spacing={2}>
-                <Select size="sm" value={link.target} onChange={(e) => handleLinkChange(idx, "target", e.target.value)}>
+                <Select size="sm" value={link.target} onChange={(e) => handleLinkChange(idx, "target", e.target.value)} bg="var(--color-input-bg)" borderColor="var(--color-border)">
                   <option value="">target…</option>
                   {otherNodeIds.map((id) => <option key={id} value={id}>{id}</option>)}
                 </Select>
-                <Input size="sm" value={link.type} onChange={(e) => handleLinkChange(idx, "type", e.target.value)} placeholder="type" />
-                <Input size="sm" value={link.label} onChange={(e) => handleLinkChange(idx, "label", e.target.value)} placeholder="label" />
+                <Input size="sm" value={link.type} onChange={(e) => handleLinkChange(idx, "type", e.target.value)} placeholder="type" bg="var(--color-input-bg)" borderColor="var(--color-border)" />
+                <Input size="sm" value={link.label} onChange={(e) => handleLinkChange(idx, "label", e.target.value)} placeholder="label" bg="var(--color-input-bg)" borderColor="var(--color-border)" />
                 <Button size="xs" colorScheme="red" variant="ghost" onClick={() => removeLink(idx)}>×</Button>
               </HStack>
             ))}

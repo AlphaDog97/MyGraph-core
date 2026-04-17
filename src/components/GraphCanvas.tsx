@@ -8,6 +8,7 @@ interface Props {
   graph: KnowledgeGraph;
   tagColors: TagColorAssignment;
   searchQuery: string;
+  theme: "light" | "dark";
   cyRef: React.MutableRefObject<Core | null>;
   onNodeSelect: (node: KnowledgeNode | null) => void;
 }
@@ -22,14 +23,18 @@ const BASE_VERTICAL_GAP = 88;
 const DEGREE_GAP_WEIGHT = 10;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildStyles(noMotion: boolean): any[] {
+function buildStyles(noMotion: boolean, theme: "light" | "dark"): any[] {
+  const nodeBackground = theme === "dark" ? "#1f2937" : "#f7fafc";
+  const nodeText = theme === "dark" ? "#e5e7eb" : "#2d3748";
+  const nodeTextOutline = theme === "dark" ? "#111827" : "#ffffff";
+  const edgeTextOutline = theme === "dark" ? "#111827" : "#f7f8fa";
   return [
     {
       selector: "node",
       style: {
         shape: "roundrectangle",
         label: "data(label)",
-        "background-color": "#f7fafc",
+        "background-color": nodeBackground,
         "border-width": 3,
         "border-color": "data(borderColor)",
         "text-valign": "center",
@@ -37,8 +42,8 @@ function buildStyles(noMotion: boolean): any[] {
         "font-family": "Inter, system-ui, sans-serif",
         "font-size": "13px",
         "font-weight": 500,
-        color: "#2d3748",
-        "text-outline-color": "#ffffff",
+        color: nodeText,
+        "text-outline-color": nodeTextOutline,
         "text-outline-width": 2,
         width: "label",
         "min-width": 110,
@@ -66,7 +71,7 @@ function buildStyles(noMotion: boolean): any[] {
         "font-size": "10px",
         color: "data(edgeColor)",
         "text-rotation": "autorotate",
-        "text-outline-color": "#f7f8fa",
+        "text-outline-color": edgeTextOutline,
         "text-outline-width": 2,
         "transition-property": "opacity, line-color",
         "transition-duration": noMotion ? 0 : 250,
@@ -86,7 +91,7 @@ function buildStyles(noMotion: boolean): any[] {
     },
     {
       selector: "node.selected-node",
-      style: { "border-width": 4, "background-color": "#f7fafc", "font-weight": 600 },
+      style: { "border-width": 4, "background-color": nodeBackground, "font-weight": 600 },
     },
   ];
 }
@@ -361,6 +366,7 @@ export default function GraphCanvas({
   graph,
   tagColors,
   searchQuery,
+  theme,
   cyRef,
   onNodeSelect,
 }: Props) {
@@ -382,7 +388,7 @@ export default function GraphCanvas({
     const cy = cytoscape({
       container: containerRef.current,
       elements,
-      style: buildStyles(noMotion),
+      style: buildStyles(noMotion, theme),
       layout: buildLayout(noMotion, plannedPositions),
       minZoom: COMPACT_LAYOUT_ZOOM_THRESHOLD,
       maxZoom: 4,
@@ -409,7 +415,7 @@ export default function GraphCanvas({
     });
 
     cyRef.current = cy;
-  }, [graph, tagColors, cyRef, onNodeSelect]);
+  }, [graph, tagColors, theme, cyRef, onNodeSelect]);
 
   useEffect(() => {
     initCy();

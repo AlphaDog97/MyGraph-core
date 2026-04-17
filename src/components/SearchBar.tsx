@@ -34,7 +34,7 @@ export default function SearchBar({ value, onChange }: Props) {
   return (
     <InputGroup maxW="320px">
       <InputLeftElement pointerEvents="none">
-        <SearchIcon color="gray.400" />
+        <SearchIcon color="var(--color-search-icon)" />
       </InputLeftElement>
       <Input
         ref={inputRef}
@@ -42,6 +42,10 @@ export default function SearchBar({ value, onChange }: Props) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         size="sm"
+        bg="var(--color-input-bg)"
+        borderColor="var(--color-border)"
+        color="var(--color-text)"
+        _placeholder={{ color: "var(--color-search-placeholder)" }}
       />
       {value && (
         <InputRightElement>
