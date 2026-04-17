@@ -36,6 +36,8 @@ npm package entry, then complete npm publish readiness checks.
 - [x] Refresh dark/light mode toggle icons to a friendlier rounded style.
 - [x] Align repository licensing from ISC to MIT (`package.json` + `LICENSE`).
 - [x] Rework README structure for onboarding: project intro → why this library → quick start → application flow.
+- [x] Migrate shared UI components to Chakra UI primitives for consistent styling contracts.
+- [x] Replace toolbar dark/light toggle SVGs with React Icons `FaMoon` / `FaSun`.
 - [ ] Add `.npmignore` or `files` review checklist to prevent accidental publish of non-package assets.
 - [ ] Add `prepublishOnly` script to guarantee `build:lib` runs before publish.
 - [x] Add repository metadata fields (`repository`, `homepage`, `bugs`, `keywords`) in `package.json`.
@@ -52,4 +54,5 @@ npm package entry, then complete npm publish readiness checks.
 - [x] Manual doc QA: README now follows intro → value proposition → quick start → AI-template usage flow.
 - [x] `npm pack --dry-run` reviewed for publish payload.
 - [x] `npm run build`
+- [x] `npm run build:app` after Chakra UI + React Icons migration.
 - [ ] Publish smoke test from fresh consumer project.

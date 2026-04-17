@@ -1,19 +1,32 @@
 import { edgeTypeLegendItems } from "../domain/edgeTypes";
+import { Box, HStack, List, ListItem, Text, VStack } from "@chakra-ui/react";
 
 export default function EdgeTypeLegend() {
   const items = edgeTypeLegendItems();
 
   return (
-    <div className="legend-panel edge-legend-panel">
-      <h3 className="legend-title">Relations</h3>
-      <ul className="legend-list">
+    <VStack
+      align="stretch"
+      spacing={2}
+      p={3}
+      borderWidth="1px"
+      borderRadius="md"
+      bg="whiteAlpha.900"
+      minW="180px"
+    >
+      <Text fontSize="sm" fontWeight="semibold">
+        Relations
+      </Text>
+      <List spacing={1}>
         {items.map((item) => (
-          <li key={item.type} className="legend-item">
-            <span className="legend-swatch" style={{ backgroundColor: item.color }} />
-            <span className="legend-label">{item.type}</span>
-          </li>
+          <ListItem key={item.type}>
+            <HStack spacing={2}>
+              <Box w="10px" h="10px" borderRadius="full" bg={item.color} />
+              <Text fontSize="xs">{item.type}</Text>
+            </HStack>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </VStack>
   );
 }

@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+import { Box, Button, FormControl, FormErrorMessage, Textarea, VStack } from "@chakra-ui/react";
 
 interface Props {
   onLoad: (rawText: string) => Promise<void> | void;
@@ -21,24 +22,24 @@ export default function InlineGraphLoader({
   };
 
   return (
-    <form className="inline-graph-loader" onSubmit={handleSubmit}>
-      <textarea
-        className="inline-graph-loader-input"
-        value={rawText}
-        onChange={(event) => setRawText(event.target.value)}
-        placeholder="粘贴 graph.json 内容（JSON 数组）"
-        aria-label="Paste graph.json"
-      />
-      <div className="inline-graph-loader-actions">
-        <button className="btn btn-secondary" type="submit" disabled={isLoading}>
+    <Box as="form" onSubmit={handleSubmit}>
+      <VStack align="stretch" spacing={3}>
+      <FormControl isInvalid={Boolean(errorMessage)}>
+        <Textarea
+          value={rawText}
+          onChange={(event) => setRawText(event.target.value)}
+          placeholder="粘贴 graph.json 内容（JSON 数组）"
+          aria-label="Paste graph.json"
+          minH="160px"
+          fontFamily="mono"
+          fontSize="xs"
+        />
+        {errorMessage ? <FormErrorMessage>{errorMessage}</FormErrorMessage> : null}
+      </FormControl>
+        <Button variant="outline" type="submit" isLoading={isLoading} loadingText="加载中…">
           {isLoading ? "加载中…" : "加载图"}
-        </button>
-        {errorMessage ? (
-          <p className="inline-graph-loader-error" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
-      </div>
-    </form>
+        </Button>
+      </VStack>
+    </Box>
   );
 }

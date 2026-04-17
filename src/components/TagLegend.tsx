@@ -1,4 +1,5 @@
 import { TagColorAssignment } from "../domain/types";
+import { Box, HStack, List, ListItem, Text, VStack } from "@chakra-ui/react";
 
 interface Props {
   tags: string[];
@@ -11,22 +12,31 @@ export default function TagLegend({ tags, tagColors }: Props) {
   if (tags.length === 0) return null;
 
   return (
-    <div className="legend-panel">
-      <h3 className="legend-title">Tags</h3>
-      <ul className="legend-list">
+    <VStack
+      align="stretch"
+      spacing={2}
+      p={3}
+      borderWidth="1px"
+      borderRadius="md"
+      bg="whiteAlpha.900"
+      minW="180px"
+    >
+      <Text fontSize="sm" fontWeight="semibold">
+        Tags
+      </Text>
+      <List spacing={1}>
         {tags.map((tag) => {
           const color = tagColors[tag] ?? DEFAULT_SWATCH;
           return (
-            <li key={tag} className="legend-item">
-              <span
-                className="legend-swatch"
-                style={{ backgroundColor: color }}
-              />
-              <span className="legend-label">{tag}</span>
-            </li>
+            <ListItem key={tag}>
+              <HStack spacing={2}>
+                <Box w="10px" h="10px" borderRadius="full" bg={color} />
+                <Text fontSize="xs">{tag}</Text>
+              </HStack>
+            </ListItem>
           );
         })}
-      </ul>
-    </div>
+      </List>
+    </VStack>
   );
 }

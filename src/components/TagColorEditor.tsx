@@ -1,3 +1,15 @@
+import {
+  Button,
+  HStack,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { TagColorAssignment } from "../domain/types";
 
 interface Props {
@@ -20,44 +32,44 @@ export default function TagColorEditor({
   onClose,
 }: Props) {
   return (
-    <div className="editor-overlay" onClick={onClose}>
-      <div className="editor-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="editor-header">
-          <h2 className="editor-title">Edit tag colors</h2>
-          <button className="editor-close" onClick={onClose} aria-label="Close">
-            ×
-          </button>
-        </div>
-        <div className="editor-body">
-          {tags.map((tag) => {
-            const current = tagColors[tag];
-            return (
-              <div key={tag} className="editor-row">
-                <span className="editor-tag-name">{tag}</span>
-                <div className="editor-colors">
-                  {PRESET_COLORS.map((c) => (
-                    <button
-                      key={c}
-                      className={`editor-color-btn${current === c ? " active" : ""}`}
-                      style={{ backgroundColor: c }}
-                      onClick={() => onChange(tag, c)}
-                      aria-label={`Set ${tag} to ${c}`}
-                    />
-                  ))}
-                  <button
-                    className={`editor-color-btn editor-clear-btn${!current ? " active" : ""}`}
-                    onClick={() => onChange(tag, undefined)}
-                    aria-label={`Clear color for ${tag}`}
-                    title="Clear"
-                  >
-                    ∅
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+    <Modal isOpen onClose={onClose} size="lg">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Edit tag colors</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={4}>
+          <VStack align="stretch" spacing={3}>
+            {tags.map((tag) => {
+              const current = tagColors[tag];
+              return (
+                <HStack key={tag} justify="space-between" align="center">
+                  <Text fontSize="sm">{tag}</Text>
+                  <HStack spacing={1}>
+                    {PRESET_COLORS.map((color) => (
+                      <Button
+                        key={color}
+                        size="xs"
+                        minW="20px"
+                        h="20px"
+                        p={0}
+                        borderRadius="full"
+                        bg={color}
+                        borderWidth={current === color ? "2px" : "1px"}
+                        borderColor={current === color ? "blackAlpha.700" : "transparent"}
+                        onClick={() => onChange(tag, color)}
+                        aria-label={`Set ${tag} to ${color}`}
+                      />
+                    ))}
+                    <Button size="xs" variant={!current ? "solid" : "outline"} onClick={() => onChange(tag, undefined)}>
+                      清除
+                    </Button>
+                  </HStack>
+                </HStack>
+              );
+            })}
+          </VStack>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

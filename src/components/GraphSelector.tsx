@@ -1,5 +1,5 @@
 import { ManifestCategory, ManifestGraph } from "../domain/types";
-import Select, { StylesConfig } from "react-select";
+import { HStack, Select, Text } from "@chakra-ui/react";
 
 interface Props {
   categories: ManifestCategory[];
@@ -18,98 +18,37 @@ export default function GraphSelector({
   onCategoryChange,
   onGraphChange,
 }: Props) {
-  const categoryOptions = categories.map((category) => ({
-    value: category.id,
-    label: category.label,
-  }));
-  const graphOptions = graphs.map((graph) => ({
-    value: graph.id,
-    label: graph.label,
-  }));
-
-  const selectStyles: StylesConfig<{ value: string; label: string }, false> = {
-    control: (base, state) => ({
-      ...base,
-      minHeight: 36,
-      borderRadius: 8,
-      backgroundColor: "var(--color-input-bg)",
-      borderColor: state.isFocused ? "#5a67d8" : "var(--color-border)",
-      boxShadow: state.isFocused ? "0 0 0 3px rgba(90, 103, 216, 0.12)" : "none",
-      fontSize: 13,
-      fontWeight: 500,
-      color: "var(--color-text)",
-      cursor: "pointer",
-      "&:hover": {
-        borderColor: state.isFocused ? "#5a67d8" : "var(--color-border-strong)",
-      },
-    }),
-    valueContainer: (base) => ({
-      ...base,
-      padding: "0 10px",
-    }),
-    indicatorSeparator: () => ({
-      display: "none",
-    }),
-    dropdownIndicator: (base) => ({
-      ...base,
-      color: "var(--color-muted)",
-      paddingRight: 8,
-      paddingLeft: 4,
-    }),
-    menu: (base) => ({
-      ...base,
-      backgroundColor: "var(--color-panel-bg)",
-      border: "1px solid var(--color-border)",
-      borderRadius: 8,
-      overflow: "hidden",
-      zIndex: 60,
-    }),
-    option: (base, state) => ({
-      ...base,
-      fontSize: 13,
-      backgroundColor: state.isSelected
-        ? "var(--color-option-selected-bg)"
-        : state.isFocused
-          ? "var(--color-option-hover-bg)"
-          : "var(--color-panel-bg)",
-      color: "var(--color-text)",
-      cursor: "pointer",
-    }),
-    singleValue: (base) => ({
-      ...base,
-      color: "var(--color-text)",
-    }),
-  };
-
   return (
-    <div className="graph-selector">
+    <HStack spacing={2}>
       <Select
-        className="selector-dropdown"
-        classNamePrefix="selector-react"
-        value={categoryOptions.find((option) => option.value === categoryId) ?? null}
-        onChange={(option) => {
-          if (option) onCategoryChange(option.value);
-        }}
-        options={categoryOptions}
-        isSearchable={false}
+        size="sm"
+        value={categoryId}
+        onChange={(event) => onCategoryChange(event.target.value)}
         aria-label="Select category"
-        styles={selectStyles}
-      />
+        minW="170px"
+      >
+        {categories.map((category) => (
+          <option key={category.id} value={category.id}>
+            {category.label}
+          </option>
+        ))}
+      </Select>
 
-      <span className="selector-sep">/</span>
+      <Text color="gray.500">/</Text>
 
       <Select
-        className="selector-dropdown"
-        classNamePrefix="selector-react"
-        value={graphOptions.find((option) => option.value === graphId) ?? null}
-        onChange={(option) => {
-          if (option) onGraphChange(option.value);
-        }}
-        options={graphOptions}
-        isSearchable={false}
+        size="sm"
+        value={graphId}
+        onChange={(event) => onGraphChange(event.target.value)}
         aria-label="Select graph"
-        styles={selectStyles}
-      />
-    </div>
+        minW="170px"
+      >
+        {graphs.map((graph) => (
+          <option key={graph.id} value={graph.id}>
+            {graph.label}
+          </option>
+        ))}
+      </Select>
+    </HStack>
   );
 }
