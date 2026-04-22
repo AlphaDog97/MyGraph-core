@@ -37,9 +37,11 @@ import { GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
 type DataSourceMode = "local" | "inline";
+type LegendState = { tagsOpen: boolean; relationsOpen: boolean };
 
 const THEME_STORAGE_KEY = "mygraph-theme";
 const INLINE_JSON_STORAGE_KEY = "mygraph-inline-json";
+const LEGEND_STATE_STORAGE_KEY = "mygraph-legend-state";
 
 const getSystemTheme = (): Theme =>
   typeof window !== "undefined" &&
@@ -150,6 +152,20 @@ export default function App() {
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
     return stored === "light" || stored === "dark";
   });
+  const [legendState, setLegendState] = useState<LegendState>(() => {
+    if (typeof window === "undefined") return { tagsOpen: true, relationsOpen: true };
+    try {
+      const stored = window.localStorage.getItem(LEGEND_STATE_STORAGE_KEY);
+      if (!stored) return { tagsOpen: true, relationsOpen: true };
+      const parsed = JSON.parse(stored) as Partial<LegendState>;
+      return {
+        tagsOpen: parsed.tagsOpen ?? true,
+        relationsOpen: parsed.relationsOpen ?? true,
+      };
+    } catch {
+      return { tagsOpen: true, relationsOpen: true };
+    }
+  });
   const cyRef = useRef<Core | null>(null);
 
   const resolveGraph = useCallback(
@@ -205,6 +221,11 @@ export default function App() {
     }
     window.localStorage.removeItem(THEME_STORAGE_KEY);
   }, [theme, isThemeOverridden]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(LEGEND_STATE_STORAGE_KEY, JSON.stringify(legendState));
+  }, [legendState]);
 
   useEffect(() => {
     if (typeof window === "undefined" || isThemeOverridden) return;
@@ -611,6 +632,7 @@ export default function App() {
             />
           </div>
           <div
+            className="legend-container"
             style={{
               position: "absolute",
               left: 16,
@@ -621,8 +643,23 @@ export default function App() {
               zIndex: 3,
             }}
           >
-            <TagLegend tags={graph.tags} tagColors={tagColors} />
-            <EdgeTypeLegend />
+            <TagLegend
+              tags={graph.tags}
+              tagColors={tagColors}
+              collapsed={!legendState.tagsOpen}
+              onToggle={() =>
+                setLegendState((prev) => ({ ...prev, tagsOpen: !prev.tagsOpen }))
+              }
+            />
+            <EdgeTypeLegend
+              collapsed={!legendState.relationsOpen}
+              onToggle={() =>
+                setLegendState((prev) => ({
+                  ...prev,
+                  relationsOpen: !prev.relationsOpen,
+                }))
+              }
+            />
           </div>
 
           {selectedNode && (

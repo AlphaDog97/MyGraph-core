@@ -43,6 +43,7 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Audit dark/light theme text and panel contrast for overlay components (node detail panel, inline loader drawer, legends, warnings, and graph canvas labels).
 - [x] Make node detail Tags/Relations sections collapsible so large edit forms are easier to navigate.
 - [x] Increase top-toolbar action button sizes to improve click/tap comfort.
+- [x] Add collapsible Tags/Relations legends with persisted open state and mobile-friendly collapsed footprint.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -56,6 +57,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx`, `src/components/TagLegend.tsx`, `src/components/EdgeTypeLegend.tsx`, and `src/App.tsx` now use shared theme variables for panel/text readability in dark mode.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` wraps Tags and Relations in collapsible sections while preserving edit/save behavior.
 - [x] Manual inspection: `src/App.tsx` and `src/components/GraphManagementMenu.tsx` increase top toolbar button sizes from `small` to `middle`.
+- [x] Manual inspection: `src/App.tsx`, `src/components/TagLegend.tsx`, and `src/components/EdgeTypeLegend.tsx` keep Tags/Relations legend collapse state synchronized with UI and `aria-expanded`.
+- [x] Manual inspection: `src/styles.css` gives collapsed legends a smaller mobile width so they obstruct less graph area.
 - [x] Manual inspection: `src/components/GraphCanvas.tsx` adapts node/label colors by current app theme.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
