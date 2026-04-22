@@ -239,9 +239,49 @@ textarea {
   height: 18px;
 }
 
+.legend-card {
+  min-width: 180px;
+}
+
+.legend-card .ant-card-head {
+  min-height: 38px;
+}
+
+.legend-card .ant-card-head-title {
+  padding: 0;
+}
+
+.legend-card__header-button {
+  width: 100%;
+  display: block;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.legend-card__header-button:focus-visible {
+  outline: 2px solid #5a67d8;
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn {
     transition: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .legend-container {
+    gap: 8px !important;
+  }
+
+  .legend-card.legend-card--collapsed {
+    min-width: 110px;
   }
 }
 
