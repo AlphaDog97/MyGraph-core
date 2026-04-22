@@ -47,6 +47,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Reorganize top toolbar into data selection, graph operations, and global groups with shared spacing/alignment utility classes.
 - [x] Unify desktop toolbar control sizing across category/graph selectors, search input, and graph operation buttons.
 - [x] Add responsive compact toolbar behavior that collapses secondary graph operations into a dropdown on narrow screens.
+- [x] Audit `src/styles.css` and component class usage; remove legacy toolbar/legend/button style blocks no longer referenced by Ant Design-based UI.
+- [x] Centralize Ant Design theme tokens (`colorPrimary`, radius, border/text colors) in `ConfigProvider` to avoid hard-coded per-component colors.
+- [x] Replace reusable inline `style={{ ... }}` layout snippets with semantic CSS classes for drawer, legend, warning bar, error panel, and node-detail/edit UI.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -70,6 +73,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
 - [x] Manual inspection: `src/App.tsx` and `src/components/*` now use Ant Design components instead of Chakra UI primitives.
 - [x] `npm run build:app` after Ant Design migration.
+- [x] Manual inspection: `src/styles.css` retains graph-canvas/layout essentials and removes obsolete legacy button/menu/legend theme blocks.
+- [x] Manual inspection: `src/App.tsx` configures core Ant Design theme tokens via `ConfigProvider.theme.token`.
+- [x] Manual inspection: `src/components/*` and `src/App.tsx` primarily rely on semantic class names instead of inline static styles.
 
 ## Notes
 

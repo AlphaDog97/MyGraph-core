@@ -504,7 +504,7 @@ export default function App() {
 
   if (state.status === "loading") {
     return (
-      <div style={{ height: "100%", display: "grid", placeItems: "center" }}>
+      <div className="app-loading">
         <Flex vertical align="center" gap={12}>
           <Spin size="large" />
           <Typography.Text>Loading knowledge graph…</Typography.Text>
@@ -546,9 +546,17 @@ export default function App() {
     <ConfigProvider
       theme={{
         algorithm: theme === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: "#5a67d8",
+          borderRadius: 8,
+          colorBorder: theme === "dark" ? "#4b5563" : "#d9dce3",
+          colorText: theme === "dark" ? "#e5e7eb" : "#2d3748",
+          colorTextSecondary: theme === "dark" ? "#9ca3af" : "#667085",
+          colorBgContainer: theme === "dark" ? "#1f2937" : "#ffffff",
+        },
       }}
     >
-      <Layout style={{ height: "100%", background: "transparent" }}>
+      <Layout className="app-layout">
         <Flex className="top-toolbar" align="center" gap={12} wrap>
           <Flex className="toolbar-group toolbar-group--data" align="center" gap={8}>
             <GraphSelector
@@ -625,22 +633,10 @@ export default function App() {
           </Flex>
         </Flex>
 
-        <Layout.Content style={{ flex: 1, position: "relative" }}>
+        <Layout.Content className="app-content">
           <div
             id="inline-loader-drawer"
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: isInlineDrawerOpen ? 360 : 0,
-              overflow: "hidden",
-              transition: "width 0.2s ease",
-              borderRight: isInlineDrawerOpen ? "1px solid var(--color-border)" : "0",
-              background: "var(--color-panel-bg)",
-              zIndex: 5,
-              padding: isInlineDrawerOpen ? 12 : 0,
-            }}
+            className={`inline-loader-drawer${isInlineDrawerOpen ? " is-open" : ""}`}
             aria-hidden={!isInlineDrawerOpen}
           >
             <InlineGraphLoader
@@ -653,7 +649,7 @@ export default function App() {
             />
           </div>
 
-          <div style={{ position: "absolute", inset: 0 }}>
+          <div className="graph-canvas-layer">
             <GraphCanvas
               graph={graph}
               tagColors={tagColors}
@@ -665,15 +661,6 @@ export default function App() {
           </div>
           <div
             className="legend-container"
-            style={{
-              position: "absolute",
-              left: 16,
-              bottom: 16,
-              display: "flex",
-              alignItems: "end",
-              gap: 12,
-              zIndex: 3,
-            }}
           >
             <TagLegend
               tags={graph.tags}
@@ -708,25 +695,9 @@ export default function App() {
         </Layout.Content>
 
         {graph.warnings.length > 0 && (
-          <div
-            style={{
-              padding: 8,
-              borderTop: "1px solid var(--color-warning-border)",
-              background: "var(--color-warning-bg)",
-              display: "flex",
-              gap: 16,
-              overflowX: "auto",
-            }}
-          >
+          <div className="warnings-bar">
             {graph.warnings.map((w, i) => (
-              <Typography.Text
-                key={i}
-                style={{
-                  fontSize: 12,
-                  color: "var(--color-warning-text)",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <Typography.Text key={i} className="warning-item">
                 ⚠ {w}
               </Typography.Text>
             ))}

@@ -65,17 +65,9 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
       size="small"
       title="Node details"
       extra={<Button size="small" type="text" icon={<CloseOutlined />} onClick={onClose} />}
-      style={{
-        position: "absolute",
-        right: 16,
-        top: 16,
-        width: 420,
-        maxHeight: "calc(100% - 32px)",
-        overflowY: "auto",
-        zIndex: 4,
-      }}
+      className="node-detail-panel"
     >
-      <Space direction="vertical" size={12} style={{ width: "100%" }}>
+      <Space direction="vertical" size={12} className="full-width">
         <div>
           <Typography.Text type="secondary">ID</Typography.Text>
           <div><Typography.Text>{node.id}</Typography.Text></div>
@@ -112,18 +104,18 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
               key: "relations",
               label: <Typography.Text type="secondary">Relations</Typography.Text>,
               children: (
-                <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Space direction="vertical" size={8} className="full-width">
+                  <div className="node-detail-actions-end">
                     <Button size="small" onClick={addLink}>+ Add relation</Button>
                   </div>
                   {links.map((link, idx) => (
-                    <Space key={`${node.id}-link-${idx}`} size={8} style={{ width: "100%" }} wrap>
+                    <Space key={`${node.id}-link-${idx}`} size={8} className="full-width" wrap>
                       <Select
                         size="small"
                         value={link.target || undefined}
                         onChange={(value) => handleLinkChange(idx, "target", value)}
                         placeholder="target…"
-                        style={{ minWidth: 120 }}
+                        className="node-detail-select-target"
                         options={otherNodeIds.map((id) => ({ value: id, label: id }))}
                       />
                       <Input
@@ -131,14 +123,14 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
                         value={link.type}
                         onChange={(e) => handleLinkChange(idx, "type", e.target.value)}
                         placeholder="type"
-                        style={{ width: 100 }}
+                        className="node-detail-input-sm"
                       />
                       <Input
                         size="small"
                         value={link.label}
                         onChange={(e) => handleLinkChange(idx, "label", e.target.value)}
                         placeholder="label"
-                        style={{ width: 100 }}
+                        className="node-detail-input-sm"
                       />
                       <Button size="small" danger type="text" onClick={() => removeLink(idx)}>×</Button>
                     </Space>
@@ -149,7 +141,7 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
           ]}
         />
 
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div className="node-detail-actions-end">
           <Button size="small" type="primary" onClick={handleSave}>
             Save
           </Button>

@@ -36,12 +36,12 @@ export default function SearchBar({ value, onChange, size = "middle" }: Props) {
       onChange={(e) => onChange(e.target.value)}
       size={size}
       className="toolbar-search"
-      prefix={<SearchOutlined style={{ color: "var(--color-search-icon)" }} />}
+      prefix={<SearchOutlined className="search-icon" />}
       suffix={
         value ? (
           <CloseCircleFilled
             onClick={() => onChange("")}
-            style={{ color: "var(--color-search-icon)", cursor: "pointer" }}
+            className="search-clear-icon"
           />
         ) : null
       }

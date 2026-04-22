@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import { Card, List, Space, Typography } from "antd";
 import { TagColorAssignment } from "../domain/types";
 
@@ -35,18 +36,13 @@ export default function TagLegend({ tags, tagColors, collapsed, onToggle }: Prop
           renderItem={(tag) => {
             const color = tagColors[tag] ?? DEFAULT_SWATCH;
             return (
-              <List.Item style={{ paddingInline: 0 }}>
+              <List.Item className="legend-card__item">
                 <Space size={8}>
                   <span
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 999,
-                      background: color,
-                      display: "inline-block",
-                    }}
+                    className="legend-card__swatch"
+                    style={{ "--legend-swatch-color": color } as CSSProperties}
                   />
-                  <Typography.Text style={{ fontSize: 12 }}>{tag}</Typography.Text>
+                  <Typography.Text className="legend-card__label">{tag}</Typography.Text>
                 </Space>
               </List.Item>
             );

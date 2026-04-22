@@ -489,5 +489,5 @@ export default function GraphCanvas({
     return () => resizeObserver.disconnect();
   }, [cyRef]);
 
-  return <div ref={containerRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />;
+  return <div ref={containerRef} className="graph-canvas-root" />;
 }
