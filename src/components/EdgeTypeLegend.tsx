@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import { Card, List, Space, Typography } from "antd";
 import { edgeTypeLegendItems } from "../domain/edgeTypes";
 
@@ -29,18 +30,13 @@ export default function EdgeTypeLegend({ collapsed, onToggle }: Props) {
           size="small"
           dataSource={items}
           renderItem={(item) => (
-            <List.Item style={{ paddingInline: 0 }}>
+            <List.Item className="legend-card__item">
               <Space size={8}>
                 <span
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 999,
-                    background: item.color,
-                    display: "inline-block",
-                  }}
+                  className="legend-card__swatch"
+                  style={{ "--legend-swatch-color": item.color } as CSSProperties}
                 />
-                <Typography.Text style={{ fontSize: 12 }}>{item.type}</Typography.Text>
+                <Typography.Text className="legend-card__label">{item.type}</Typography.Text>
               </Space>
             </List.Item>
           )}
