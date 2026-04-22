@@ -41,6 +41,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Refine dark-theme neutral palette for dropdowns, menus, legends, and detail/edit panels to reduce glare and improve contrast consistency.
 - [x] Fix top toolbar category/graph dropdown styling to ensure Chakra-based controls visibly use app theme tokens instead of appearing as default browser selects.
 - [x] Audit dark/light theme text and panel contrast for overlay components (node detail panel, inline loader drawer, legends, warnings, and graph canvas labels).
+- [x] Make node detail Tags/Relations sections collapsible so large edit forms are easier to navigate.
+- [x] Increase top-toolbar action button sizes to improve click/tap comfort.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -52,6 +54,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/styles.css` and `src/components/GraphSelector.tsx` use shared CSS variables for react-select, menus, legends, and detail/edit panel neutrals under dark theme.
 - [x] Manual inspection: `src/components/GraphSelector.tsx` applies explicit themed Chakra `Select` styling on toolbar dropdowns.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx`, `src/components/TagLegend.tsx`, `src/components/EdgeTypeLegend.tsx`, and `src/App.tsx` now use shared theme variables for panel/text readability in dark mode.
+- [x] Manual inspection: `src/components/NodeDetailPanel.tsx` wraps Tags and Relations in collapsible sections while preserving edit/save behavior.
+- [x] Manual inspection: `src/App.tsx` and `src/components/GraphManagementMenu.tsx` increase top toolbar button sizes from `small` to `middle`.
 - [x] Manual inspection: `src/components/GraphCanvas.tsx` adapts node/label colors by current app theme.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.

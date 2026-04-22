@@ -37,7 +37,7 @@ export default function GraphManagementMenu({
 
   return (
     <Dropdown menu={{ items }} trigger={["click"]}>
-      <Button size="small" icon={<EllipsisOutlined />} aria-label="Graph actions" />
+      <Button size="middle" icon={<EllipsisOutlined />} aria-label="Graph actions" />
     </Dropdown>
   );
 }

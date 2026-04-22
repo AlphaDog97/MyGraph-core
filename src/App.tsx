@@ -536,17 +536,17 @@ export default function App() {
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <Flex gap={8}>
             <Button
-              size="small"
+              size="middle"
               onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
               aria-expanded={isInlineDrawerOpen}
               aria-controls="inline-loader-drawer"
             >
               JSON加载
             </Button>
-            <Button size="small" onClick={handleResetView}>
+            <Button size="middle" onClick={handleResetView}>
               Fit view
             </Button>
-            <Button size="small" type="primary" onClick={() => setEditorOpen(true)}>
+            <Button size="middle" type="primary" onClick={() => setEditorOpen(true)}>
               Edit tag colors
             </Button>
           </Flex>
@@ -561,7 +561,7 @@ export default function App() {
             />
 
             <Button
-              size="small"
+              size="middle"
               icon={<GithubOutlined />}
               href="https://github.com/AlphaDog97/MyGraph-core"
               target="_blank"
