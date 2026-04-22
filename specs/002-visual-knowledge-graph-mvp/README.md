@@ -50,6 +50,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Audit `src/styles.css` and component class usage; remove legacy toolbar/legend/button style blocks no longer referenced by Ant Design-based UI.
 - [x] Centralize Ant Design theme tokens (`colorPrimary`, radius, border/text colors) in `ConfigProvider` to avoid hard-coded per-component colors.
 - [x] Replace reusable inline `style={{ ... }}` layout snippets with semantic CSS classes for drawer, legend, warning bar, error panel, and node-detail/edit UI.
+- [x] Refactor node detail overlay from absolute card to responsive drawer/fixed side panel with a mobile full-width strategy.
+- [x] Centralize app overlay stacking order (inline JSON drawer, legends, node detail drawer) with explicit z-index rules in `App.tsx`.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -76,6 +78,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/styles.css` retains graph-canvas/layout essentials and removes obsolete legacy button/menu/legend theme blocks.
 - [x] Manual inspection: `src/App.tsx` configures core Ant Design theme tokens via `ConfigProvider.theme.token`.
 - [x] Manual inspection: `src/components/*` and `src/App.tsx` primarily rely on semantic class names instead of inline static styles.
+- [x] Manual inspection: `src/components/NodeDetailPanel.tsx` preserves Label/Description/Tags/Relations/Save editing capabilities after drawer migration.
+- [x] Manual inspection: `src/App.tsx` + `src/styles.css` allow inline JSON drawer, node detail drawer, and both legends to render together with deterministic layering.
 
 ## Notes
 
