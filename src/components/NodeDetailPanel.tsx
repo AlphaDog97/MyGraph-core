@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Button, Card, Input, Select, Space, Typography } from "antd";
+import { Button, Card, Collapse, Input, Select, Space, Typography } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import { KnowledgeNode, KnowledgeNodeFile } from "../domain/types";
 
@@ -93,45 +93,61 @@ export default function NodeDetailPanel({ node, allNodeIds, onClose, onSave }: P
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
-        <div>
-          <Typography.Text type="secondary">Tags（逗号分隔）</Typography.Text>
-          <Input size="small" value={tagsText} onChange={(e) => setTagsText(e.target.value)} />
-        </div>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-            <Typography.Text type="secondary">Links</Typography.Text>
-            <Button size="small" onClick={addLink}>+ Add link</Button>
-          </div>
-          <Space direction="vertical" size={8} style={{ width: "100%" }}>
-            {links.map((link, idx) => (
-              <Space key={`${node.id}-link-${idx}`} size={8} style={{ width: "100%" }} wrap>
-                <Select
-                  size="small"
-                  value={link.target || undefined}
-                  onChange={(value) => handleLinkChange(idx, "target", value)}
-                  placeholder="target…"
-                  style={{ minWidth: 120 }}
-                  options={otherNodeIds.map((id) => ({ value: id, label: id }))}
-                />
+        <Collapse
+          size="small"
+          defaultActiveKey={["tags", "relations"]}
+          items={[
+            {
+              key: "tags",
+              label: <Typography.Text type="secondary">Tags（逗号分隔）</Typography.Text>,
+              children: (
                 <Input
                   size="small"
-                  value={link.type}
-                  onChange={(e) => handleLinkChange(idx, "type", e.target.value)}
-                  placeholder="type"
-                  style={{ width: 100 }}
+                  value={tagsText}
+                  onChange={(e) => setTagsText(e.target.value)}
                 />
-                <Input
-                  size="small"
-                  value={link.label}
-                  onChange={(e) => handleLinkChange(idx, "label", e.target.value)}
-                  placeholder="label"
-                  style={{ width: 100 }}
-                />
-                <Button size="small" danger type="text" onClick={() => removeLink(idx)}>×</Button>
-              </Space>
-            ))}
-          </Space>
-        </div>
+              ),
+            },
+            {
+              key: "relations",
+              label: <Typography.Text type="secondary">Relations</Typography.Text>,
+              children: (
+                <Space direction="vertical" size={8} style={{ width: "100%" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Button size="small" onClick={addLink}>+ Add relation</Button>
+                  </div>
+                  {links.map((link, idx) => (
+                    <Space key={`${node.id}-link-${idx}`} size={8} style={{ width: "100%" }} wrap>
+                      <Select
+                        size="small"
+                        value={link.target || undefined}
+                        onChange={(value) => handleLinkChange(idx, "target", value)}
+                        placeholder="target…"
+                        style={{ minWidth: 120 }}
+                        options={otherNodeIds.map((id) => ({ value: id, label: id }))}
+                      />
+                      <Input
+                        size="small"
+                        value={link.type}
+                        onChange={(e) => handleLinkChange(idx, "type", e.target.value)}
+                        placeholder="type"
+                        style={{ width: 100 }}
+                      />
+                      <Input
+                        size="small"
+                        value={link.label}
+                        onChange={(e) => handleLinkChange(idx, "label", e.target.value)}
+                        placeholder="label"
+                        style={{ width: 100 }}
+                      />
+                      <Button size="small" danger type="text" onClick={() => removeLink(idx)}>×</Button>
+                    </Space>
+                  ))}
+                </Space>
+              ),
+            },
+          ]}
+        />
 
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <Button size="small" type="primary" onClick={handleSave}>
