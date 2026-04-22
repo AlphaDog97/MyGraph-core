@@ -149,30 +149,56 @@ textarea {
 
 /* ─── Toolbar ───────────────────────────────────────────────────── */
 
-.toolbar {
+.top-toolbar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   padding: 12px 20px;
   background: var(--color-toolbar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-toolbar-border);
+  border-bottom: 1px solid var(--color-border);
   z-index: 10;
   flex-shrink: 0;
+  width: 100%;
 }
 
-.toolbar-actions-left {
+.toolbar-group {
   display: flex;
+  align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  min-height: 32px;
 }
 
-.toolbar-actions-right {
-  display: flex;
-  gap: 8px;
+.toolbar-group--search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.toolbar-group--global {
   margin-left: auto;
-  flex-shrink: 0;
+}
+
+@media (max-width: 991px) {
+  .top-toolbar {
+    padding: 10px 12px;
+  }
+
+  .toolbar-group--search {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 767px) {
+  .top-toolbar {
+    gap: 8px;
+  }
+
+  .toolbar-group--search {
+    order: 4;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
 }
 
 /* ─── Buttons ───────────────────────────────────────────────────── */
@@ -338,8 +364,12 @@ textarea {
 .graph-selector {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.graph-selector-item {
+  min-width: 170px;
 }
 
 .selector-dropdown {
@@ -425,6 +455,10 @@ textarea {
   align-items: center;
   flex: 1;
   max-width: 420px;
+}
+
+.toolbar-search {
+  width: min(420px, 100%);
 }
 
 .search-icon {

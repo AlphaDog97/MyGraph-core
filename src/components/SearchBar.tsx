@@ -2,13 +2,15 @@ import { useRef, useEffect } from "react";
 import { CloseCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 import type { InputRef } from "antd";
+import type { SizeType } from "antd/es/config-provider/SizeContext";
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
+  size?: SizeType;
 }
 
-export default function SearchBar({ value, onChange }: Props) {
+export default function SearchBar({ value, onChange, size = "middle" }: Props) {
   const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
@@ -32,8 +34,8 @@ export default function SearchBar({ value, onChange }: Props) {
       placeholder='Search nodes… (press "/")'
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      size="small"
-      style={{ width: 320 }}
+      size={size}
+      className="toolbar-search"
       prefix={<SearchOutlined style={{ color: "var(--color-search-icon)" }} />}
       suffix={
         value ? (

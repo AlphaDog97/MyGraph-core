@@ -31,8 +31,9 @@ import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 import InlineGraphLoader from "./components/InlineGraphLoader";
-import { Button, ConfigProvider, Flex, Layout, Spin, Switch, theme as antdTheme, Typography } from "antd";
-import { GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { Button, ConfigProvider, Dropdown, Flex, Grid, Layout, Spin, Switch, theme as antdTheme, Typography } from "antd";
+import { EllipsisOutlined, GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import type { MenuProps } from "antd";
 
 type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
@@ -131,6 +132,7 @@ function downloadGraphJson(graph: KnowledgeGraph) {
 }
 
 export default function App() {
+  const screens = Grid.useBreakpoint();
   const [state, setState] = useState<AppState>({ status: "loading" });
   const [tagColors, setTagColors] = useState<TagColorAssignment>(loadTagColors);
   const [searchQuery, setSearchQuery] = useState("");
@@ -520,6 +522,25 @@ export default function App() {
     ...category,
     graphs: [],
   }));
+  const toolbarControlSize = screens.md ? "middle" : "small";
+  const isCompactToolbar = !screens.lg;
+  const compactActionItems: MenuProps["items"] = [
+    {
+      key: "inline-json",
+      label: "JSON加载",
+      onClick: () => setIsInlineDrawerOpen((prev) => !prev),
+    },
+    {
+      key: "fit-view",
+      label: "Fit view",
+      onClick: handleResetView,
+    },
+    {
+      key: "edit-tag-colors",
+      label: "Edit tag colors",
+      onClick: () => setEditorOpen(true),
+    },
+  ];
 
   return (
     <ConfigProvider
@@ -528,50 +549,61 @@ export default function App() {
       }}
     >
       <Layout style={{ height: "100%", background: "transparent" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 12,
-            padding: "12px 20px",
-            borderBottom: "1px solid var(--color-border)",
-            backdropFilter: "blur(8px)",
-            flexWrap: "wrap",
-          }}
-        >
-          <GraphSelector
-            categories={categoryOptions}
-            graphs={graphOptions}
-            categoryId={categoryId}
-            graphId={graphId}
-            onCategoryChange={handleCategoryChange}
-            onGraphChange={handleGraphChange}
-          />
-          <GraphManagementMenu
-            manifest={manifest}
-            categoryId={categoryId}
-            graphId={graphId}
-            onMove={handleMoveGraph}
-            onDelete={handleDeleteGraph}
-          />
-          <SearchBar value={searchQuery} onChange={setSearchQuery} />
-          <Flex gap={8}>
-            <Button
-              size="middle"
-              onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
-              aria-expanded={isInlineDrawerOpen}
-              aria-controls="inline-loader-drawer"
-            >
-              JSON加载
-            </Button>
-            <Button size="middle" onClick={handleResetView}>
-              Fit view
-            </Button>
-            <Button size="middle" type="primary" onClick={() => setEditorOpen(true)}>
-              Edit tag colors
-            </Button>
+        <Flex className="top-toolbar" align="center" gap={12} wrap>
+          <Flex className="toolbar-group toolbar-group--data" align="center" gap={8}>
+            <GraphSelector
+              categories={categoryOptions}
+              graphs={graphOptions}
+              categoryId={categoryId}
+              graphId={graphId}
+              onCategoryChange={handleCategoryChange}
+              onGraphChange={handleGraphChange}
+              size={toolbarControlSize}
+            />
           </Flex>
-          <Flex gap={8} style={{ marginLeft: "auto", alignItems: "center" }}>
+
+          <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
+            <SearchBar value={searchQuery} onChange={setSearchQuery} size={toolbarControlSize} />
+          </Flex>
+
+          <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
+            <GraphManagementMenu
+              manifest={manifest}
+              categoryId={categoryId}
+              graphId={graphId}
+              onMove={handleMoveGraph}
+              onDelete={handleDeleteGraph}
+              size={toolbarControlSize}
+            />
+            {isCompactToolbar ? (
+              <Dropdown menu={{ items: compactActionItems }} trigger={["click"]}>
+                <Button size={toolbarControlSize} icon={<EllipsisOutlined />}>图操作</Button>
+              </Dropdown>
+            ) : (
+              <>
+                <Button
+                  size={toolbarControlSize}
+                  onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
+                  aria-expanded={isInlineDrawerOpen}
+                  aria-controls="inline-loader-drawer"
+                >
+                  JSON加载
+                </Button>
+                <Button size={toolbarControlSize} onClick={handleResetView}>
+                  Fit view
+                </Button>
+                <Button
+                  size={toolbarControlSize}
+                  type="primary"
+                  onClick={() => setEditorOpen(true)}
+                >
+                  Edit tag colors
+                </Button>
+              </>
+            )}
+          </Flex>
+
+          <Flex className="toolbar-group toolbar-group--global" align="center" gap={8}>
             <Switch
               size="small"
               checkedChildren={<MoonOutlined />}
@@ -582,7 +614,7 @@ export default function App() {
             />
 
             <Button
-              size="middle"
+              size={toolbarControlSize}
               icon={<GithubOutlined />}
               href="https://github.com/AlphaDog97/MyGraph-core"
               target="_blank"
@@ -591,7 +623,7 @@ export default function App() {
               title="Open GitHub repository"
             />
           </Flex>
-        </div>
+        </Flex>
 
         <Layout.Content style={{ flex: 1, position: "relative" }}>
           <div

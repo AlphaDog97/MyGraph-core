@@ -44,6 +44,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Make node detail Tags/Relations sections collapsible so large edit forms are easier to navigate.
 - [x] Increase top-toolbar action button sizes to improve click/tap comfort.
 - [x] Add collapsible Tags/Relations legends with persisted open state and mobile-friendly collapsed footprint.
+- [x] Reorganize top toolbar into data selection, graph operations, and global groups with shared spacing/alignment utility classes.
+- [x] Unify desktop toolbar control sizing across category/graph selectors, search input, and graph operation buttons.
+- [x] Add responsive compact toolbar behavior that collapses secondary graph operations into a dropdown on narrow screens.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -59,6 +62,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/App.tsx` and `src/components/GraphManagementMenu.tsx` increase top toolbar button sizes from `small` to `middle`.
 - [x] Manual inspection: `src/App.tsx`, `src/components/TagLegend.tsx`, and `src/components/EdgeTypeLegend.tsx` keep Tags/Relations legend collapse state synchronized with UI and `aria-expanded`.
 - [x] Manual inspection: `src/styles.css` gives collapsed legends a smaller mobile width so they obstruct less graph area.
+- [x] Manual inspection: `src/App.tsx` renders toolbar in three explicit groups and uses shared `Flex` alignment/gap config instead of per-control inline alignment styles.
+- [x] Manual inspection: `src/styles.css`, `src/components/GraphSelector.tsx`, and `src/components/SearchBar.tsx` centralize toolbar sizing/layout classes (`top-toolbar`, `toolbar-group`, `graph-selector-item`, `toolbar-search`).
+- [x] Manual inspection: `src/App.tsx` collapses JSON/Fit/Edit actions into a dropdown when the viewport is below the large (`lg`) Ant Design breakpoint.
 - [x] Manual inspection: `src/components/GraphCanvas.tsx` adapts node/label colors by current app theme.
 - [x] `npm run build:app`
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
