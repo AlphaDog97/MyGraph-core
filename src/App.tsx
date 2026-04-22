@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { CSSProperties, useState, useEffect, useRef, useCallback } from "react";
 import { Core } from "cytoscape";
 import {
   Manifest,
@@ -43,6 +43,11 @@ type LegendState = { tagsOpen: boolean; relationsOpen: boolean };
 const THEME_STORAGE_KEY = "mygraph-theme";
 const INLINE_JSON_STORAGE_KEY = "mygraph-inline-json";
 const LEGEND_STATE_STORAGE_KEY = "mygraph-legend-state";
+const OVERLAY_Z_INDEX = {
+  inlineDrawer: 20,
+  legends: 30,
+  detailDrawer: 40,
+} as const;
 
 const getSystemTheme = (): Theme =>
   typeof window !== "undefined" &&
@@ -633,7 +638,16 @@ export default function App() {
           </Flex>
         </Flex>
 
-        <Layout.Content className="app-content">
+        <Layout.Content
+          className="app-content"
+          style={
+            {
+              "--overlay-z-inline": OVERLAY_Z_INDEX.inlineDrawer,
+              "--overlay-z-legends": OVERLAY_Z_INDEX.legends,
+              "--overlay-z-detail": OVERLAY_Z_INDEX.detailDrawer,
+            } as CSSProperties
+          }
+        >
           <div
             id="inline-loader-drawer"
             className={`inline-loader-drawer${isInlineDrawerOpen ? " is-open" : ""}`}
@@ -685,6 +699,7 @@ export default function App() {
             <NodeDetailPanel
               node={selectedNode}
               allNodeIds={graph.nodes.map((n) => n.id)}
+              zIndex={OVERLAY_Z_INDEX.detailDrawer}
               onClose={() => {
                 setSelectedNode(null);
                 cyRef.current?.nodes().removeClass("selected-node");
