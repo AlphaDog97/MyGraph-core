@@ -10,6 +10,7 @@ interface Props {
   onCategoryChange: (categoryId: string) => void;
   onGraphChange: (graphId: string) => void;
   size?: SizeType;
+  showGraphSelect?: boolean;
 }
 
 export default function GraphSelector({
@@ -20,6 +21,7 @@ export default function GraphSelector({
   onCategoryChange,
   onGraphChange,
   size = "middle",
+  showGraphSelect = true,
 }: Props) {
   return (
     <Space size={8} className="graph-selector" align="center">
@@ -32,16 +34,20 @@ export default function GraphSelector({
         options={categories.map((category) => ({ value: category.id, label: category.label }))}
       />
 
-      <Typography.Text type="secondary">/</Typography.Text>
+      {showGraphSelect && (
+        <>
+          <Typography.Text type="secondary">/</Typography.Text>
 
-      <Select
-        size={size}
-        value={graphId}
-        onChange={onGraphChange}
-        aria-label="Select graph"
-        className="graph-selector-item"
-        options={graphs.map((graph) => ({ value: graph.id, label: graph.label }))}
-      />
+          <Select
+            size={size}
+            value={graphId}
+            onChange={onGraphChange}
+            aria-label="Select graph"
+            className="graph-selector-item"
+            options={graphs.map((graph) => ({ value: graph.id, label: graph.label }))}
+          />
+        </>
+      )}
     </Space>
   );
 }

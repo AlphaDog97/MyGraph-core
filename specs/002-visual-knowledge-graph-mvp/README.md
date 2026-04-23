@@ -52,6 +52,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Replace reusable inline `style={{ ... }}` layout snippets with semantic CSS classes for drawer, legend, warning bar, error panel, and node-detail/edit UI.
 - [x] Refactor node detail overlay from absolute card to responsive drawer/fixed side panel with a mobile full-width strategy.
 - [x] Centralize app overlay stacking order (inline JSON drawer, legends, node detail drawer) with explicit z-index rules in `App.tsx`.
+- [x] Introduce in-app page mode state (`single`/`overview3d`) with a toolbar "总览" entry, keeping `single` as default and preserving existing single-graph logic.
+- [x] Hide `categoryId + graphId`-bound single-graph controls/canvas in `overview3d`, and render a dedicated `Overview3DCanvas` placeholder component.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -80,6 +82,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/components/*` and `src/App.tsx` primarily rely on semantic class names instead of inline static styles.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` preserves Label/Description/Tags/Relations/Save editing capabilities after drawer migration.
 - [x] Manual inspection: `src/App.tsx` + `src/styles.css` allow inline JSON drawer, node detail drawer, and both legends to render together with deterministic layering.
+- [x] Manual inspection: `src/App.tsx` keeps default mode as `single`, and toggles to `overview3d` via toolbar button without changing the existing single-mode data path.
+- [x] Manual inspection: `src/components/GraphSelector.tsx` can hide graph selection in overview mode while retaining category selection control.
+- [x] Manual inspection: `src/components/Overview3DCanvas.tsx` renders overview placeholder content when app mode is `overview3d`.
 
 ## Notes
 

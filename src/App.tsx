@@ -31,6 +31,7 @@ import TagColorEditor from "./components/TagColorEditor";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 import InlineGraphLoader from "./components/InlineGraphLoader";
+import Overview3DCanvas from "./components/Overview3DCanvas";
 import { Button, ConfigProvider, Dropdown, Flex, Grid, Layout, Spin, Switch, theme as antdTheme, Typography } from "antd";
 import { EllipsisOutlined, GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -39,6 +40,7 @@ type GraphOption = { id: string; label: string };
 type Theme = "light" | "dark";
 type DataSourceMode = "local" | "inline";
 type LegendState = { tagsOpen: boolean; relationsOpen: boolean };
+type ViewMode = "single" | "overview3d";
 
 const THEME_STORAGE_KEY = "mygraph-theme";
 const INLINE_JSON_STORAGE_KEY = "mygraph-inline-json";
@@ -148,6 +150,7 @@ export default function App() {
     status: "ready",
   });
   const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("local");
+  const [viewMode, setViewMode] = useState<ViewMode>("single");
   const [inlineSource, setInlineSource] = useState<ParsedInlineSource | null>(null);
   const [isInlineDrawerOpen, setIsInlineDrawerOpen] = useState(false);
   const [inlineInitialText, setInlineInitialText] = useState<string>(() => {
@@ -384,6 +387,13 @@ export default function App() {
     setSelectedNode(node);
   }, []);
 
+  const handleViewModeToggle = useCallback(() => {
+    setViewMode((currentMode) =>
+      currentMode === "single" ? "overview3d" : "single"
+    );
+    setSelectedNode(null);
+  }, []);
+
   const handleThemeToggle = useCallback(() => {
     setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
     setIsThemeOverridden(true);
@@ -572,51 +582,59 @@ export default function App() {
               onCategoryChange={handleCategoryChange}
               onGraphChange={handleGraphChange}
               size={toolbarControlSize}
+              showGraphSelect={viewMode === "single"}
             />
           </Flex>
 
-          <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
-            <SearchBar value={searchQuery} onChange={setSearchQuery} size={toolbarControlSize} />
-          </Flex>
+          {viewMode === "single" && (
+            <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
+              <SearchBar value={searchQuery} onChange={setSearchQuery} size={toolbarControlSize} />
+            </Flex>
+          )}
 
-          <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
-            <GraphManagementMenu
-              manifest={manifest}
-              categoryId={categoryId}
-              graphId={graphId}
-              onMove={handleMoveGraph}
-              onDelete={handleDeleteGraph}
-              size={toolbarControlSize}
-            />
-            {isCompactToolbar ? (
-              <Dropdown menu={{ items: compactActionItems }} trigger={["click"]}>
-                <Button size={toolbarControlSize} icon={<EllipsisOutlined />}>图操作</Button>
-              </Dropdown>
-            ) : (
-              <>
-                <Button
-                  size={toolbarControlSize}
-                  onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
-                  aria-expanded={isInlineDrawerOpen}
-                  aria-controls="inline-loader-drawer"
-                >
-                  JSON加载
-                </Button>
-                <Button size={toolbarControlSize} onClick={handleResetView}>
-                  Fit view
-                </Button>
-                <Button
-                  size={toolbarControlSize}
-                  type="primary"
-                  onClick={() => setEditorOpen(true)}
-                >
-                  Edit tag colors
-                </Button>
-              </>
-            )}
-          </Flex>
+          {viewMode === "single" && (
+            <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
+              <GraphManagementMenu
+                manifest={manifest}
+                categoryId={categoryId}
+                graphId={graphId}
+                onMove={handleMoveGraph}
+                onDelete={handleDeleteGraph}
+                size={toolbarControlSize}
+              />
+              {isCompactToolbar ? (
+                <Dropdown menu={{ items: compactActionItems }} trigger={["click"]}>
+                  <Button size={toolbarControlSize} icon={<EllipsisOutlined />}>图操作</Button>
+                </Dropdown>
+              ) : (
+                <>
+                  <Button
+                    size={toolbarControlSize}
+                    onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
+                    aria-expanded={isInlineDrawerOpen}
+                    aria-controls="inline-loader-drawer"
+                  >
+                    JSON加载
+                  </Button>
+                  <Button size={toolbarControlSize} onClick={handleResetView}>
+                    Fit view
+                  </Button>
+                  <Button
+                    size={toolbarControlSize}
+                    type="primary"
+                    onClick={() => setEditorOpen(true)}
+                  >
+                    Edit tag colors
+                  </Button>
+                </>
+              )}
+            </Flex>
+          )}
 
           <Flex className="toolbar-group toolbar-group--global" align="center" gap={8}>
+            <Button size={toolbarControlSize} onClick={handleViewModeToggle}>
+              {viewMode === "single" ? "总览" : "返回单图"}
+            </Button>
             <Switch
               size="small"
               checkedChildren={<MoonOutlined />}
@@ -648,68 +666,74 @@ export default function App() {
             } as CSSProperties
           }
         >
-          <div
-            id="inline-loader-drawer"
-            className={`inline-loader-drawer${isInlineDrawerOpen ? " is-open" : ""}`}
-            aria-hidden={!isInlineDrawerOpen}
-          >
-            <InlineGraphLoader
-              onLoad={handleInlineGraphLoad}
-              initialText={inlineInitialText}
-              isLoading={inlineLoadState.status === "loading"}
-              errorMessage={
-                inlineLoadState.status === "error" ? inlineLoadState.message : null
-              }
-            />
-          </div>
+          {viewMode === "single" ? (
+            <>
+              <div
+                id="inline-loader-drawer"
+                className={`inline-loader-drawer${isInlineDrawerOpen ? " is-open" : ""}`}
+                aria-hidden={!isInlineDrawerOpen}
+              >
+                <InlineGraphLoader
+                  onLoad={handleInlineGraphLoad}
+                  initialText={inlineInitialText}
+                  isLoading={inlineLoadState.status === "loading"}
+                  errorMessage={
+                    inlineLoadState.status === "error" ? inlineLoadState.message : null
+                  }
+                />
+              </div>
 
-          <div className="graph-canvas-layer">
-            <GraphCanvas
-              graph={graph}
-              tagColors={tagColors}
-              searchQuery={searchQuery}
-              theme={theme}
-              cyRef={cyRef}
-              onNodeSelect={handleNodeSelect}
-            />
-          </div>
-          <div
-            className="legend-container"
-          >
-            <TagLegend
-              tags={graph.tags}
-              tagColors={tagColors}
-              collapsed={!legendState.tagsOpen}
-              onToggle={() =>
-                setLegendState((prev) => ({ ...prev, tagsOpen: !prev.tagsOpen }))
-              }
-            />
-            <EdgeTypeLegend
-              collapsed={!legendState.relationsOpen}
-              onToggle={() =>
-                setLegendState((prev) => ({
-                  ...prev,
-                  relationsOpen: !prev.relationsOpen,
-                }))
-              }
-            />
-          </div>
+              <div className="graph-canvas-layer">
+                <GraphCanvas
+                  graph={graph}
+                  tagColors={tagColors}
+                  searchQuery={searchQuery}
+                  theme={theme}
+                  cyRef={cyRef}
+                  onNodeSelect={handleNodeSelect}
+                />
+              </div>
+              <div
+                className="legend-container"
+              >
+                <TagLegend
+                  tags={graph.tags}
+                  tagColors={tagColors}
+                  collapsed={!legendState.tagsOpen}
+                  onToggle={() =>
+                    setLegendState((prev) => ({ ...prev, tagsOpen: !prev.tagsOpen }))
+                  }
+                />
+                <EdgeTypeLegend
+                  collapsed={!legendState.relationsOpen}
+                  onToggle={() =>
+                    setLegendState((prev) => ({
+                      ...prev,
+                      relationsOpen: !prev.relationsOpen,
+                    }))
+                  }
+                />
+              </div>
 
-          {selectedNode && (
-            <NodeDetailPanel
-              node={selectedNode}
-              allNodeIds={graph.nodes.map((n) => n.id)}
-              zIndex={OVERLAY_Z_INDEX.detailDrawer}
-              onClose={() => {
-                setSelectedNode(null);
-                cyRef.current?.nodes().removeClass("selected-node");
-              }}
-              onSave={handleNodeSave}
-            />
+              {selectedNode && (
+                <NodeDetailPanel
+                  node={selectedNode}
+                  allNodeIds={graph.nodes.map((n) => n.id)}
+                  zIndex={OVERLAY_Z_INDEX.detailDrawer}
+                  onClose={() => {
+                    setSelectedNode(null);
+                    cyRef.current?.nodes().removeClass("selected-node");
+                  }}
+                  onSave={handleNodeSave}
+                />
+              )}
+            </>
+          ) : (
+            <Overview3DCanvas theme={theme} />
           )}
         </Layout.Content>
 
-        {graph.warnings.length > 0 && (
+        {viewMode === "single" && graph.warnings.length > 0 && (
           <div className="warnings-bar">
             {graph.warnings.map((w, i) => (
               <Typography.Text key={i} className="warning-item">
@@ -719,7 +743,7 @@ export default function App() {
           </div>
         )}
 
-        {editorOpen && (
+        {viewMode === "single" && editorOpen && (
           <TagColorEditor
             tags={graph.tags}
             tagColors={tagColors}

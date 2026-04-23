@@ -158,6 +158,18 @@ body {
   height: 100%;
 }
 
+.overview3d-root {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.overview3d-card {
+  width: min(640px, 100%);
+}
+
 .legend-container {
   position: absolute;
   left: 16px;
