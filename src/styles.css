@@ -118,21 +118,21 @@ body {
 
 .inline-loader-drawer {
   position: absolute;
-  left: 0;
+  right: 0;
   top: 0;
   bottom: 0;
   width: 0;
   overflow: hidden;
   z-index: var(--overlay-z-inline);
   background: var(--panel-bg);
-  border-right: 0 solid var(--panel-border);
+  border-left: 0 solid var(--panel-border);
   padding: 0;
-  transition: width 0.2s ease, border-right-width 0.2s ease, padding 0.2s ease;
+  transition: width 0.2s ease, border-left-width 0.2s ease, padding 0.2s ease;
 }
 
 .inline-loader-drawer.is-open {
   width: 360px;
-  border-right-width: 1px;
+  border-left-width: 1px;
   padding: 12px;
 }
 
