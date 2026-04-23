@@ -46,6 +46,8 @@ Hard rules:
 7) Node IDs must be unique within each graph.
 8) Every node should have at least one inbound or outbound link inside its graph.
 9) Return JSON only.
+10) Use only these four relation `type` values: `Concept`, `Description`, `Condition`, `Action`.
+11) Prefer exact capitalization for relation `type` values to match UI legend.
 ```
 
 ---
@@ -92,6 +94,8 @@ Hard rules:
 7）每张图内节点 `id` 必须唯一。
 8）每个节点至少有一条同图入边或出边。
 9）只输出 JSON。
+10）关系 `type` 只能使用这四种：`Concept`、`Description`、`Condition`、`Action`。
+11）关系 `type` 推荐使用上述完全一致的大小写，便于和 UI 图例对齐。
 ```
 
 ---

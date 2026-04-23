@@ -27,6 +27,8 @@ into the currently selected graph view without switching category/graph files.
   parse + schema validation there.
 - Reuse existing `buildGraphFromRaw` validation to avoid schema drift.
 - Extend toolbar styling with dark/light variable-driven textarea and error UI.
+- Keep the inline loader as a side drawer that can be moved by UX feedback
+  without changing parsing/validation contracts.
 
 ## Plan
 
@@ -36,6 +38,8 @@ into the currently selected graph view without switching category/graph files.
 - [x] Add stylesheet rules for textarea sizing, resize behavior, and error styles.
 - [x] Reposition loader from toolbar into a toggleable left-side drawer overlay.
 - [x] Keep inline parse/validation errors inside drawer UI to avoid full-page local dataset confusion.
+- [x] Move the inline JSON drawer to the right side for better visual separation from legends.
+- [x] Update prompt template hard rules to explicitly list the four supported relation types.
 
 ## Test
 
@@ -46,5 +50,7 @@ into the currently selected graph view without switching category/graph files.
       height with vertical resize.
 - [x] Manual inspection: toolbar has `JSON加载` button that toggles drawer open/closed.
 - [x] Manual inspection: inline load errors render inside drawer error panel.
+- [x] Manual inspection: inline loader drawer opens from the right side.
+- [x] Manual inspection: `PROMPT_TEMPLATE.md` includes four allowed relation types (`Concept`, `Description`, `Condition`, `Action`).
 - [x] Manual inspection: loading inline JSON no longer triggers a follow-up local bootstrap that can replace the view with `Category '...' has no graphs.`
 - [ ] `lean-spec validate` (CLI unavailable in environment)
