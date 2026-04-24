@@ -54,6 +54,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Centralize app overlay stacking order (inline JSON drawer, legends, node detail drawer) with explicit z-index rules in `App.tsx`.
 - [x] Introduce in-app page mode state (`single`/`overview3d`) with a toolbar "总览" entry, keeping `single` as default and preserving existing single-graph logic.
 - [x] Hide `categoryId + graphId`-bound single-graph controls/canvas in `overview3d`, and render a dedicated `Overview3DCanvas` placeholder component.
+- [x] Replace `Overview3DCanvas` placeholder with real 3D graph rendering, keeping it isolated from existing 2D `GraphCanvas` behavior.
+- [x] Keep 3D mode node/edge field mappings explicit (`id/label/tags` and `source/target/type/label`) and route node click selection through existing `onNodeSelect`/`NodeDetailPanel` flow.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -85,6 +87,9 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/App.tsx` keeps default mode as `single`, and toggles to `overview3d` via toolbar button without changing the existing single-mode data path.
 - [x] Manual inspection: `src/components/GraphSelector.tsx` can hide graph selection in overview mode while retaining category selection control.
 - [x] Manual inspection: `src/components/Overview3DCanvas.tsx` renders overview placeholder content when app mode is `overview3d`.
+- [x] Manual inspection: `src/components/Overview3DCanvas.tsx` renders a 3D graph (nodes + directed edges), adapts visuals to light/dark theme, and preserves required node/edge field mappings.
+- [x] Manual inspection: `src/App.tsx` reuses `NodeDetailPanel` selection interaction from 3D mode via shared `onNodeSelect`.
+- [x] `npm run build:app`
 
 ## Notes
 

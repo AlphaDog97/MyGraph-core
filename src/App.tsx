@@ -715,21 +715,26 @@ export default function App() {
                 />
               </div>
 
-              {selectedNode && (
-                <NodeDetailPanel
-                  node={selectedNode}
-                  allNodeIds={graph.nodes.map((n) => n.id)}
-                  zIndex={OVERLAY_Z_INDEX.detailDrawer}
-                  onClose={() => {
-                    setSelectedNode(null);
-                    cyRef.current?.nodes().removeClass("selected-node");
-                  }}
-                  onSave={handleNodeSave}
-                />
-              )}
             </>
           ) : (
-            <Overview3DCanvas theme={theme} />
+            <Overview3DCanvas
+              graph={graph}
+              theme={theme}
+              onNodeSelect={handleNodeSelect}
+            />
+          )}
+
+          {selectedNode && (
+            <NodeDetailPanel
+              node={selectedNode}
+              allNodeIds={graph.nodes.map((n) => n.id)}
+              zIndex={OVERLAY_Z_INDEX.detailDrawer}
+              onClose={() => {
+                setSelectedNode(null);
+                cyRef.current?.nodes().removeClass("selected-node");
+              }}
+              onSave={handleNodeSave}
+            />
           )}
         </Layout.Content>
 
