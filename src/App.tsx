@@ -8,8 +8,10 @@ import {
   TagColorAssignment,
 } from "./domain/types";
 import {
+  aggregateGraphsToKnowledgeGraph,
   buildGraphFromRaw,
   loadCategoryGraphs,
+  loadAllGraphsAsKnowledgeGraph,
   loadLocalGraphNodes,
   loadManifest,
   parseInlineGraphJson,
@@ -73,6 +75,7 @@ type AppState =
       categoryId: string;
       graphId: string;
       graph: KnowledgeGraph;
+      overviewGraph: KnowledgeGraph;
     };
 
 type InlineLoadState =
@@ -177,6 +180,7 @@ export default function App() {
     }
   });
   const cyRef = useRef<Core | null>(null);
+  const overviewGraphRef = useRef<KnowledgeGraph | null>(null);
 
   const resolveGraph = useCallback(
     async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
@@ -287,7 +291,11 @@ export default function App() {
           return;
         }
 
-        const graph = await resolveGraph(catId, gId);
+        const [graph, overviewGraph] = await Promise.all([
+          resolveGraph(catId, gId),
+          loadAllGraphsAsKnowledgeGraph(manifest),
+        ]);
+        overviewGraphRef.current = overviewGraph;
         saveLastViewed({ categoryId: catId, graphId: gId });
         setDataSourceMode("local");
         setState({
@@ -297,6 +305,7 @@ export default function App() {
           categoryId: catId,
           graphId: gId,
           graph,
+          overviewGraph,
         });
       } catch (err) {
         setState({
@@ -331,6 +340,7 @@ export default function App() {
           categoryId: catId,
           graphId: selectedGraph.id,
           graph,
+          overviewGraph: overviewGraphRef.current ?? graph,
         });
       } catch (err) {
         setState({
@@ -427,6 +437,17 @@ export default function App() {
         setInlineInitialText(rawText);
         setInlineSource(parsed);
         setDataSourceMode("inline");
+        const overviewGraph = aggregateGraphsToKnowledgeGraph(
+          Object.entries(parsed.categoryGraphs).flatMap(([categoryId, graphs]) =>
+            graphs.map((entry) => ({
+              categoryId,
+              graphId: entry.graphId,
+              graphLabel: entry.graphLabel,
+              nodes: entry.nodes,
+            }))
+          )
+        );
+        overviewGraphRef.current = overviewGraph;
         setState({
           status: "ready",
           manifest: parsed.manifestLike,
@@ -434,6 +455,7 @@ export default function App() {
           categoryId: firstCategory.id,
           graphId: firstGraph.id,
           graph,
+          overviewGraph,
         });
         setSearchQuery("");
         setSelectedNode(null);
@@ -532,7 +554,7 @@ export default function App() {
     return <ErrorDisplay error={state.message} />;
   }
 
-  const { manifest, graphOptions, categoryId, graphId, graph } = state;
+  const { manifest, graphOptions, categoryId, graphId, graph, overviewGraph } = state;
   const categoryOptions = manifest.categories.map((category) => ({
     ...category,
     graphs: [],
@@ -718,7 +740,7 @@ export default function App() {
             </>
           ) : (
             <Overview3DCanvas
-              graph={graph}
+              graph={overviewGraph}
               theme={theme}
               onNodeSelect={handleNodeSelect}
             />
