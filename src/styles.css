@@ -161,13 +161,43 @@ body {
 .overview3d-root {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
 }
 
-.overview3d-card {
-  width: min(640px, 100%);
+.overview3d-root--loading {
+  display: grid;
+  place-items: center;
+}
+
+.overview3d-hint-wrap {
+  z-index: 2;
+}
+
+.overview3d-hint {
+  max-width: 520px;
+}
+
+.overview3d-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.overview3d-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.overview3d-caption {
+  font-size: 12px;
+  opacity: 0.85;
+  padding-inline: 2px;
 }
 
 .legend-container {
