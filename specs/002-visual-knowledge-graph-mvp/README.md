@@ -56,6 +56,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Hide `categoryId + graphId`-bound single-graph controls/canvas in `overview3d`, and render a dedicated `Overview3DCanvas` placeholder component.
 - [x] Replace `Overview3DCanvas` placeholder with real 3D graph rendering, keeping it isolated from existing 2D `GraphCanvas` behavior.
 - [x] Keep 3D mode node/edge field mappings explicit (`id/label/tags` and `source/target/type/label`) and route node click selection through existing `onNodeSelect`/`NodeDetailPanel` flow.
+- [x] Add manifest-wide graph aggregation loader (`loadAllGraphsAsKnowledgeGraph`) for `overview3d` with duplicate-node merge warnings.
+- [x] Cache aggregated overview graph during app initialization/data-source switch so toggling single/overview does not re-fetch all graph files.
 - [x] Keep editing/export flow local-only.
 
 ## Test
@@ -76,6 +78,8 @@ and renders an interactive Cytoscape graph with search and node details.
 - [x] Manual inspection: `src/App.tsx` collapses JSON/Fit/Edit actions into a dropdown when the viewport is below the large (`lg`) Ant Design breakpoint.
 - [x] Manual inspection: `src/components/GraphCanvas.tsx` adapts node/label colors by current app theme.
 - [x] `npm run build:app`
+- [x] Manual inspection: `src/data/loader.ts` provides graph aggregation flow over `manifest.categories[].graphs[]` and returns merged `nodes/edges/tags/warnings`.
+- [x] Manual inspection: `src/App.tsx` stores and reuses cached `overviewGraph` for `Overview3DCanvas`.
 - [x] Manual inspection: `src/components/NodeDetailPanel.tsx` exports updated JSON data.
 - [x] Manual inspection: `src/App.tsx` and `src/components/*` now use Ant Design components instead of Chakra UI primitives.
 - [x] `npm run build:app` after Ant Design migration.
