@@ -1,5 +1,6 @@
 import { ComponentType, useEffect, useMemo, useState } from "react";
 import { Alert, Spin } from "antd";
+import { CanvasTexture, Sprite, SpriteMaterial } from "three";
 import { KnowledgeGraph, KnowledgeNode } from "../domain/types";
 
 interface Props {
@@ -146,6 +147,43 @@ export default function Overview3DCanvas({ graph, theme, onNodeSelect }: Props) 
           particle: "#4338ca",
         };
 
+  const nodeTextSprite = useMemo(() => {
+    const cache = new Map<string, Sprite>();
+    const makeSprite = (text: string) => {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return null;
+
+      const fontSize = 38;
+      context.font = `600 ${fontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
+      const textWidth = Math.max(220, Math.ceil(context.measureText(text).width) + 30);
+      canvas.width = textWidth;
+      canvas.height = 66;
+
+      context.font = `600 ${fontSize}px Inter, -apple-system, BlinkMacSystemFont, sans-serif`;
+      context.fillStyle = theme === "dark" ? "rgba(15, 23, 42, 0.82)" : "rgba(255, 255, 255, 0.82)";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = palette.text;
+      context.fillText(text, 12, 46);
+
+      const texture = new CanvasTexture(canvas);
+      const material = new SpriteMaterial({ map: texture, depthWrite: false, transparent: true });
+      const sprite = new Sprite(material);
+      sprite.scale.set(18, 5.2, 1);
+      sprite.position.set(0, 8.8, 0);
+      return sprite;
+    };
+
+    return (node: Overview3DNode) => {
+      const cached = cache.get(node.id);
+      if (cached) return cached.clone();
+      const sprite = makeSprite(node.label || node.id);
+      if (!sprite) return undefined;
+      cache.set(node.id, sprite);
+      return sprite.clone();
+    };
+  }, [palette.text, theme]);
+
   if (loadState === "loading") {
     return (
       <div className="overview3d-root overview3d-root--loading">
@@ -185,6 +223,8 @@ export default function Overview3DCanvas({ graph, theme, onNodeSelect }: Props) 
             `${node.label} (${node.id})${node.tags.length > 0 ? `\n#${node.tags.join(" #")}` : ""}`
           }
           nodeColor={() => palette.node}
+          nodeThreeObject={nodeTextSprite}
+          nodeThreeObjectExtend
           nodeVal={profile.nodeVal}
           linkColor={() => palette.link}
           linkLabel={(link: Overview3DEdge) => `${link.label} [${link.type}]`}
@@ -210,7 +250,7 @@ export default function Overview3DCanvas({ graph, theme, onNodeSelect }: Props) 
         />
       </div>
       <div className="overview3d-caption" style={{ color: palette.text }}>
-        节点映射：id / label / tags；关系映射：source / target / type / label（性能档位：{profile.name}）
+        节点映射：id / label / tags（节点名常驻显示）；关系映射：source / target / type / label（性能档位：{profile.name}）
       </div>
     </div>
   );
