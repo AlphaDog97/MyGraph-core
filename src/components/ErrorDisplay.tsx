@@ -16,7 +16,7 @@ export default function ErrorDisplay({ error }: Props) {
           <Space direction="vertical" size={8}>
             <Typography.Text className="error-display-message">{error}</Typography.Text>
             <Typography.Text>
-              Check your files in <Typography.Text code>graph-data/nodes/</Typography.Text> and redeploy.
+              Check your files in <Typography.Text code>graph-data/manifest.json</Typography.Text> and <Typography.Text code>graph-data/&lt;category&gt;/graph.json</Typography.Text>, then redeploy.
             </Typography.Text>
           </Space>
         }
