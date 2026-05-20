@@ -49,52 +49,32 @@
       "label": "English Expression",
       "graphs": [
         {
-          "id": "coffee-ordering",
-          "label": "澳洲咖啡店点单"
+          "id": "daily-service",
+          "label": "澳洲日常服务表达"
         },
         {
-          "id": "rental-inspection",
-          "label": "澳洲租房看房"
+          "id": "settlement-admin",
+          "label": "澳洲生活办理表达"
         },
         {
-          "id": "bank-account",
-          "label": "澳洲银行开户"
+          "id": "office-small-talk",
+          "label": "澳洲办公室闲聊表达"
         },
         {
-          "id": "gym-membership",
-          "label": "澳洲健身房咨询"
+          "id": "engineering-collaboration",
+          "label": "工程日常协作表达"
         },
         {
-          "id": "office-lunch-chat",
-          "label": "澳洲办公室午休闲聊"
+          "id": "code-architecture",
+          "label": "Code Review 与架构表达"
         },
         {
-          "id": "supermarket-return",
-          "label": "澳洲超市退货"
+          "id": "agile-requirements",
+          "label": "敏捷与需求变更表达"
         },
         {
-          "id": "requirement-confirmation",
-          "label": "和同事确认需求"
-        },
-        {
-          "id": "standup-progress",
-          "label": "Stand-up 日常站会"
-        },
-        {
-          "id": "code-review",
-          "label": "Code Review 后讨论问题"
-        },
-        {
-          "id": "architecture-discussion",
-          "label": "和 Tech Lead 讨论架构"
-        },
-        {
-          "id": "sprint-planning",
-          "label": "Sprint Planning 讨论任务"
-        },
-        {
-          "id": "requirement-change",
-          "label": "和 PM 讨论需求变更"
+          "id": "common-corrections",
+          "label": "常见表达纠错"
         }
       ]
     }
