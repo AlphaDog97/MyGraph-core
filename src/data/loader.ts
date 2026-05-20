@@ -108,11 +108,15 @@ export function parseInlineGraphJson(text: string): ParsedInlineSource {
   };
 }
 
+async function fetchGraphDataJson(url: string): Promise<Response> {
+  return fetch(url, { cache: "no-store" });
+}
+
 async function loadCategoryGraphFile(
   categoryId: string
 ): Promise<MultiGraphCategoryFile> {
   const categoryUrl = `${BASE}graph-data/${categoryId}/graph.json`;
-  const categoryRes = await fetch(categoryUrl);
+  const categoryRes = await fetchGraphDataJson(categoryUrl);
   if (!categoryRes.ok) {
     throw new Error(
       `Failed to load graph-data/${categoryId}/graph.json (${categoryRes.status}).`
@@ -164,7 +168,7 @@ export async function loadCategoryGraphs(
 }
 
 export async function loadManifest(): Promise<Manifest> {
-  const res = await fetch(`${BASE}graph-data/manifest.json`);
+  const res = await fetchGraphDataJson(`${BASE}graph-data/manifest.json`);
   if (!res.ok) {
     throw new Error(
       `Failed to load manifest (${res.status}). ` +
