@@ -32,6 +32,12 @@ interface MultiGraphCategoryFile {
   }>;
 }
 
+interface SingleGraphFile {
+  graphId?: string;
+  graphLabel?: string;
+  nodes?: unknown[];
+}
+
 function parseCategoryGraphFile(filePath: string): ManifestGraph[] {
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
@@ -48,6 +54,29 @@ function parseCategoryGraphFile(filePath: string): ManifestGraph[] {
       }));
   } catch {
     return [];
+  }
+}
+
+function parseSingleGraphFile(filePath: string, fallbackId: string): ManifestGraph {
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(raw) as SingleGraphFile | unknown[];
+    if (Array.isArray(parsed)) {
+      return { id: fallbackId, label: labelFromId(fallbackId) };
+    }
+
+    const id =
+      typeof parsed.graphId === "string" && parsed.graphId.trim() !== ""
+        ? parsed.graphId
+        : fallbackId;
+    const label =
+      typeof parsed.graphLabel === "string" && parsed.graphLabel.trim() !== ""
+        ? parsed.graphLabel
+        : labelFromId(id);
+
+    return { id, label };
+  } catch {
+    return { id: fallbackId, label: labelFromId(fallbackId) };
   }
 }
 
@@ -73,17 +102,15 @@ function graphDataPlugin(): Plugin {
         }
       }
 
-      // Legacy mode: graph-data/<category>/<graph>/graph.json
+      // Legacy/standalone mode: graph-data/<category>/<graph>/graph.json
       for (const graphEntry of fs
         .readdirSync(catDir, { withFileTypes: true })
         .filter((d) => d.isDirectory())
         .sort((a, b) => a.name.localeCompare(b.name))) {
         const graphFile = path.join(catDir, graphEntry.name, "graph.json");
         if (fs.existsSync(graphFile)) {
-          graphMap.set(graphEntry.name, {
-            id: graphEntry.name,
-            label: labelFromId(graphEntry.name),
-          });
+          const graph = parseSingleGraphFile(graphFile, graphEntry.name);
+          graphMap.set(graph.id, graph);
         }
       }
 
