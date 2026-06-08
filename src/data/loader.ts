@@ -19,6 +19,12 @@ interface MultiGraphCategoryFile {
   }>;
 }
 
+interface SingleGraphFile {
+  graphId?: string;
+  graphLabel?: string;
+  nodes?: KnowledgeNodeFile[];
+}
+
 interface GraphNodeSource {
   categoryId: string;
   graphId: string;
@@ -112,28 +118,42 @@ async function fetchGraphDataJson(url: string): Promise<Response> {
   return fetch(url, { cache: "no-store" });
 }
 
-async function loadCategoryGraphFile(
-  categoryId: string
-): Promise<MultiGraphCategoryFile> {
-  const categoryUrl = `${BASE}graph-data/${categoryId}/graph.json`;
-  const categoryRes = await fetchGraphDataJson(categoryUrl);
-  if (!categoryRes.ok) {
-    throw new Error(
-      `Failed to load graph-data/${categoryId}/graph.json (${categoryRes.status}).`
-    );
+async function fetchJsonFile<T>(url: string, errorPrefix: string): Promise<T> {
+  const res = await fetchGraphDataJson(url);
+  if (!res.ok) {
+    throw new Error(`${errorPrefix} (${res.status}).`);
   }
 
   try {
-    return (await categoryRes.json()) as MultiGraphCategoryFile;
+    return (await res.json()) as T;
   } catch {
-    throw new Error(`graph-data/${categoryId}/graph.json: invalid JSON.`);
+    throw new Error(`${errorPrefix}: invalid JSON.`);
   }
 }
 
-export async function loadCategoryGraphs(
+async function loadCategoryGraphFile(
   categoryId: string
-): Promise<CategoryGraphEntry[]> {
-  const parsed = await loadCategoryGraphFile(categoryId);
+): Promise<MultiGraphCategoryFile> {
+  return fetchJsonFile<MultiGraphCategoryFile>(
+    `${BASE}graph-data/${categoryId}/graph.json`,
+    `Failed to load graph-data/${categoryId}/graph.json`
+  );
+}
+
+async function loadSingleGraphFile(
+  categoryId: string,
+  graphId: string
+): Promise<SingleGraphFile> {
+  return fetchJsonFile<SingleGraphFile>(
+    `${BASE}graph-data/${categoryId}/${graphId}/graph.json`,
+    `Failed to load graph-data/${categoryId}/${graphId}/graph.json`
+  );
+}
+
+function parseCategoryGraphs(
+  categoryId: string,
+  parsed: MultiGraphCategoryFile
+): CategoryGraphEntry[] {
   if (!Array.isArray(parsed.graphs)) {
     throw new Error(
       `graph-data/${categoryId}/graph.json must be a JSON object with graphs[].`
@@ -165,6 +185,35 @@ export async function loadCategoryGraphs(
       nodes: graph.nodes,
     };
   });
+}
+
+function parseSingleGraph(
+  categoryId: string,
+  graphId: string,
+  parsed: SingleGraphFile | KnowledgeNodeFile[]
+): CategoryGraphEntry {
+  if (Array.isArray(parsed)) {
+    return { graphId, graphLabel: graphId, nodes: parsed };
+  }
+
+  if (!Array.isArray(parsed.nodes)) {
+    throw new Error(
+      `graph-data/${categoryId}/${graphId}/graph.json must contain nodes[].`
+    );
+  }
+
+  return {
+    graphId: parsed.graphId?.trim() || graphId,
+    graphLabel: parsed.graphLabel?.trim() || graphId,
+    nodes: parsed.nodes,
+  };
+}
+
+export async function loadCategoryGraphs(
+  categoryId: string
+): Promise<CategoryGraphEntry[]> {
+  const parsed = await loadCategoryGraphFile(categoryId);
+  return parseCategoryGraphs(categoryId, parsed);
 }
 
 export async function loadManifest(): Promise<Manifest> {
@@ -247,14 +296,16 @@ export async function loadLocalGraphNodes(
   categoryId: string,
   graphId: string
 ): Promise<KnowledgeNodeFile[]> {
-  const graphs = await loadCategoryGraphs(categoryId);
-  const matched = graphs.find((graph) => graph.graphId === graphId);
-  if (!matched) {
-    throw new Error(
-      `graph-data/${categoryId}/graph.json: graphId '${graphId}' not found.`
-    );
+  try {
+    const graphs = await loadCategoryGraphs(categoryId);
+    const matched = graphs.find((graph) => graph.graphId === graphId);
+    if (matched) return matched.nodes;
+  } catch {
+    // Fall back to legacy graph-data/<category>/<graph>/graph.json below.
   }
-  return matched.nodes;
+
+  const singleGraph = await loadSingleGraphFile(categoryId, graphId);
+  return parseSingleGraph(categoryId, graphId, singleGraph).nodes;
 }
 
 export async function loadGraphData(
