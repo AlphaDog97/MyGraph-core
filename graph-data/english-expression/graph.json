@@ -2,6 +2,159 @@
   "categoryId": "english-expression",
   "graphs": [
     {
+  "graphId": "australia-life-key-phrases",
+  "graphLabel": "澳洲生活高频关键表达",
+  "nodes": [
+    {
+      "id": "life-key-root",
+      "label": "澳洲生活高频关键表达 / Practical Australia life expressions",
+      "description": "整理咖啡点单、GP 预约、药房买药、租房报修、银行银行卡问题和常见纠错。英文短语作为可见节点，便于按场景复习。",
+      "tags": ["scenario", "daily", "australia", "english-expression"],
+      "links": [
+        { "target": "life-coffee", "type": "Concept", "label": "场景" },
+        { "target": "life-gp", "type": "Concept", "label": "场景" },
+        { "target": "life-pharmacy", "type": "Concept", "label": "场景" },
+        { "target": "life-rental-maintenance", "type": "Concept", "label": "场景" },
+        { "target": "life-banking-card", "type": "Concept", "label": "场景" },
+        { "target": "life-common-corrections", "type": "Concept", "label": "常见纠错" }
+      ]
+    },
+    {
+      "id": "life-coffee",
+      "label": "咖啡店点单 / Ordering coffee",
+      "description": "在澳洲咖啡店点单、外带、少糖和等待时常用的自然表达。",
+      "tags": ["intent", "daily", "australia", "coffee"],
+      "links": [
+        { "target": "life-coffee-01", "type": "Action", "label": "点单" },
+        { "target": "life-coffee-02", "type": "Action", "label": "外带" },
+        { "target": "life-coffee-03", "type": "Action", "label": "少甜" },
+        { "target": "life-coffee-04", "type": "Action", "label": "等待时间" },
+        { "target": "life-coffee-05", "type": "Action", "label": "等待位置" }
+      ]
+    },
+    { "id": "life-coffee-01", "label": "Can I get a medium latte, takeaway, please?", "description": "澳洲咖啡店自然点单；takeaway 比 to go 更本地化。", "tags": ["phrase", "daily", "australia", "coffee"] },
+    { "id": "life-coffee-02", "label": "Takeaway, please.", "description": "回答外带。", "tags": ["phrase", "daily", "australia", "coffee"] },
+    { "id": "life-coffee-03", "label": "Could you make it less sweet?", "description": "请求少甜；比 reduce the sugar 更自然。", "tags": ["phrase", "daily", "coffee"] },
+    { "id": "life-coffee-04", "label": "How long's the wait?", "description": "询问大概要等多久。", "tags": ["phrase", "daily", "service"] },
+    { "id": "life-coffee-05", "label": "I'll just wait over there.", "description": "说明自己在旁边等。", "tags": ["phrase", "daily", "service"] },
+
+    {
+      "id": "life-gp",
+      "label": "预约 GP / Booking a GP appointment",
+      "description": "电话预约 GP、说明新病人身份、确认空位、预约时长和保险付款。",
+      "tags": ["intent", "daily", "australia", "healthcare"],
+      "links": [
+        { "target": "life-gp-01", "type": "Action", "label": "预约" },
+        { "target": "life-gp-02", "type": "Action", "label": "空位" },
+        { "target": "life-gp-03", "type": "Action", "label": "新病人" },
+        { "target": "life-gp-04", "type": "Action", "label": "症状" },
+        { "target": "life-gp-05", "type": "Action", "label": "保险" },
+        { "target": "life-gp-06", "type": "Action", "label": "确认时间" }
+      ]
+    },
+    { "id": "life-gp-01", "label": "I'd like to book an appointment with a GP.", "description": "预约看医生用 appointment，不用 reservation。", "tags": ["phrase", "daily", "healthcare"] },
+    { "id": "life-gp-02", "label": "Do you have any appointments available today?", "description": "询问今天有没有预约空位。", "tags": ["phrase", "daily", "healthcare"] },
+    { "id": "life-gp-03", "label": "I'm a new patient. I haven't been here before.", "description": "说明自己是新病人。", "tags": ["phrase", "daily", "healthcare"] },
+    { "id": "life-gp-04", "label": "I just have a bit of an upset stomach.", "description": "说明胃有点不舒服。", "tags": ["phrase", "daily", "healthcare"] },
+    { "id": "life-gp-05", "label": "I don't have Medicare, but I have private health insurance.", "description": "说明没有 Medicare 但有私人保险。", "tags": ["phrase", "daily", "healthcare", "insurance"] },
+    { "id": "life-gp-06", "label": "I'll take the 10:30 tomorrow morning.", "description": "确认预约具体时间。", "tags": ["phrase", "daily", "booking"] },
+
+    {
+      "id": "life-pharmacy",
+      "label": "药房买药 / At the pharmacy",
+      "description": "在药房描述感冒症状、确认白天用药、是否犯困和服用方式。",
+      "tags": ["intent", "daily", "australia", "pharmacy"],
+      "links": [
+        { "target": "life-pharmacy-01", "type": "Action", "label": "感冒" },
+        { "target": "life-pharmacy-02", "type": "Action", "label": "鼻塞" },
+        { "target": "life-pharmacy-03", "type": "Action", "label": "喉咙痛" },
+        { "target": "life-pharmacy-04", "type": "Action", "label": "白天用药" },
+        { "target": "life-pharmacy-05", "type": "Action", "label": "不犯困" },
+        { "target": "life-pharmacy-06", "type": "Action", "label": "饭前饭后" }
+      ]
+    },
+    { "id": "life-pharmacy-01", "label": "I've got a bit of a cold.", "description": "我有点感冒；不要说 I'm a little bit cold。", "tags": ["phrase", "daily", "pharmacy"] },
+    { "id": "life-pharmacy-02", "label": "I've got a blocked nose.", "description": "鼻子堵。", "tags": ["phrase", "daily", "pharmacy"] },
+    { "id": "life-pharmacy-03", "label": "I've got a bit of a sore throat.", "description": "喉咙有点痛。", "tags": ["phrase", "daily", "pharmacy"] },
+    { "id": "life-pharmacy-04", "label": "Something for daytime, please.", "description": "想要白天吃的药。", "tags": ["phrase", "daily", "pharmacy"] },
+    { "id": "life-pharmacy-05", "label": "I don't want anything that'll make me drowsy.", "description": "不想要会犯困的药；drowsy 在药房场景很常用。", "tags": ["phrase", "daily", "pharmacy"] },
+    { "id": "life-pharmacy-06", "label": "Should I take this before or after food?", "description": "询问饭前还是饭后吃。", "tags": ["phrase", "daily", "pharmacy"] },
+
+    {
+      "id": "life-rental-maintenance",
+      "label": "租房报修 / Rental maintenance",
+      "description": "联系 property manager 报修热水器、说明地址、安排维修人员上门。",
+      "tags": ["intent", "daily", "australia", "rental"],
+      "links": [
+        { "target": "life-rental-01", "type": "Action", "label": "租客身份" },
+        { "target": "life-rental-02", "type": "Action", "label": "报修" },
+        { "target": "life-rental-03", "type": "Action", "label": "无热水" },
+        { "target": "life-rental-04", "type": "Action", "label": "持续时间" },
+        { "target": "life-rental-05", "type": "Action", "label": "维修上门" },
+        { "target": "life-rental-06", "type": "Action", "label": "短信邮件确认" }
+      ]
+    },
+    { "id": "life-rental-01", "label": "I'm the tenant in Unit 302 at 18 Brisbane Road.", "description": "说明租客身份和澳洲地址。", "tags": ["phrase", "daily", "rental"] },
+    { "id": "life-rental-02", "label": "I'd like to report an issue with the hot water system.", "description": "报修热水器；report an issue with 很自然。", "tags": ["phrase", "daily", "rental"] },
+    { "id": "life-rental-03", "label": "There's no hot water when I shower.", "description": "洗澡时没有热水。", "tags": ["phrase", "daily", "rental"] },
+    { "id": "life-rental-04", "label": "It's been going on for two days.", "description": "问题已经持续两天。", "tags": ["phrase", "daily", "rental"] },
+    { "id": "life-rental-05", "label": "Tomorrow morning would be best.", "description": "礼貌说明最好明天上午上门。", "tags": ["phrase", "daily", "booking"] },
+    { "id": "life-rental-06", "label": "Could you send me a confirmation by text or email?", "description": "请对方通过短信或邮件确认。", "tags": ["phrase", "daily", "rental"] },
+
+    {
+      "id": "life-banking-card",
+      "label": "银行卡问题 / Card issues at the bank",
+      "description": "银行卡刷不了、交易失败、安全提醒、解冻、重新激活和补卡。",
+      "tags": ["intent", "daily", "australia", "banking"],
+      "links": [
+        { "target": "life-bank-01", "type": "Action", "label": "刷卡失败" },
+        { "target": "life-bank-02", "type": "Action", "label": "付款未通过" },
+        { "target": "life-bank-03", "type": "Action", "label": "安全提醒" },
+        { "target": "life-bank-04", "type": "Action", "label": "异常活动" },
+        { "target": "life-bank-05", "type": "Action", "label": "重新激活" },
+        { "target": "life-bank-06", "type": "Action", "label": "补卡" },
+        { "target": "life-bank-07", "type": "Action", "label": "手机支付" }
+      ]
+    },
+    { "id": "life-bank-01", "label": "My card got declined today.", "description": "银行卡刷不了/被拒付。", "tags": ["phrase", "daily", "banking"] },
+    { "id": "life-bank-02", "label": "The payment didn't go through.", "description": "付款没成功。", "tags": ["phrase", "daily", "payment"] },
+    { "id": "life-bank-03", "label": "I got a security alert from my bank.", "description": "收到银行安全提醒。", "tags": ["phrase", "daily", "banking"] },
+    { "id": "life-bank-04", "label": "There might be unusual activity on my account.", "description": "账户可能有异常活动。", "tags": ["phrase", "daily", "banking"] },
+    { "id": "life-bank-05", "label": "Can this card be reactivated today?", "description": "询问这张卡今天能否重新激活。", "tags": ["phrase", "daily", "banking"] },
+    { "id": "life-bank-06", "label": "Could you order me a replacement card?", "description": "请银行补办/寄送新卡。", "tags": ["phrase", "daily", "banking"] },
+    { "id": "life-bank-07", "label": "Can I still use my phone to pay in the meantime?", "description": "询问期间是否还能用手机支付。", "tags": ["phrase", "daily", "banking", "payment"] },
+
+    {
+      "id": "life-common-corrections",
+      "label": "常见错误替换 / Common correction pairs",
+      "description": "把中式直译替换成澳洲生活场景更自然的表达。",
+      "tags": ["intent", "correction", "english-expression"],
+      "links": [
+        { "target": "life-correction-01", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-02", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-03", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-04", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-05", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-06", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-07", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-08", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-09", "type": "Condition", "label": "替换" },
+        { "target": "life-correction-10", "type": "Condition", "label": "替换" }
+      ]
+    },
+    { "id": "life-correction-01", "label": "book an appointment / not book a reservation", "description": "看医生、办事预约用 appointment。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-02", "label": "appointments available / not available seats", "description": "诊所空位说 appointments available。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-03", "label": "existing patient / not old patient", "description": "老病人/已登记病人说 existing patient。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-04", "label": "private health insurance / not personal insurance", "description": "私人医疗保险说 private health insurance。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-05", "label": "card got declined / not card is unavailable", "description": "银行卡被拒付用 got declined。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-06", "label": "tenant / not renter", "description": "租房正式场景更常用 tenant。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-07", "label": "tradesperson / not maintainer", "description": "租房维修人员可说 tradesperson、technician 或 plumber。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-08", "label": "I've got a cold / not I'm cold", "description": "I'm cold 是觉得冷，不是感冒。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-09", "label": "blocked nose / not my nose is blocking", "description": "鼻塞说 blocked nose。", "tags": ["correction", "english-expression"] },
+    { "id": "life-correction-10", "label": "take medicine / not have medicine", "description": "吃药通常说 take medicine。", "tags": ["correction", "english-expression"] }
+  ]
+},
+    {
       "graphId": "daily-service",
       "graphLabel": "澳洲日常服务表达",
       "nodes": [
