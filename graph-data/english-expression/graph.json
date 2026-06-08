@@ -2,359 +2,1440 @@
   "categoryId": "english-expression",
   "graphs": [
     {
-  "graphId": "australia-life-key-phrases",
-  "graphLabel": "澳洲生活高频关键表达",
-  "nodes": [
-    {
-      "id": "life-key-root",
-      "label": "澳洲生活高频关键表达 / Practical Australia life expressions",
-      "description": "整理咖啡点单、GP 预约、药房买药、租房报修、银行银行卡问题和常见纠错。英文短语作为可见节点，便于按场景复习。",
-      "tags": ["scenario", "daily", "australia", "english-expression"],
-      "links": [
-        { "target": "life-coffee", "type": "Concept", "label": "场景" },
-        { "target": "life-gp", "type": "Concept", "label": "场景" },
-        { "target": "life-pharmacy", "type": "Concept", "label": "场景" },
-        { "target": "life-rental-maintenance", "type": "Concept", "label": "场景" },
-        { "target": "life-banking-card", "type": "Concept", "label": "场景" },
-        { "target": "life-common-corrections", "type": "Concept", "label": "常见纠错" }
-      ]
-    },
-    {
-      "id": "life-coffee",
-      "label": "咖啡店点单 / Ordering coffee",
-      "description": "在澳洲咖啡店点单、外带、少糖和等待时常用的自然表达。",
-      "tags": ["intent", "daily", "australia", "coffee"],
-      "links": [
-        { "target": "life-coffee-01", "type": "Action", "label": "点单" },
-        { "target": "life-coffee-02", "type": "Action", "label": "外带" },
-        { "target": "life-coffee-03", "type": "Action", "label": "少甜" },
-        { "target": "life-coffee-04", "type": "Action", "label": "等待时间" },
-        { "target": "life-coffee-05", "type": "Action", "label": "等待位置" }
-      ]
-    },
-    { "id": "life-coffee-01", "label": "Can I get a medium latte, takeaway, please?", "description": "澳洲咖啡店自然点单；takeaway 比 to go 更本地化。", "tags": ["phrase", "daily", "australia", "coffee"] },
-    { "id": "life-coffee-02", "label": "Takeaway, please.", "description": "回答外带。", "tags": ["phrase", "daily", "australia", "coffee"] },
-    { "id": "life-coffee-03", "label": "Could you make it less sweet?", "description": "请求少甜；比 reduce the sugar 更自然。", "tags": ["phrase", "daily", "coffee"] },
-    { "id": "life-coffee-04", "label": "How long's the wait?", "description": "询问大概要等多久。", "tags": ["phrase", "daily", "service"] },
-    { "id": "life-coffee-05", "label": "I'll just wait over there.", "description": "说明自己在旁边等。", "tags": ["phrase", "daily", "service"] },
-
-    {
-      "id": "life-gp",
-      "label": "预约 GP / Booking a GP appointment",
-      "description": "电话预约 GP、说明新病人身份、确认空位、预约时长和保险付款。",
-      "tags": ["intent", "daily", "australia", "healthcare"],
-      "links": [
-        { "target": "life-gp-01", "type": "Action", "label": "预约" },
-        { "target": "life-gp-02", "type": "Action", "label": "空位" },
-        { "target": "life-gp-03", "type": "Action", "label": "新病人" },
-        { "target": "life-gp-04", "type": "Action", "label": "症状" },
-        { "target": "life-gp-05", "type": "Action", "label": "保险" },
-        { "target": "life-gp-06", "type": "Action", "label": "确认时间" }
-      ]
-    },
-    { "id": "life-gp-01", "label": "I'd like to book an appointment with a GP.", "description": "预约看医生用 appointment，不用 reservation。", "tags": ["phrase", "daily", "healthcare"] },
-    { "id": "life-gp-02", "label": "Do you have any appointments available today?", "description": "询问今天有没有预约空位。", "tags": ["phrase", "daily", "healthcare"] },
-    { "id": "life-gp-03", "label": "I'm a new patient. I haven't been here before.", "description": "说明自己是新病人。", "tags": ["phrase", "daily", "healthcare"] },
-    { "id": "life-gp-04", "label": "I just have a bit of an upset stomach.", "description": "说明胃有点不舒服。", "tags": ["phrase", "daily", "healthcare"] },
-    { "id": "life-gp-05", "label": "I don't have Medicare, but I have private health insurance.", "description": "说明没有 Medicare 但有私人保险。", "tags": ["phrase", "daily", "healthcare", "insurance"] },
-    { "id": "life-gp-06", "label": "I'll take the 10:30 tomorrow morning.", "description": "确认预约具体时间。", "tags": ["phrase", "daily", "booking"] },
-
-    {
-      "id": "life-pharmacy",
-      "label": "药房买药 / At the pharmacy",
-      "description": "在药房描述感冒症状、确认白天用药、是否犯困和服用方式。",
-      "tags": ["intent", "daily", "australia", "pharmacy"],
-      "links": [
-        { "target": "life-pharmacy-01", "type": "Action", "label": "感冒" },
-        { "target": "life-pharmacy-02", "type": "Action", "label": "鼻塞" },
-        { "target": "life-pharmacy-03", "type": "Action", "label": "喉咙痛" },
-        { "target": "life-pharmacy-04", "type": "Action", "label": "白天用药" },
-        { "target": "life-pharmacy-05", "type": "Action", "label": "不犯困" },
-        { "target": "life-pharmacy-06", "type": "Action", "label": "饭前饭后" }
-      ]
-    },
-    { "id": "life-pharmacy-01", "label": "I've got a bit of a cold.", "description": "我有点感冒；不要说 I'm a little bit cold。", "tags": ["phrase", "daily", "pharmacy"] },
-    { "id": "life-pharmacy-02", "label": "I've got a blocked nose.", "description": "鼻子堵。", "tags": ["phrase", "daily", "pharmacy"] },
-    { "id": "life-pharmacy-03", "label": "I've got a bit of a sore throat.", "description": "喉咙有点痛。", "tags": ["phrase", "daily", "pharmacy"] },
-    { "id": "life-pharmacy-04", "label": "Something for daytime, please.", "description": "想要白天吃的药。", "tags": ["phrase", "daily", "pharmacy"] },
-    { "id": "life-pharmacy-05", "label": "I don't want anything that'll make me drowsy.", "description": "不想要会犯困的药；drowsy 在药房场景很常用。", "tags": ["phrase", "daily", "pharmacy"] },
-    { "id": "life-pharmacy-06", "label": "Should I take this before or after food?", "description": "询问饭前还是饭后吃。", "tags": ["phrase", "daily", "pharmacy"] },
-
-    {
-      "id": "life-rental-maintenance",
-      "label": "租房报修 / Rental maintenance",
-      "description": "联系 property manager 报修热水器、说明地址、安排维修人员上门。",
-      "tags": ["intent", "daily", "australia", "rental"],
-      "links": [
-        { "target": "life-rental-01", "type": "Action", "label": "租客身份" },
-        { "target": "life-rental-02", "type": "Action", "label": "报修" },
-        { "target": "life-rental-03", "type": "Action", "label": "无热水" },
-        { "target": "life-rental-04", "type": "Action", "label": "持续时间" },
-        { "target": "life-rental-05", "type": "Action", "label": "维修上门" },
-        { "target": "life-rental-06", "type": "Action", "label": "短信邮件确认" }
-      ]
-    },
-    { "id": "life-rental-01", "label": "I'm the tenant in Unit 302 at 18 Brisbane Road.", "description": "说明租客身份和澳洲地址。", "tags": ["phrase", "daily", "rental"] },
-    { "id": "life-rental-02", "label": "I'd like to report an issue with the hot water system.", "description": "报修热水器；report an issue with 很自然。", "tags": ["phrase", "daily", "rental"] },
-    { "id": "life-rental-03", "label": "There's no hot water when I shower.", "description": "洗澡时没有热水。", "tags": ["phrase", "daily", "rental"] },
-    { "id": "life-rental-04", "label": "It's been going on for two days.", "description": "问题已经持续两天。", "tags": ["phrase", "daily", "rental"] },
-    { "id": "life-rental-05", "label": "Tomorrow morning would be best.", "description": "礼貌说明最好明天上午上门。", "tags": ["phrase", "daily", "booking"] },
-    { "id": "life-rental-06", "label": "Could you send me a confirmation by text or email?", "description": "请对方通过短信或邮件确认。", "tags": ["phrase", "daily", "rental"] },
-
-    {
-      "id": "life-banking-card",
-      "label": "银行卡问题 / Card issues at the bank",
-      "description": "银行卡刷不了、交易失败、安全提醒、解冻、重新激活和补卡。",
-      "tags": ["intent", "daily", "australia", "banking"],
-      "links": [
-        { "target": "life-bank-01", "type": "Action", "label": "刷卡失败" },
-        { "target": "life-bank-02", "type": "Action", "label": "付款未通过" },
-        { "target": "life-bank-03", "type": "Action", "label": "安全提醒" },
-        { "target": "life-bank-04", "type": "Action", "label": "异常活动" },
-        { "target": "life-bank-05", "type": "Action", "label": "重新激活" },
-        { "target": "life-bank-06", "type": "Action", "label": "补卡" },
-        { "target": "life-bank-07", "type": "Action", "label": "手机支付" }
-      ]
-    },
-    { "id": "life-bank-01", "label": "My card got declined today.", "description": "银行卡刷不了/被拒付。", "tags": ["phrase", "daily", "banking"] },
-    { "id": "life-bank-02", "label": "The payment didn't go through.", "description": "付款没成功。", "tags": ["phrase", "daily", "payment"] },
-    { "id": "life-bank-03", "label": "I got a security alert from my bank.", "description": "收到银行安全提醒。", "tags": ["phrase", "daily", "banking"] },
-    { "id": "life-bank-04", "label": "There might be unusual activity on my account.", "description": "账户可能有异常活动。", "tags": ["phrase", "daily", "banking"] },
-    { "id": "life-bank-05", "label": "Can this card be reactivated today?", "description": "询问这张卡今天能否重新激活。", "tags": ["phrase", "daily", "banking"] },
-    { "id": "life-bank-06", "label": "Could you order me a replacement card?", "description": "请银行补办/寄送新卡。", "tags": ["phrase", "daily", "banking"] },
-    { "id": "life-bank-07", "label": "Can I still use my phone to pay in the meantime?", "description": "询问期间是否还能用手机支付。", "tags": ["phrase", "daily", "banking", "payment"] },
-
-    {
-      "id": "life-common-corrections",
-      "label": "常见错误替换 / Common correction pairs",
-      "description": "把中式直译替换成澳洲生活场景更自然的表达。",
-      "tags": ["intent", "correction", "english-expression"],
-      "links": [
-        { "target": "life-correction-01", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-02", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-03", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-04", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-05", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-06", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-07", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-08", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-09", "type": "Condition", "label": "替换" },
-        { "target": "life-correction-10", "type": "Condition", "label": "替换" }
-      ]
-    },
-    { "id": "life-correction-01", "label": "book an appointment / not book a reservation", "description": "看医生、办事预约用 appointment。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-02", "label": "appointments available / not available seats", "description": "诊所空位说 appointments available。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-03", "label": "existing patient / not old patient", "description": "老病人/已登记病人说 existing patient。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-04", "label": "private health insurance / not personal insurance", "description": "私人医疗保险说 private health insurance。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-05", "label": "card got declined / not card is unavailable", "description": "银行卡被拒付用 got declined。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-06", "label": "tenant / not renter", "description": "租房正式场景更常用 tenant。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-07", "label": "tradesperson / not maintainer", "description": "租房维修人员可说 tradesperson、technician 或 plumber。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-08", "label": "I've got a cold / not I'm cold", "description": "I'm cold 是觉得冷，不是感冒。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-09", "label": "blocked nose / not my nose is blocking", "description": "鼻塞说 blocked nose。", "tags": ["correction", "english-expression"] },
-    { "id": "life-correction-10", "label": "take medicine / not have medicine", "description": "吃药通常说 take medicine。", "tags": ["correction", "english-expression"] }
-  ]
-},
-    {
       "graphId": "daily-service",
       "graphLabel": "澳洲日常服务表达",
       "nodes": [
         {
           "id": "daily-service-root",
           "label": "澳洲日常服务表达 / Daily service phrase bank",
-          "description": "咖啡店、超市、柜台等服务场景下，按表达意图整理可直接复用的澳洲英语表达。英文表达本身会作为图谱节点显示。",
-          "tags": ["scenario", "daily", "australia", "service"],
+          "description": "按日常服务场景整理：寒暄、咖啡点单、购物退换货、付款、礼貌回应和健身房咨询。",
+          "tags": [
+            "scenario",
+            "daily",
+            "australia",
+            "service",
+            "english-expression"
+          ],
           "links": [
-            { "target": "daily-service-greeting", "type": "Concept", "label": "表达意图" },
-            { "target": "daily-service-request", "type": "Concept", "label": "表达意图" },
-            { "target": "daily-service-options", "type": "Concept", "label": "表达意图" },
-            { "target": "daily-service-payment", "type": "Concept", "label": "表达意图" },
-            { "target": "daily-service-return", "type": "Concept", "label": "表达意图" },
-            { "target": "daily-service-response", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "daily-greeting",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "daily-coffee",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "daily-shopping-return",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "daily-payment",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "daily-polite-response",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "daily-gym-membership",
+              "type": "Concept",
+              "label": "表达场景"
+            }
           ]
         },
         {
-          "id": "daily-service-greeting",
+          "id": "daily-greeting",
           "label": "开场寒暄 / Greeting",
-          "description": "澳洲日常服务场景的轻量开场寒暄。",
-          "tags": ["intent", "daily", "australia", "service"],
+          "description": "日常服务、咖啡店和柜台场景的轻量寒暄。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "service"
+          ],
           "links": [
-            { "target": "daily-service-greeting-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-greeting-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-greeting-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "daily-service-greeting-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-greeting-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-greeting-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "daily-service-greeting-01", "label": "How ya going?", "description": "澳洲服务场景常见寒暄。", "tags": ["phrase", "daily", "australia", "service"] },
-        { "id": "daily-service-greeting-02", "label": "How's it going?", "description": "较通用的自然寒暄。", "tags": ["phrase", "daily", "service"] },
-        { "id": "daily-service-greeting-03", "label": "Yeah, not too bad. Yourself?", "description": "回答寒暄并自然反问。", "tags": ["phrase", "daily", "australia", "service"] },
         {
-          "id": "daily-service-request",
-          "label": "提出请求 / Making a request",
-          "description": "点单、开户、看房、退货等场景下说明来意。",
-          "tags": ["intent", "daily", "australia", "service"],
-          "links": [
-            { "target": "daily-service-request-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-request-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-request-03", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-request-04", "type": "Action", "label": "常用表达" }
+          "id": "daily-service-greeting-01",
+          "label": "How ya going?",
+          "description": "澳洲服务场景常见寒暄。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "service"
           ]
         },
-        { "id": "daily-service-request-01", "label": "Can I get a medium oat latte, please?", "description": "点单用 Can I get... 很自然。", "tags": ["phrase", "daily", "coffee"] },
-        { "id": "daily-service-request-02", "label": "I'd like to return this item.", "description": "退货说 return this item，不说 refund this good。", "tags": ["phrase", "daily", "shopping"] },
-        { "id": "daily-service-request-03", "label": "I'd like to open a bank account.", "description": "银行开户的标准表达。", "tags": ["phrase", "daily", "banking"] },
-        { "id": "daily-service-request-04", "label": "I'm here for the inspection.", "description": "澳洲租房看房常说 inspection。", "tags": ["phrase", "daily", "rental"] },
         {
-          "id": "daily-service-options",
-          "label": "确认选项 / Checking options",
-          "description": "确认堂食外带、糖、账户类型等选项。",
-          "tags": ["intent", "daily", "australia", "service"],
-          "links": [
-            { "target": "daily-service-options-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-options-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-options-03", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-options-04", "type": "Action", "label": "常用表达" }
+          "id": "daily-service-greeting-02",
+          "label": "How's it going?",
+          "description": "较通用的自然寒暄。",
+          "tags": [
+            "phrase",
+            "daily",
+            "service"
           ]
         },
-        { "id": "daily-service-options-01", "label": "For here or takeaway?", "description": "询问堂食或外带；澳洲常用 takeaway。", "tags": ["phrase", "daily", "australia", "service"] },
-        { "id": "daily-service-options-02", "label": "Takeaway, please.", "description": "回答外带。", "tags": ["phrase", "daily", "australia", "service"] },
-        { "id": "daily-service-options-03", "label": "Any sugar?", "description": "服务场景里询问是否加糖。", "tags": ["phrase", "daily", "coffee"] },
-        { "id": "daily-service-options-04", "label": "Just a transaction account for now.", "description": "银行开户时表示先开日常消费账户。", "tags": ["phrase", "daily", "banking"] },
         {
-          "id": "daily-service-payment",
-          "label": "付款金额 / Payment",
-          "description": "付款、金额和银行卡相关表达。",
-          "tags": ["intent", "daily", "australia", "payment"],
-          "links": [
-            { "target": "daily-service-payment-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-payment-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-payment-03", "type": "Action", "label": "常用表达" }
+          "id": "daily-service-greeting-03",
+          "label": "Yeah, not too bad. Yourself?",
+          "description": "回答寒暄并自然反问。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "service"
           ]
         },
-        { "id": "daily-service-payment-01", "label": "That'll be six fifty.", "description": "$6.50 读作 six fifty。", "tags": ["phrase", "daily", "payment"] },
-        { "id": "daily-service-payment-02", "label": "Can I pay by card?", "description": "询问是否可以刷卡/银行卡支付。", "tags": ["phrase", "daily", "payment"] },
-        { "id": "daily-service-payment-03", "label": "within a few business days", "description": "银行、物流、行政场景里的“几个工作日内”。", "tags": ["phrase", "daily", "admin"] },
         {
-          "id": "daily-service-return",
-          "label": "退货换货 / Returns and exchanges",
+          "id": "daily-coffee",
+          "label": "咖啡点单 / Coffee ordering",
+          "description": "咖啡店点单、外带、少甜、等待和堂食外带确认。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "coffee"
+          ],
+          "links": [
+            {
+              "target": "life-coffee-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-coffee-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-coffee-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-coffee-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-coffee-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-request-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-options-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-options-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-options-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-coffee-01",
+          "label": "Can I get a medium latte, takeaway, please?",
+          "description": "澳洲咖啡店自然点单；takeaway 比 to go 更本地化。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "coffee"
+          ]
+        },
+        {
+          "id": "life-coffee-02",
+          "label": "Takeaway, please.",
+          "description": "回答外带。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "coffee"
+          ]
+        },
+        {
+          "id": "life-coffee-03",
+          "label": "Could you make it less sweet?",
+          "description": "请求少甜；比 reduce the sugar 更自然。",
+          "tags": [
+            "phrase",
+            "daily",
+            "coffee"
+          ]
+        },
+        {
+          "id": "life-coffee-04",
+          "label": "How long's the wait?",
+          "description": "询问大概要等多久。",
+          "tags": [
+            "phrase",
+            "daily",
+            "service"
+          ]
+        },
+        {
+          "id": "life-coffee-05",
+          "label": "I'll just wait over there.",
+          "description": "说明自己在旁边等。",
+          "tags": [
+            "phrase",
+            "daily",
+            "service"
+          ]
+        },
+        {
+          "id": "daily-service-request-01",
+          "label": "Can I get a medium oat latte, please?",
+          "description": "点单用 Can I get... 很自然。",
+          "tags": [
+            "phrase",
+            "daily",
+            "coffee"
+          ]
+        },
+        {
+          "id": "daily-service-options-01",
+          "label": "For here or takeaway?",
+          "description": "询问堂食或外带；澳洲常用 takeaway。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "service"
+          ]
+        },
+        {
+          "id": "daily-service-options-02",
+          "label": "Takeaway, please.",
+          "description": "回答外带。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia",
+            "service"
+          ]
+        },
+        {
+          "id": "daily-service-options-03",
+          "label": "Any sugar?",
+          "description": "服务场景里询问是否加糖。",
+          "tags": [
+            "phrase",
+            "daily",
+            "coffee"
+          ]
+        },
+        {
+          "id": "daily-shopping-return",
+          "label": "购物退换货 / Shopping returns and exchanges",
           "description": "退货、换货、退款和商品故障相关表达。",
-          "tags": ["intent", "daily", "australia", "shopping"],
+          "tags": [
+            "intent",
+            "daily",
+            "shopping",
+            "service"
+          ],
           "links": [
-            { "target": "daily-service-return-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-return-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-return-03", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-return-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "daily-service-request-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-return-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-return-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-return-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-return-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "daily-service-return-01", "label": "What seems to be the problem?", "description": "服务人员询问商品问题。", "tags": ["phrase", "daily", "shopping"] },
-        { "id": "daily-service-return-02", "label": "I realised it was faulty.", "description": "说明买回去后发现有故障。", "tags": ["phrase", "daily", "shopping"] },
-        { "id": "daily-service-return-03", "label": "We can give you a refund or exchange it for a new one.", "description": "说明可以退款或换新。", "tags": ["phrase", "daily", "shopping"] },
-        { "id": "daily-service-return-04", "label": "I'll take a replacement, please.", "description": "选择换货/替换件。", "tags": ["phrase", "daily", "shopping"] },
         {
-          "id": "daily-service-response",
-          "label": "礼貌回应 / Polite responses",
-          "description": "等待、递交物品、回应对方时的自然短句。",
-          "tags": ["intent", "daily", "australia", "service"],
-          "links": [
-            { "target": "daily-service-response-01", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-response-02", "type": "Action", "label": "常用表达" },
-            { "target": "daily-service-response-03", "type": "Action", "label": "常用表达" }
+          "id": "daily-service-request-02",
+          "label": "I'd like to return this item.",
+          "description": "退货说 return this item，不说 refund this good。",
+          "tags": [
+            "phrase",
+            "daily",
+            "shopping"
           ]
         },
-        { "id": "daily-service-response-01", "label": "No worries.", "description": "澳洲高频表达：没问题、不客气、可以。", "tags": ["phrase", "daily", "australia"] },
-        { "id": "daily-service-response-02", "label": "Just give me a moment.", "description": "请稍等。", "tags": ["phrase", "daily", "service"] },
-        { "id": "daily-service-response-03", "label": "Sure, here you go.", "description": "递交物品、小票、证件时常用。", "tags": ["phrase", "daily", "service"] }
+        {
+          "id": "daily-service-return-01",
+          "label": "What seems to be the problem?",
+          "description": "服务人员询问商品问题。",
+          "tags": [
+            "phrase",
+            "daily",
+            "shopping"
+          ]
+        },
+        {
+          "id": "daily-service-return-02",
+          "label": "I realised it was faulty.",
+          "description": "说明买回去后发现有故障。",
+          "tags": [
+            "phrase",
+            "daily",
+            "shopping"
+          ]
+        },
+        {
+          "id": "daily-service-return-03",
+          "label": "We can give you a refund or exchange it for a new one.",
+          "description": "说明可以退款或换新。",
+          "tags": [
+            "phrase",
+            "daily",
+            "shopping"
+          ]
+        },
+        {
+          "id": "daily-service-return-04",
+          "label": "I'll take a replacement, please.",
+          "description": "选择换货/替换件。",
+          "tags": [
+            "phrase",
+            "daily",
+            "shopping"
+          ]
+        },
+        {
+          "id": "daily-payment",
+          "label": "付款 / Payment",
+          "description": "柜台付款、金额和刷卡相关表达。",
+          "tags": [
+            "intent",
+            "daily",
+            "payment",
+            "service"
+          ],
+          "links": [
+            {
+              "target": "daily-service-payment-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-payment-02",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "daily-service-payment-01",
+          "label": "That'll be six fifty.",
+          "description": "$6.50 读作 six fifty。",
+          "tags": [
+            "phrase",
+            "daily",
+            "payment"
+          ]
+        },
+        {
+          "id": "daily-service-payment-02",
+          "label": "Can I pay by card?",
+          "description": "询问是否可以刷卡/银行卡支付。",
+          "tags": [
+            "phrase",
+            "daily",
+            "payment"
+          ]
+        },
+        {
+          "id": "daily-polite-response",
+          "label": "礼貌回应 / Polite responses",
+          "description": "等待、递交物品和回应对方时的自然短句。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "service"
+          ],
+          "links": [
+            {
+              "target": "daily-service-response-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-response-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-response-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "daily-service-response-01",
+          "label": "No worries.",
+          "description": "澳洲高频表达：没问题、不客气、可以。",
+          "tags": [
+            "phrase",
+            "daily",
+            "australia"
+          ]
+        },
+        {
+          "id": "daily-service-response-02",
+          "label": "Just give me a moment.",
+          "description": "请稍等。",
+          "tags": [
+            "phrase",
+            "daily",
+            "service"
+          ]
+        },
+        {
+          "id": "daily-service-response-03",
+          "label": "Sure, here you go.",
+          "description": "递交物品、小票、证件时常用。",
+          "tags": [
+            "phrase",
+            "daily",
+            "service"
+          ]
+        },
+        {
+          "id": "daily-gym-membership",
+          "label": "健身房咨询 / Gym membership",
+          "description": "咨询健身房会员和服务计划。",
+          "tags": [
+            "intent",
+            "daily",
+            "gym",
+            "service"
+          ],
+          "links": [
+            {
+              "target": "settlement-purpose-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "settlement-purpose-03",
+          "label": "I'd like to ask about your membership plans.",
+          "description": "咨询健身房会员。",
+          "tags": [
+            "phrase",
+            "daily",
+            "gym"
+          ]
+        }
       ]
     },
     {
-      "graphId": "settlement-admin",
-      "graphLabel": "澳洲生活办理表达",
+      "graphId": "healthcare-pharmacy",
+      "graphLabel": "澳洲医疗与药房表达",
       "nodes": [
         {
-          "id": "settlement-admin-root",
-          "label": "澳洲生活办理表达 / Settlement phrase bank",
-          "description": "租房、银行开户、健身房咨询等生活落地场景的表达归纳。英文表达作为可见节点展示。",
-          "tags": ["scenario", "daily", "australia", "settlement"],
+          "id": "healthcare-pharmacy-root",
+          "label": "澳洲医疗与药房表达 / Healthcare and pharmacy phrase bank",
+          "description": "把 GP 预约、症状描述、药房买药和医保保险相关表达集中整理，便于医疗场景复习。",
+          "tags": [
+            "scenario",
+            "daily",
+            "australia",
+            "healthcare",
+            "pharmacy"
+          ],
           "links": [
-            { "target": "settlement-purpose", "type": "Concept", "label": "表达意图" },
-            { "target": "settlement-booking-address", "type": "Concept", "label": "表达意图" },
-            { "target": "settlement-rent-cost", "type": "Concept", "label": "表达意图" },
-            { "target": "settlement-documents", "type": "Concept", "label": "表达意图" },
-            { "target": "settlement-next-step", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "health-gp-booking",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "health-symptoms",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "health-medicine",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "health-insurance",
+              "type": "Concept",
+              "label": "表达场景"
+            }
           ]
         },
         {
-          "id": "settlement-purpose",
-          "label": "说明来意 / Stating the purpose",
-          "description": "在银行、健身房、看房等场景直接说明目的。",
-          "tags": ["intent", "daily", "australia", "settlement"],
+          "id": "health-gp-booking",
+          "label": "预约 GP / Booking a GP appointment",
+          "description": "电话预约 GP、说明新病人身份、确认空位和时间。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "healthcare"
+          ],
           "links": [
-            { "target": "settlement-purpose-01", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-purpose-02", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-purpose-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "life-gp-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-gp-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-gp-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-gp-06",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "settlement-purpose-01", "label": "I'm here for the inspection.", "description": "看房说明来意。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-purpose-02", "label": "I'm looking to open an account.", "description": "银行开户表达，比 I want to open 更自然。", "tags": ["phrase", "daily", "banking"] },
-        { "id": "settlement-purpose-03", "label": "I'd like to ask about your membership plans.", "description": "咨询健身房会员。", "tags": ["phrase", "daily", "gym"] },
         {
-          "id": "settlement-booking-address",
-          "label": "预约和地址 / Booking and address",
-          "description": "确认看房预约、澳洲地址和租房状态。",
-          "tags": ["intent", "daily", "australia", "rental"],
-          "links": [
-            { "target": "settlement-booking-address-01", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-booking-address-02", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-booking-address-03", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-booking-address-04", "type": "Action", "label": "常用表达" }
+          "id": "life-gp-01",
+          "label": "I'd like to book an appointment with a GP.",
+          "description": "预约看医生用 appointment，不用 reservation。",
+          "tags": [
+            "phrase",
+            "daily",
+            "healthcare"
           ]
         },
-        { "id": "settlement-booking-address-01", "label": "Have you booked an inspection?", "description": "询问是否预约看房。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-booking-address-02", "label": "I booked the 2 pm inspection.", "description": "说明预约时间。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-booking-address-03", "label": "Do you currently have an Australian address?", "description": "银行等机构询问澳洲地址。", "tags": ["phrase", "daily", "banking"] },
-        { "id": "settlement-booking-address-04", "label": "I recently rented a place.", "description": "说明刚租好住处。", "tags": ["phrase", "daily", "settlement"] },
         {
-          "id": "settlement-rent-cost",
-          "label": "租房费用 / Rent and utilities",
+          "id": "life-gp-02",
+          "label": "Do you have any appointments available today?",
+          "description": "询问今天有没有预约空位。",
+          "tags": [
+            "phrase",
+            "daily",
+            "healthcare"
+          ]
+        },
+        {
+          "id": "life-gp-03",
+          "label": "I'm a new patient. I haven't been here before.",
+          "description": "说明自己是新病人。",
+          "tags": [
+            "phrase",
+            "daily",
+            "healthcare"
+          ]
+        },
+        {
+          "id": "life-gp-06",
+          "label": "I'll take the 10:30 tomorrow morning.",
+          "description": "确认预约具体时间。",
+          "tags": [
+            "phrase",
+            "daily",
+            "booking"
+          ]
+        },
+        {
+          "id": "health-symptoms",
+          "label": "描述症状 / Describing symptoms",
+          "description": "描述胃不舒服、感冒、鼻塞和喉咙痛。",
+          "tags": [
+            "intent",
+            "daily",
+            "healthcare",
+            "pharmacy"
+          ],
+          "links": [
+            {
+              "target": "life-gp-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-pharmacy-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-pharmacy-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-pharmacy-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-gp-04",
+          "label": "I just have a bit of an upset stomach.",
+          "description": "说明胃有点不舒服。",
+          "tags": [
+            "phrase",
+            "daily",
+            "healthcare"
+          ]
+        },
+        {
+          "id": "life-pharmacy-01",
+          "label": "I've got a bit of a cold.",
+          "description": "我有点感冒；不要说 I'm a little bit cold。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "life-pharmacy-02",
+          "label": "I've got a blocked nose.",
+          "description": "鼻子堵。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "life-pharmacy-03",
+          "label": "I've got a bit of a sore throat.",
+          "description": "喉咙有点痛。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "health-medicine",
+          "label": "药房用药需求 / Pharmacy medicine requests",
+          "description": "确认白天用药、是否犯困以及饭前饭后服用。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "pharmacy"
+          ],
+          "links": [
+            {
+              "target": "life-pharmacy-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-pharmacy-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-pharmacy-06",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-pharmacy-04",
+          "label": "Something for daytime, please.",
+          "description": "想要白天吃的药。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "life-pharmacy-05",
+          "label": "I don't want anything that'll make me drowsy.",
+          "description": "不想要会犯困的药；drowsy 在药房场景很常用。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "life-pharmacy-06",
+          "label": "Should I take this before or after food?",
+          "description": "询问饭前还是饭后吃。",
+          "tags": [
+            "phrase",
+            "daily",
+            "pharmacy"
+          ]
+        },
+        {
+          "id": "health-insurance",
+          "label": "医保与保险 / Medicare and insurance",
+          "description": "说明 Medicare 和私人医疗保险情况。",
+          "tags": [
+            "intent",
+            "daily",
+            "healthcare",
+            "insurance"
+          ],
+          "links": [
+            {
+              "target": "life-gp-05",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-gp-05",
+          "label": "I don't have Medicare, but I have private health insurance.",
+          "description": "说明没有 Medicare 但有私人保险。",
+          "tags": [
+            "phrase",
+            "daily",
+            "healthcare",
+            "insurance"
+          ]
+        }
+      ]
+    },
+    {
+      "graphId": "rental-housing",
+      "graphLabel": "澳洲租房与居住表达",
+      "nodes": [
+        {
+          "id": "rental-housing-root",
+          "label": "澳洲租房与居住表达 / Rental and housing phrase bank",
+          "description": "按租房流程整理：看房预约、租客身份、报修维护、房型家具、租金费用和网络设置。",
+          "tags": [
+            "scenario",
+            "daily",
+            "australia",
+            "rental",
+            "housing"
+          ],
+          "links": [
+            {
+              "target": "housing-inspection",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "housing-tenant-address",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "housing-maintenance",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "housing-rent-utilities",
+              "type": "Concept",
+              "label": "表达场景"
+            }
+          ]
+        },
+        {
+          "id": "housing-inspection",
+          "label": "看房预约 / Rental inspection",
+          "description": "看房说明来意、确认是否预约以及预约时间。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "rental"
+          ],
+          "links": [
+            {
+              "target": "daily-service-request-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-purpose-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-booking-address-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-booking-address-02",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "daily-service-request-04",
+          "label": "I'm here for the inspection.",
+          "description": "澳洲租房看房常说 inspection。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-purpose-01",
+          "label": "I'm here for the inspection.",
+          "description": "看房说明来意。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-booking-address-01",
+          "label": "Have you booked an inspection?",
+          "description": "询问是否预约看房。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-booking-address-02",
+          "label": "I booked the 2 pm inspection.",
+          "description": "说明预约时间。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "housing-tenant-address",
+          "label": "租客身份和住址 / Tenant and address",
+          "description": "说明租客身份、房号地址和刚租好住处。",
+          "tags": [
+            "intent",
+            "daily",
+            "rental",
+            "address"
+          ],
+          "links": [
+            {
+              "target": "life-rental-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-booking-address-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-rental-01",
+          "label": "I'm the tenant in Unit 302 at 18 Brisbane Road.",
+          "description": "说明租客身份和澳洲地址。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-booking-address-04",
+          "label": "I recently rented a place.",
+          "description": "说明刚租好住处。",
+          "tags": [
+            "phrase",
+            "daily",
+            "settlement"
+          ]
+        },
+        {
+          "id": "housing-maintenance",
+          "label": "租房报修 / Rental maintenance",
+          "description": "联系 property manager 报修热水器、说明问题持续时间和预约维修上门。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "rental",
+            "maintenance"
+          ],
+          "links": [
+            {
+              "target": "life-rental-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-rental-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-rental-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-rental-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-rental-06",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-rental-02",
+          "label": "I'd like to report an issue with the hot water system.",
+          "description": "报修热水器；report an issue with 很自然。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "life-rental-03",
+          "label": "There's no hot water when I shower.",
+          "description": "洗澡时没有热水。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "life-rental-04",
+          "label": "It's been going on for two days.",
+          "description": "问题已经持续两天。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "life-rental-05",
+          "label": "Tomorrow morning would be best.",
+          "description": "礼貌说明最好明天上午上门。",
+          "tags": [
+            "phrase",
+            "daily",
+            "booking"
+          ]
+        },
+        {
+          "id": "life-rental-06",
+          "label": "Could you send me a confirmation by text or email?",
+          "description": "请对方通过短信或邮件确认。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "housing-rent-utilities",
+          "label": "租金与居住费用 / Rent and utilities",
           "description": "房型、家具、费用包含和网络设置。",
-          "tags": ["intent", "daily", "australia", "rental"],
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "rental",
+            "utilities"
+          ],
           "links": [
-            { "target": "settlement-rent-cost-01", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-rent-cost-02", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-rent-cost-03", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-rent-cost-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "settlement-rent-cost-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-rent-cost-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-rent-cost-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-rent-cost-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "settlement-rent-cost-01", "label": "This is a two-bedroom apartment.", "description": "两室公寓标准表达。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-rent-cost-02", "label": "Most of the furniture is included.", "description": "furniture 不可数。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-rent-cost-03", "label": "Are utilities included in the rent?", "description": "询问水电网等费用是否包含。", "tags": ["phrase", "daily", "rental"] },
-        { "id": "settlement-rent-cost-04", "label": "You'll need to set up your own internet.", "description": "需要自己办理网络。", "tags": ["phrase", "daily", "rental"] },
         {
-          "id": "settlement-documents",
-          "label": "证件和账户 / Documents and accounts",
-          "description": "银行开户时确认材料和账户类型。",
-          "tags": ["intent", "daily", "australia", "banking"],
-          "links": [
-            { "target": "settlement-documents-01", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-documents-02", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-documents-03", "type": "Action", "label": "常用表达" }
+          "id": "settlement-rent-cost-01",
+          "label": "This is a two-bedroom apartment.",
+          "description": "两室公寓标准表达。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
           ]
         },
-        { "id": "settlement-documents-01", "label": "I'll also need your passport and visa.", "description": "说明需要护照和签证。", "tags": ["phrase", "daily", "banking"] },
-        { "id": "settlement-documents-02", "label": "Is an electronic visa okay?", "description": "询问电子签证是否可以。", "tags": ["phrase", "daily", "banking"] },
-        { "id": "settlement-documents-03", "label": "Would you like a savings account or a transaction account?", "description": "银行账户类型。", "tags": ["phrase", "daily", "banking"] },
         {
-          "id": "settlement-next-step",
-          "label": "下一步 / Next steps",
+          "id": "settlement-rent-cost-02",
+          "label": "Most of the furniture is included.",
+          "description": "furniture 不可数。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-rent-cost-03",
+          "label": "Are utilities included in the rent?",
+          "description": "询问水电网等费用是否包含。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        },
+        {
+          "id": "settlement-rent-cost-04",
+          "label": "You'll need to set up your own internet.",
+          "description": "需要自己办理网络。",
+          "tags": [
+            "phrase",
+            "daily",
+            "rental"
+          ]
+        }
+      ]
+    },
+    {
+      "graphId": "banking-admin",
+      "graphLabel": "澳洲银行与办理表达",
+      "nodes": [
+        {
+          "id": "banking-admin-root",
+          "label": "澳洲银行与办理表达 / Banking and admin phrase bank",
+          "description": "把银行开户、证件地址、银行卡问题、安全提醒和办理流程归到同一类。",
+          "tags": [
+            "scenario",
+            "daily",
+            "australia",
+            "banking",
+            "admin"
+          ],
+          "links": [
+            {
+              "target": "bank-account-opening",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "bank-documents-address",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "bank-card-security",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "bank-admin-next-step",
+              "type": "Concept",
+              "label": "表达场景"
+            }
+          ]
+        },
+        {
+          "id": "bank-account-opening",
+          "label": "开户与账户类型 / Account opening",
+          "description": "银行开户、选择账户类型和日常交易账户表达。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "banking"
+          ],
+          "links": [
+            {
+              "target": "daily-service-request-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-purpose-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "daily-service-options-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-documents-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "daily-service-request-03",
+          "label": "I'd like to open a bank account.",
+          "description": "银行开户的标准表达。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "settlement-purpose-02",
+          "label": "I'm looking to open an account.",
+          "description": "银行开户表达，比 I want to open 更自然。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "daily-service-options-04",
+          "label": "Just a transaction account for now.",
+          "description": "银行开户时表示先开日常消费账户。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "settlement-documents-03",
+          "label": "Would you like a savings account or a transaction account?",
+          "description": "银行账户类型。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "bank-documents-address",
+          "label": "证件和地址 / Documents and address",
+          "description": "银行等机构确认澳洲地址、护照、签证和电子签证。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "banking",
+            "documents"
+          ],
+          "links": [
+            {
+              "target": "settlement-booking-address-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-documents-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-documents-02",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "settlement-booking-address-03",
+          "label": "Do you currently have an Australian address?",
+          "description": "银行等机构询问澳洲地址。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "settlement-documents-01",
+          "label": "I'll also need your passport and visa.",
+          "description": "说明需要护照和签证。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "settlement-documents-02",
+          "label": "Is an electronic visa okay?",
+          "description": "询问电子签证是否可以。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "bank-card-security",
+          "label": "银行卡与安全提醒 / Card issues and security",
+          "description": "银行卡刷不了、交易失败、安全提醒、异常活动、解冻、补卡和手机支付。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "banking",
+            "payment"
+          ],
+          "links": [
+            {
+              "target": "life-bank-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-06",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "life-bank-07",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "life-bank-01",
+          "label": "My card got declined today.",
+          "description": "银行卡刷不了/被拒付。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "life-bank-02",
+          "label": "The payment didn't go through.",
+          "description": "付款没成功。",
+          "tags": [
+            "phrase",
+            "daily",
+            "payment"
+          ]
+        },
+        {
+          "id": "life-bank-03",
+          "label": "I got a security alert from my bank.",
+          "description": "收到银行安全提醒。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "life-bank-04",
+          "label": "There might be unusual activity on my account.",
+          "description": "账户可能有异常活动。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "life-bank-05",
+          "label": "Can this card be reactivated today?",
+          "description": "询问这张卡今天能否重新激活。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "life-bank-06",
+          "label": "Could you order me a replacement card?",
+          "description": "请银行补办/寄送新卡。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking"
+          ]
+        },
+        {
+          "id": "life-bank-07",
+          "label": "Can I still use my phone to pay in the meantime?",
+          "description": "询问期间是否还能用手机支付。",
+          "tags": [
+            "phrase",
+            "daily",
+            "banking",
+            "payment"
+          ]
+        },
+        {
+          "id": "bank-admin-next-step",
+          "label": "办理流程和下一步 / Admin next steps",
+          "description": "说明工作日、询问下一步和提交申请。",
+          "tags": [
+            "intent",
+            "daily",
+            "australia",
+            "admin",
+            "settlement"
+          ],
+          "links": [
+            {
+              "target": "daily-service-payment-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-next-step-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-next-step-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "settlement-next-step-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "daily-service-payment-03",
+          "label": "within a few business days",
+          "description": "银行、物流、行政场景里的“几个工作日内”。",
+          "tags": [
+            "phrase",
+            "daily",
+            "admin"
+          ]
+        },
+        {
+          "id": "settlement-next-step-01",
+          "label": "What should I do next?",
           "description": "询问下一步流程。",
-          "tags": ["intent", "daily", "australia", "settlement"],
-          "links": [
-            { "target": "settlement-next-step-01", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-next-step-02", "type": "Action", "label": "常用表达" },
-            { "target": "settlement-next-step-03", "type": "Action", "label": "常用表达" }
+          "tags": [
+            "phrase",
+            "daily",
+            "settlement"
           ]
         },
-        { "id": "settlement-next-step-01", "label": "What should I do next?", "description": "询问下一步流程。", "tags": ["phrase", "daily", "settlement"] },
-        { "id": "settlement-next-step-02", "label": "What's the next step?", "description": "更通用的下一步问法。", "tags": ["phrase", "daily", "settlement"] },
-        { "id": "settlement-next-step-03", "label": "You'll need to submit an application.", "description": "提交申请。", "tags": ["phrase", "daily", "settlement"] }
+        {
+          "id": "settlement-next-step-02",
+          "label": "What's the next step?",
+          "description": "更通用的下一步问法。",
+          "tags": [
+            "phrase",
+            "daily",
+            "settlement"
+          ]
+        },
+        {
+          "id": "settlement-next-step-03",
+          "label": "You'll need to submit an application.",
+          "description": "提交申请。",
+          "tags": [
+            "phrase",
+            "daily",
+            "settlement"
+          ]
+        }
       ]
     },
     {
@@ -364,216 +1445,1235 @@
         {
           "id": "office-small-talk-root",
           "label": "澳洲办公室闲聊表达 / Office small talk phrase bank",
-          "description": "同事之间轻量聊天时使用的澳洲口语归纳。英文表达作为可见节点展示。",
-          "tags": ["scenario", "work", "australia", "office-chat"],
+          "description": "同事之间轻量聊天时使用的澳洲口语归纳，按午饭咖啡、饮食偏好、忙碌状态和短回应整理。",
+          "tags": [
+            "scenario",
+            "work",
+            "australia",
+            "office-chat"
+          ],
           "links": [
-            { "target": "office-lunch", "type": "Concept", "label": "表达意图" },
-            { "target": "office-food", "type": "Concept", "label": "表达意图" },
-            { "target": "office-busy", "type": "Concept", "label": "表达意图" },
-            { "target": "office-soft", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "office-lunch",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "office-food",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "office-busy",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "office-soft",
+              "type": "Concept",
+              "label": "表达场景"
+            }
           ]
         },
         {
           "id": "office-lunch",
           "label": "约午饭和咖啡 / Lunch and coffee",
           "description": "办公室午休、咖啡和附近餐厅闲聊。",
-          "tags": ["intent", "work", "australia", "office-chat"],
+          "tags": [
+            "intent",
+            "work",
+            "australia",
+            "office-chat"
+          ],
           "links": [
-            { "target": "office-lunch-01", "type": "Action", "label": "常用表达" },
-            { "target": "office-lunch-02", "type": "Action", "label": "常用表达" },
-            { "target": "office-lunch-03", "type": "Action", "label": "常用表达" },
-            { "target": "office-lunch-04", "type": "Action", "label": "常用表达" },
-            { "target": "office-lunch-05", "type": "Action", "label": "常用表达" }
+            {
+              "target": "office-lunch-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-lunch-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-lunch-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-lunch-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-lunch-05",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "office-lunch-01", "label": "Any lunch plans today?", "description": "问午饭安排。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-lunch-02", "label": "What are you having for lunch today?", "description": "问对方中午吃什么。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-lunch-03", "label": "I might just grab something quick.", "description": "随便买点快的。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-lunch-04", "label": "A new Thai place just opened downstairs.", "description": "楼下新开泰餐店。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-lunch-05", "label": "Keen to try it?", "description": "澳洲口语：想试试吗？", "tags": ["phrase", "work", "australia"] },
+        {
+          "id": "office-lunch-01",
+          "label": "Any lunch plans today?",
+          "description": "问午饭安排。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-lunch-02",
+          "label": "What are you having for lunch today?",
+          "description": "问对方中午吃什么。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-lunch-03",
+          "label": "I might just grab something quick.",
+          "description": "随便买点快的。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-lunch-04",
+          "label": "A new Thai place just opened downstairs.",
+          "description": "楼下新开泰餐店。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-lunch-05",
+          "label": "Keen to try it?",
+          "description": "澳洲口语：想试试吗？",
+          "tags": [
+            "phrase",
+            "work",
+            "australia"
+          ]
+        },
         {
           "id": "office-food",
           "label": "饮食偏好 / Food preferences",
           "description": "表达能不能吃辣、有没有不辣选项。",
-          "tags": ["intent", "work", "australia", "office-chat"],
+          "tags": [
+            "intent",
+            "work",
+            "australia",
+            "office-chat"
+          ],
           "links": [
-            { "target": "office-food-01", "type": "Action", "label": "常用表达" },
-            { "target": "office-food-02", "type": "Action", "label": "常用表达" },
-            { "target": "office-food-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "office-food-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-food-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-food-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "office-food-01", "label": "I'm not really into spicy food.", "description": "不太喜欢/不太能吃辣。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-food-02", "label": "I can't really handle spicy food.", "description": "不太能吃辣。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-food-03", "label": "They've got non-spicy options too.", "description": "他们也有不辣选择。", "tags": ["phrase", "work", "office-chat"] },
+        {
+          "id": "office-food-01",
+          "label": "I'm not really into spicy food.",
+          "description": "不太喜欢/不太能吃辣。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-food-02",
+          "label": "I can't really handle spicy food.",
+          "description": "不太能吃辣。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-food-03",
+          "label": "They've got non-spicy options too.",
+          "description": "他们也有不辣选择。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
         {
           "id": "office-busy",
           "label": "忙碌加班 / Being busy",
           "description": "表达最近忙、项目赶或加班。",
-          "tags": ["intent", "work", "australia", "office-chat"],
+          "tags": [
+            "intent",
+            "work",
+            "australia",
+            "office-chat"
+          ],
           "links": [
-            { "target": "office-busy-01", "type": "Action", "label": "常用表达" },
-            { "target": "office-busy-02", "type": "Action", "label": "常用表达" },
-            { "target": "office-busy-03", "type": "Action", "label": "常用表达" },
-            { "target": "office-busy-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "office-busy-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-busy-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-busy-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-busy-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "office-busy-01", "label": "Have you been working overtime lately?", "description": "问最近是否经常加班。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-busy-02", "label": "We've been pretty flat out lately.", "description": "澳洲口语：最近很忙。", "tags": ["phrase", "work", "australia"] },
-        { "id": "office-busy-03", "label": "The project's been pretty hectic lately.", "description": "项目最近比较赶/乱。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-busy-04", "label": "I've been pretty slammed this week.", "description": "这周忙爆了。", "tags": ["phrase", "work", "office-chat"] },
+        {
+          "id": "office-busy-01",
+          "label": "Have you been working overtime lately?",
+          "description": "问最近是否经常加班。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-busy-02",
+          "label": "We've been pretty flat out lately.",
+          "description": "澳洲口语：最近很忙。",
+          "tags": [
+            "phrase",
+            "work",
+            "australia"
+          ]
+        },
+        {
+          "id": "office-busy-03",
+          "label": "The project's been pretty hectic lately.",
+          "description": "项目最近比较赶/乱。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-busy-04",
+          "label": "I've been pretty slammed this week.",
+          "description": "这周忙爆了。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
         {
           "id": "office-soft",
           "label": "轻量回应 / Short responses",
           "description": "办公室闲聊里的自然短句。",
-          "tags": ["intent", "work", "australia", "office-chat"],
+          "tags": [
+            "intent",
+            "work",
+            "australia",
+            "office-chat"
+          ],
           "links": [
-            { "target": "office-soft-01", "type": "Action", "label": "常用表达" },
-            { "target": "office-soft-02", "type": "Action", "label": "常用表达" },
-            { "target": "office-soft-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "office-soft-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-soft-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "office-soft-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "office-soft-01", "label": "Sounds good.", "description": "自然回应。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-soft-02", "label": "Might grab a coffee as well.", "description": "顺便也买杯咖啡。", "tags": ["phrase", "work", "office-chat"] },
-        { "id": "office-soft-03", "label": "Probably just gonna grab something nearby.", "description": "大概就在附近随便买点。", "tags": ["phrase", "work", "office-chat"] }
+        {
+          "id": "office-soft-01",
+          "label": "Sounds good.",
+          "description": "自然回应。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-soft-02",
+          "label": "Might grab a coffee as well.",
+          "description": "顺便也买杯咖啡。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        },
+        {
+          "id": "office-soft-03",
+          "label": "Probably just gonna grab something nearby.",
+          "description": "大概就在附近随便买点。",
+          "tags": [
+            "phrase",
+            "work",
+            "office-chat"
+          ]
+        }
       ]
     },
     {
       "graphId": "engineering-collaboration",
-      "graphLabel": "工程日常协作表达",
+      "graphLabel": "工程协作与敏捷交付表达",
       "nodes": [
         {
           "id": "engineering-collaboration-root",
-          "label": "工程日常协作表达 / Engineering collaboration phrase bank",
-          "description": "站会、需求确认、风险说明、依赖同步、时间线影响等工程协作表达归纳。英文表达作为可见节点展示。",
-          "tags": ["scenario", "work", "engineering", "collaboration"],
+          "label": "工程协作与敏捷交付表达 / Engineering collaboration and agile delivery phrase bank",
+          "description": "把站会进度、澄清同步、问题风险、依赖阻塞、估算时间线和需求变更集中整理。",
+          "tags": [
+            "scenario",
+            "work",
+            "engineering",
+            "collaboration",
+            "agile"
+          ],
           "links": [
-            { "target": "eng-ask-progress", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-report-progress", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-uncertainty", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-problem", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-dependency", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-timeline", "type": "Concept", "label": "表达意图" },
-            { "target": "eng-sync", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "eng-progress",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "eng-clarify-sync",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "eng-issues-blockers",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "eng-estimate-timeline",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "eng-requirements-impact",
+              "type": "Concept",
+              "label": "表达场景"
+            }
           ]
         },
         {
-          "id": "eng-ask-progress",
-          "label": "询问进度 / Asking for progress",
-          "description": "询问任务、站会或 feature 进展。",
-          "tags": ["intent", "work", "engineering", "collaboration"],
+          "id": "eng-progress",
+          "label": "进度沟通 / Progress updates",
+          "description": "站会、任务进度询问和完成情况汇报。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "standup"
+          ],
           "links": [
-            { "target": "eng-ask-progress-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-ask-progress-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-ask-progress-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-ask-progress-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "eng-ask-progress-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-ask-progress-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-ask-progress-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-ask-progress-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-report-progress-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-report-progress-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-report-progress-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-report-progress-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "eng-ask-progress-01", "label": "Do you think you can finish this feature today?", "description": "比 Can you finish... 更委婉。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-ask-progress-02", "label": "How's it going?", "description": "询问进展。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-ask-progress-03", "label": "What did you work on yesterday?", "description": "站会问昨天做了什么。", "tags": ["phrase", "work", "standup"] },
-        { "id": "eng-ask-progress-04", "label": "Any updates on this?", "description": "询问是否有更新。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-report-progress",
-          "label": "汇报进度 / Reporting progress",
-          "description": "汇报完成情况、测试覆盖和当天计划。",
-          "tags": ["intent", "work", "engineering", "standup"],
-          "links": [
-            { "target": "eng-report-progress-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-report-progress-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-report-progress-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-report-progress-04", "type": "Action", "label": "常用表达" }
+          "id": "eng-ask-progress-01",
+          "label": "Do you think you can finish this feature today?",
+          "description": "比 Can you finish... 更委婉。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
           ]
         },
-        { "id": "eng-report-progress-01", "label": "I should be able to.", "description": "表达应该可以。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-report-progress-02", "label": "I finished refactoring the login module yesterday.", "description": "汇报完成重构。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-report-progress-03", "label": "Overall it's been pretty smooth.", "description": "整体还算顺利。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-report-progress-04", "label": "I'll add more test coverage today.", "description": "补测试覆盖。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-uncertainty",
-          "label": "说明还不确定 / Expressing uncertainty",
-          "description": "说明 API、权限或需求仍需确认。",
-          "tags": ["intent", "work", "engineering", "requirements"],
-          "links": [
-            { "target": "eng-uncertainty-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-uncertainty-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-uncertainty-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-uncertainty-04", "type": "Action", "label": "常用表达" }
+          "id": "eng-ask-progress-02",
+          "label": "How's it going?",
+          "description": "询问进展。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
           ]
         },
-        { "id": "eng-uncertainty-01", "label": "I still need to check a few things with the API.", "description": "还需要确认 API 细节。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-uncertainty-02", "label": "The user permission logic is still a bit unclear.", "description": "用户权限逻辑还不清晰。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-uncertainty-03", "label": "I need to clarify that part first.", "description": "需要先澄清那部分。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-uncertainty-04", "label": "I'm not 100% sure about the API contract yet.", "description": "API contract 还不完全确定。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-problem",
-          "label": "描述问题 / Describing issues",
-          "description": "描述遇到的问题、旧代码问题、数据格式问题或边界情况。",
-          "tags": ["intent", "work", "engineering", "problem"],
-          "links": [
-            { "target": "eng-problem-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-problem-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-problem-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-problem-04", "type": "Action", "label": "常用表达" },
-            { "target": "eng-problem-05", "type": "Action", "label": "常用表达" }
+          "id": "eng-ask-progress-03",
+          "label": "What did you work on yesterday?",
+          "description": "站会问昨天做了什么。",
+          "tags": [
+            "phrase",
+            "work",
+            "standup"
           ]
         },
-        { "id": "eng-problem-01", "label": "We ran into some issues.", "description": "描述遇到问题。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-problem-02", "label": "I found a few issues in the legacy code.", "description": "旧代码里发现问题。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-problem-03", "label": "The legacy system uses inconsistent data formats.", "description": "旧系统数据格式不统一。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-problem-04", "label": "There are a few edge cases we haven't covered yet.", "description": "还有边界情况没覆盖。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-problem-05", "label": "This part is still a bit unclear.", "description": "这部分仍然不太清楚。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-dependency",
-          "label": "说明依赖或阻塞 / Dependencies and blockers",
-          "description": "说明依赖、等待、API contract 或 blocker。",
-          "tags": ["intent", "work", "engineering", "dependency"],
-          "links": [
-            { "target": "eng-dependency-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-dependency-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-dependency-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-dependency-04", "type": "Action", "label": "常用表达" },
-            { "target": "eng-dependency-05", "type": "Action", "label": "常用表达" }
+          "id": "eng-ask-progress-04",
+          "label": "Any updates on this?",
+          "description": "询问是否有更新。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
           ]
         },
-        { "id": "eng-dependency-01", "label": "There's a dependency that hasn't been confirmed.", "description": "有一个依赖还没确认。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-dependency-02", "label": "We're waiting on the backend team.", "description": "正在等后端团队。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-dependency-03", "label": "This depends on the API changes.", "description": "这取决于 API 变更。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-dependency-04", "label": "The backend contract hasn't been finalised yet.", "description": "后端 contract 还没最终确定。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-dependency-05", "label": "This might become a blocker.", "description": "这可能变成阻塞点。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-timeline",
-          "label": "说明影响时间线 / Timeline impact",
-          "description": "说明可能影响上线、时间线或预期耗时。",
-          "tags": ["intent", "work", "engineering", "timeline"],
-          "links": [
-            { "target": "eng-timeline-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-timeline-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-timeline-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-timeline-04", "type": "Action", "label": "常用表达" },
-            { "target": "eng-timeline-05", "type": "Action", "label": "常用表达" }
+          "id": "eng-report-progress-01",
+          "label": "I should be able to.",
+          "description": "表达应该可以。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
           ]
         },
-        { "id": "eng-timeline-01", "label": "This might impact the timeline.", "description": "可能影响时间线。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-timeline-02", "label": "This could affect this week's release.", "description": "可能影响本周上线。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-timeline-03", "label": "It might push the release back.", "description": "可能推迟上线。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-timeline-04", "label": "It could take longer than expected.", "description": "可能比预期更久。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-timeline-05", "label": "We may need to adjust the timeline.", "description": "可能需要调整时间线。", "tags": ["phrase", "work", "engineering"] },
         {
-          "id": "eng-sync",
-          "label": "同步确认 / Syncing and confirming",
-          "description": "和 PM、后端或相关方同步确认。",
-          "tags": ["intent", "work", "engineering", "collaboration"],
-          "links": [
-            { "target": "eng-sync-01", "type": "Action", "label": "常用表达" },
-            { "target": "eng-sync-02", "type": "Action", "label": "常用表达" },
-            { "target": "eng-sync-03", "type": "Action", "label": "常用表达" },
-            { "target": "eng-sync-04", "type": "Action", "label": "常用表达" }
+          "id": "eng-report-progress-02",
+          "label": "I finished refactoring the login module yesterday.",
+          "description": "汇报完成重构。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
           ]
         },
-        { "id": "eng-sync-01", "label": "Maybe sync with the PM this afternoon.", "description": "下午和 PM 对一下。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-sync-02", "label": "Should we sync with the backend team first?", "description": "是否先和后端同步。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-sync-03", "label": "I'll continue once I've clarified that part.", "description": "澄清后继续。", "tags": ["phrase", "work", "engineering"] },
-        { "id": "eng-sync-04", "label": "Might be worth confirming with the backend side first.", "description": "委婉建议先和后端确认。", "tags": ["phrase", "work", "engineering"] }
+        {
+          "id": "eng-report-progress-03",
+          "label": "Overall it's been pretty smooth.",
+          "description": "整体还算顺利。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-report-progress-04",
+          "label": "I'll add more test coverage today.",
+          "description": "补测试覆盖。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-clarify-sync",
+          "label": "澄清与同步 / Clarifying and syncing",
+          "description": "说明不确定点，并和 PM、后端或相关方同步确认。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "collaboration"
+          ],
+          "links": [
+            {
+              "target": "eng-uncertainty-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-uncertainty-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-uncertainty-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-uncertainty-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-sync-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-sync-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-sync-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-sync-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "eng-uncertainty-01",
+          "label": "I still need to check a few things with the API.",
+          "description": "还需要确认 API 细节。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-uncertainty-02",
+          "label": "The user permission logic is still a bit unclear.",
+          "description": "用户权限逻辑还不清晰。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-uncertainty-03",
+          "label": "I need to clarify that part first.",
+          "description": "需要先澄清那部分。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-uncertainty-04",
+          "label": "I'm not 100% sure about the API contract yet.",
+          "description": "API contract 还不完全确定。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-sync-01",
+          "label": "Maybe sync with the PM this afternoon.",
+          "description": "下午和 PM 对一下。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-sync-02",
+          "label": "Should we sync with the backend team first?",
+          "description": "是否先和后端同步。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-sync-03",
+          "label": "I'll continue once I've clarified that part.",
+          "description": "澄清后继续。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-sync-04",
+          "label": "Might be worth confirming with the backend side first.",
+          "description": "委婉建议先和后端确认。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-issues-blockers",
+          "label": "问题、风险与阻塞 / Issues, risks and blockers",
+          "description": "描述问题、旧系统风险、依赖、blocker 和测试风险。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "risk",
+            "dependency"
+          ],
+          "links": [
+            {
+              "target": "eng-problem-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-problem-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-problem-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-problem-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-problem-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-dependency-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-dependency-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-dependency-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-dependency-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-dependency-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-risk-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-risk-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-risk-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-risk-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "eng-problem-01",
+          "label": "We ran into some issues.",
+          "description": "描述遇到问题。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-problem-02",
+          "label": "I found a few issues in the legacy code.",
+          "description": "旧代码里发现问题。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-problem-03",
+          "label": "The legacy system uses inconsistent data formats.",
+          "description": "旧系统数据格式不统一。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-problem-04",
+          "label": "There are a few edge cases we haven't covered yet.",
+          "description": "还有边界情况没覆盖。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-problem-05",
+          "label": "This part is still a bit unclear.",
+          "description": "这部分仍然不太清楚。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-dependency-01",
+          "label": "There's a dependency that hasn't been confirmed.",
+          "description": "有一个依赖还没确认。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-dependency-02",
+          "label": "We're waiting on the backend team.",
+          "description": "正在等后端团队。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-dependency-03",
+          "label": "This depends on the API changes.",
+          "description": "这取决于 API 变更。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-dependency-04",
+          "label": "The backend contract hasn't been finalised yet.",
+          "description": "后端 contract 还没最终确定。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-dependency-05",
+          "label": "This might become a blocker.",
+          "description": "这可能变成阻塞点。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "agile-risk-01",
+          "label": "Any risks?",
+          "description": "询问风险。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-risk-02",
+          "label": "Any blockers?",
+          "description": "询问阻塞点。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-risk-03",
+          "label": "The main risk is the legacy data format.",
+          "description": "主要风险是旧数据格式。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-risk-04",
+          "label": "We might run into issues during testing.",
+          "description": "测试时可能遇到问题。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "eng-estimate-timeline",
+          "label": "估算与时间线 / Estimates and timeline",
+          "description": "估算工作量、说明前提、上线影响和目标发布日期。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "agile",
+            "timeline"
+          ],
+          "links": [
+            {
+              "target": "eng-timeline-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-timeline-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-timeline-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-timeline-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "eng-timeline-05",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-estimate-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-estimate-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-estimate-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-estimate-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-assumption-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-assumption-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-assumption-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-timeline-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-timeline-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-timeline-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-timeline-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "eng-timeline-01",
+          "label": "This might impact the timeline.",
+          "description": "可能影响时间线。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-timeline-02",
+          "label": "This could affect this week's release.",
+          "description": "可能影响本周上线。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-timeline-03",
+          "label": "It might push the release back.",
+          "description": "可能推迟上线。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-timeline-04",
+          "label": "It could take longer than expected.",
+          "description": "可能比预期更久。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "eng-timeline-05",
+          "label": "We may need to adjust the timeline.",
+          "description": "可能需要调整时间线。",
+          "tags": [
+            "phrase",
+            "work",
+            "engineering"
+          ]
+        },
+        {
+          "id": "agile-estimate-01",
+          "label": "How long do you think this will take?",
+          "description": "询问耗时。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-estimate-02",
+          "label": "What's your estimate for this task?",
+          "description": "询问 estimate。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-estimate-03",
+          "label": "It should take around two days.",
+          "description": "大约两天。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-estimate-04",
+          "label": "I'll estimate the effort first.",
+          "description": "先评估工作量。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-assumption-01",
+          "label": "Assuming there are no API changes, it should take around two days.",
+          "description": "说明估算前提。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-assumption-02",
+          "label": "As long as the API stays the same, it should be fine.",
+          "description": "只要 API 不变就可以。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-assumption-03",
+          "label": "This estimate assumes the backend contract is stable.",
+          "description": "估算假设后端 contract 稳定。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "agile-timeline-01",
+          "label": "Is there a timeline for this requirement?",
+          "description": "询问时间线。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-timeline-02",
+          "label": "Do we have a target release date?",
+          "description": "是否有目标上线日期？",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-timeline-03",
+          "label": "The client wants this done as soon as possible.",
+          "description": "客户希望越快越好。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-timeline-04",
+          "label": "Let's put this into the current sprint for now.",
+          "description": "先放进当前 sprint。",
+          "tags": [
+            "phrase",
+            "work",
+            "agile"
+          ]
+        },
+        {
+          "id": "eng-requirements-impact",
+          "label": "需求变更与影响范围 / Requirement changes and impact scope",
+          "description": "客户新需求、范围变化、数据结构和前后端影响范围。",
+          "tags": [
+            "intent",
+            "work",
+            "requirements",
+            "agile"
+          ],
+          "links": [
+            {
+              "target": "agile-change-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-change-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-change-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-change-04",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-impact-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-impact-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-impact-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "agile-impact-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
+          ]
+        },
+        {
+          "id": "agile-change-01",
+          "label": "The client just brought up a new requirement.",
+          "description": "客户刚提新需求。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-change-02",
+          "label": "Is it a minor change, or will it affect the current logic?",
+          "description": "是小改动还是会影响当前逻辑？",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-change-03",
+          "label": "They want us to support role-based access control.",
+          "description": "他们希望支持 RBAC。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-change-04",
+          "label": "The scope is slightly different now.",
+          "description": "现在范围有点不同。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-impact-01",
+          "label": "We might need to adjust the current data structure.",
+          "description": "可能需要调整数据结构。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-impact-02",
+          "label": "The frontend team will probably need to make quite a few changes as well.",
+          "description": "前端可能也要改不少。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-impact-03",
+          "label": "I'll assess the impact scope first.",
+          "description": "先评估影响范围。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        },
+        {
+          "id": "agile-impact-04",
+          "label": "We need to understand the affected areas first.",
+          "description": "先了解受影响区域。",
+          "tags": [
+            "phrase",
+            "work",
+            "requirements"
+          ]
+        }
       ]
     },
     {
@@ -583,221 +2683,440 @@
         {
           "id": "code-architecture-root",
           "label": "Code Review 与架构表达 / Code review and architecture phrase bank",
-          "description": "PR 反馈、代码质量、职责边界、重构、抽象和可维护性讨论的表达归纳。英文表达作为可见节点展示。",
-          "tags": ["scenario", "work", "engineering", "architecture"],
+          "description": "PR 反馈、代码质量、职责边界、重构、抽象和可维护性讨论的表达归纳。",
+          "tags": [
+            "scenario",
+            "work",
+            "engineering",
+            "architecture",
+            "code-review"
+          ],
           "links": [
-            { "target": "code-review-feedback", "type": "Concept", "label": "表达意图" },
-            { "target": "code-ask-fix", "type": "Concept", "label": "表达意图" },
-            { "target": "code-concern", "type": "Concept", "label": "表达意图" },
-            { "target": "code-responsibility", "type": "Concept", "label": "表达意图" },
-            { "target": "code-refactor", "type": "Concept", "label": "表达意图" },
-            { "target": "code-maintainability", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "code-review-feedback",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "code-ask-fix",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "code-concern",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "code-responsibility",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "code-refactor",
+              "type": "Concept",
+              "label": "表达场景"
+            },
+            {
+              "target": "code-maintainability",
+              "type": "Concept",
+              "label": "表达场景"
+            }
           ]
         },
         {
           "id": "code-review-feedback",
           "label": "给 Review 反馈 / Review feedback",
           "description": "给 PR Review 反馈和总体评价。",
-          "tags": ["intent", "work", "engineering", "code-review"],
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "code-review"
+          ],
           "links": [
-            { "target": "code-review-feedback-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-review-feedback-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-review-feedback-03", "type": "Action", "label": "常用表达" },
-            { "target": "code-review-feedback-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "code-review-feedback-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-review-feedback-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-review-feedback-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-review-feedback-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "code-review-feedback-01", "label": "I just had a look at your PR.", "description": "刚看了你的 PR。", "tags": ["phrase", "work", "code-review"] },
-        { "id": "code-review-feedback-02", "label": "Overall it looks good.", "description": "整体看起来不错。", "tags": ["phrase", "work", "code-review"] },
-        { "id": "code-review-feedback-03", "label": "There are still a few areas we could improve.", "description": "还有几个地方可以优化。", "tags": ["phrase", "work", "code-review"] },
-        { "id": "code-review-feedback-04", "label": "A couple of things could be cleaned up.", "description": "有几个地方可以清理。", "tags": ["phrase", "work", "code-review"] },
+        {
+          "id": "code-review-feedback-01",
+          "label": "I just had a look at your PR.",
+          "description": "刚看了你的 PR。",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
+        {
+          "id": "code-review-feedback-02",
+          "label": "Overall it looks good.",
+          "description": "整体看起来不错。",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
+        {
+          "id": "code-review-feedback-03",
+          "label": "There are still a few areas we could improve.",
+          "description": "还有几个地方可以优化。",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
+        {
+          "id": "code-review-feedback-04",
+          "label": "A couple of things could be cleaned up.",
+          "description": "有几个地方可以清理。",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
         {
           "id": "code-ask-fix",
           "label": "询问修改 / Asking what to fix",
           "description": "询问是否需要修改。",
-          "tags": ["intent", "work", "engineering", "code-review"],
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "code-review"
+          ],
           "links": [
-            { "target": "code-ask-fix-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-ask-fix-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-ask-fix-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "code-ask-fix-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-ask-fix-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-ask-fix-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "code-ask-fix-01", "label": "Anything I should fix?", "description": "有什么需要我修吗？", "tags": ["phrase", "work", "code-review"] },
-        { "id": "code-ask-fix-02", "label": "Any changes needed?", "description": "需要改什么吗？", "tags": ["phrase", "work", "code-review"] },
-        { "id": "code-ask-fix-03", "label": "Anything I need to update?", "description": "有什么需要我更新吗？", "tags": ["phrase", "work", "code-review"] },
+        {
+          "id": "code-ask-fix-01",
+          "label": "Anything I should fix?",
+          "description": "有什么需要我修吗？",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
+        {
+          "id": "code-ask-fix-02",
+          "label": "Any changes needed?",
+          "description": "需要改什么吗？",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
+        {
+          "id": "code-ask-fix-03",
+          "label": "Anything I need to update?",
+          "description": "有什么需要我更新吗？",
+          "tags": [
+            "phrase",
+            "work",
+            "code-review"
+          ]
+        },
         {
           "id": "code-concern",
           "label": "提出担心 / Raising concerns",
           "description": "提出性能、结构或维护风险。",
-          "tags": ["intent", "work", "engineering", "architecture"],
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "architecture"
+          ],
           "links": [
-            { "target": "code-concern-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-concern-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-concern-03", "type": "Action", "label": "常用表达" }
+            {
+              "target": "code-concern-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-concern-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-concern-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "code-concern-01", "label": "There's one thing I'm a bit concerned about.", "description": "有一点我有点担心。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-concern-02", "label": "I have a small concern around this part.", "description": "我对这一部分有点担心。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-concern-03", "label": "This might be a performance issue.", "description": "这可能是性能问题。", "tags": ["phrase", "work", "architecture"] },
+        {
+          "id": "code-concern-01",
+          "label": "There's one thing I'm a bit concerned about.",
+          "description": "有一点我有点担心。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
+        {
+          "id": "code-concern-02",
+          "label": "I have a small concern around this part.",
+          "description": "我对这一部分有点担心。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
+        {
+          "id": "code-concern-03",
+          "label": "This might be a performance issue.",
+          "description": "这可能是性能问题。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
         {
           "id": "code-responsibility",
-          "label": "职责过多 / Too much responsibility",
-          "description": "说明 service、controller 或 class 做了太多事。",
-          "tags": ["intent", "work", "engineering", "architecture"],
+          "label": "职责边界 / Responsibility boundaries",
+          "description": "说明 service、controller 或 class 职责过多。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "architecture"
+          ],
           "links": [
-            { "target": "code-responsibility-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-responsibility-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-responsibility-03", "type": "Action", "label": "常用表达" },
-            { "target": "code-responsibility-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "code-responsibility-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-responsibility-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-responsibility-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-responsibility-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "code-responsibility-01", "label": "This service has too many responsibilities.", "description": "这个 service 职责太多。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-responsibility-02", "label": "This service is handling too much logic.", "description": "这个 service 处理太多逻辑。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-responsibility-03", "label": "There seems to be too much business logic in the controller.", "description": "controller 里业务逻辑太多。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-responsibility-04", "label": "This class is doing too much.", "description": "这个 class 做太多事。", "tags": ["phrase", "work", "architecture"] },
+        {
+          "id": "code-responsibility-01",
+          "label": "This service has too many responsibilities.",
+          "description": "这个 service 职责太多。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
+        {
+          "id": "code-responsibility-02",
+          "label": "This service is handling too much logic.",
+          "description": "这个 service 处理太多逻辑。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
+        {
+          "id": "code-responsibility-03",
+          "label": "There seems to be too much business logic in the controller.",
+          "description": "controller 里业务逻辑太多。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
+        {
+          "id": "code-responsibility-04",
+          "label": "This class is doing too much.",
+          "description": "这个 class 做太多事。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
+          ]
+        },
         {
           "id": "code-refactor",
           "label": "建议重构 / Refactoring suggestions",
           "description": "建议拆分、抽象、移动到 service 层。",
-          "tags": ["intent", "work", "engineering", "refactor"],
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "refactor"
+          ],
           "links": [
-            { "target": "code-refactor-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-refactor-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-refactor-03", "type": "Action", "label": "常用表达" },
-            { "target": "code-refactor-04", "type": "Action", "label": "常用表达" }
+            {
+              "target": "code-refactor-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-refactor-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-refactor-03",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-refactor-04",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
-        { "id": "code-refactor-01", "label": "Should we move it into the service layer?", "description": "是否移到 service 层？", "tags": ["phrase", "work", "refactor"] },
-        { "id": "code-refactor-02", "label": "Should we extract this into a separate service?", "description": "是否抽成单独 service？", "tags": ["phrase", "work", "refactor"] },
-        { "id": "code-refactor-03", "label": "We could split this logic up.", "description": "可以拆分这段逻辑。", "tags": ["phrase", "work", "refactor"] },
-        { "id": "code-refactor-04", "label": "Some of the logic could be abstracted further.", "description": "部分逻辑可以进一步抽象。", "tags": ["phrase", "work", "refactor"] },
+        {
+          "id": "code-refactor-01",
+          "label": "Should we move it into the service layer?",
+          "description": "是否移到 service 层？",
+          "tags": [
+            "phrase",
+            "work",
+            "refactor"
+          ]
+        },
+        {
+          "id": "code-refactor-02",
+          "label": "Should we extract this into a separate service?",
+          "description": "是否抽成单独 service？",
+          "tags": [
+            "phrase",
+            "work",
+            "refactor"
+          ]
+        },
+        {
+          "id": "code-refactor-03",
+          "label": "We could split this logic up.",
+          "description": "可以拆分这段逻辑。",
+          "tags": [
+            "phrase",
+            "work",
+            "refactor"
+          ]
+        },
+        {
+          "id": "code-refactor-04",
+          "label": "Some of the logic could be abstracted further.",
+          "description": "部分逻辑可以进一步抽象。",
+          "tags": [
+            "phrase",
+            "work",
+            "refactor"
+          ]
+        },
         {
           "id": "code-maintainability",
-          "label": "可维护性 / Maintainability",
-          "description": "说明可维护性、技术债和未来修改成本。",
-          "tags": ["intent", "work", "engineering", "architecture"],
+          "label": "可维护性与技术债 / Maintainability and technical debt",
+          "description": "说明后续维护成本和技术债风险。",
+          "tags": [
+            "intent",
+            "work",
+            "engineering",
+            "architecture"
+          ],
           "links": [
-            { "target": "code-maintainability-01", "type": "Action", "label": "常用表达" },
-            { "target": "code-maintainability-02", "type": "Action", "label": "常用表达" },
-            { "target": "code-maintainability-03", "type": "Action", "label": "常用表达" }
-          ]
-        },
-        { "id": "code-maintainability-01", "label": "It could cause maintainability issues later.", "description": "后面可能有可维护性问题。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-maintainability-02", "label": "It might become harder to maintain later on.", "description": "后面可能更难维护。", "tags": ["phrase", "work", "architecture"] },
-        { "id": "code-maintainability-03", "label": "This might introduce technical debt.", "description": "这可能引入技术债。", "tags": ["phrase", "work", "architecture"] }
-      ]
-    },
-    {
-      "graphId": "agile-requirements",
-      "graphLabel": "敏捷与需求变更表达",
-      "nodes": [
-        {
-          "id": "agile-requirements-root",
-          "label": "敏捷与需求变更表达 / Agile and requirements phrase bank",
-          "description": "Sprint planning、估算、风险、需求变更、影响范围和时间线表达归纳。英文表达作为可见节点展示。",
-          "tags": ["scenario", "work", "engineering", "agile", "requirements"],
-          "links": [
-            { "target": "agile-estimate", "type": "Concept", "label": "表达意图" },
-            { "target": "agile-assumption", "type": "Concept", "label": "表达意图" },
-            { "target": "agile-risk", "type": "Concept", "label": "表达意图" },
-            { "target": "agile-change", "type": "Concept", "label": "表达意图" },
-            { "target": "agile-impact", "type": "Concept", "label": "表达意图" },
-            { "target": "agile-timeline", "type": "Concept", "label": "表达意图" }
+            {
+              "target": "code-maintainability-01",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-maintainability-02",
+              "type": "Action",
+              "label": "常用表达"
+            },
+            {
+              "target": "code-maintainability-03",
+              "type": "Action",
+              "label": "常用表达"
+            }
           ]
         },
         {
-          "id": "agile-estimate",
-          "label": "估算工作量 / Estimating effort",
-          "description": "询问或说明任务耗时。",
-          "tags": ["intent", "work", "engineering", "agile"],
-          "links": [
-            { "target": "agile-estimate-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-estimate-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-estimate-03", "type": "Action", "label": "常用表达" },
-            { "target": "agile-estimate-04", "type": "Action", "label": "常用表达" }
+          "id": "code-maintainability-01",
+          "label": "It could cause maintainability issues later.",
+          "description": "后面可能有可维护性问题。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
           ]
         },
-        { "id": "agile-estimate-01", "label": "How long do you think this will take?", "description": "询问耗时。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-estimate-02", "label": "What's your estimate for this task?", "description": "询问 estimate。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-estimate-03", "label": "It should take around two days.", "description": "大约两天。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-estimate-04", "label": "I'll estimate the effort first.", "description": "先评估工作量。", "tags": ["phrase", "work", "agile"] },
         {
-          "id": "agile-assumption",
-          "label": "说明前提 / Stating assumptions",
-          "description": "说明估算成立的前提条件。",
-          "tags": ["intent", "work", "engineering", "agile"],
-          "links": [
-            { "target": "agile-assumption-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-assumption-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-assumption-03", "type": "Action", "label": "常用表达" }
+          "id": "code-maintainability-02",
+          "label": "It might become harder to maintain later on.",
+          "description": "后面可能更难维护。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
           ]
         },
-        { "id": "agile-assumption-01", "label": "Assuming there are no API changes, it should take around two days.", "description": "说明估算前提。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-assumption-02", "label": "As long as the API stays the same, it should be fine.", "description": "只要 API 不变就可以。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-assumption-03", "label": "This estimate assumes the backend contract is stable.", "description": "估算假设后端 contract 稳定。", "tags": ["phrase", "work", "agile"] },
         {
-          "id": "agile-risk",
-          "label": "说明风险 / Risks and blockers",
-          "description": "询问或说明风险、阻塞点和测试阶段问题。",
-          "tags": ["intent", "work", "engineering", "agile"],
-          "links": [
-            { "target": "agile-risk-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-risk-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-risk-03", "type": "Action", "label": "常用表达" },
-            { "target": "agile-risk-04", "type": "Action", "label": "常用表达" }
+          "id": "code-maintainability-03",
+          "label": "This might introduce technical debt.",
+          "description": "这可能引入技术债。",
+          "tags": [
+            "phrase",
+            "work",
+            "architecture"
           ]
-        },
-        { "id": "agile-risk-01", "label": "Any risks?", "description": "询问风险。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-risk-02", "label": "Any blockers?", "description": "询问阻塞点。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-risk-03", "label": "The main risk is the legacy data format.", "description": "主要风险是旧数据格式。", "tags": ["phrase", "work", "agile"] },
-        { "id": "agile-risk-04", "label": "We might run into issues during testing.", "description": "测试时可能遇到问题。", "tags": ["phrase", "work", "agile"] },
-        {
-          "id": "agile-change",
-          "label": "需求变更 / Requirement changes",
-          "description": "描述客户新增需求、scope 变化和 RBAC。",
-          "tags": ["intent", "work", "engineering", "requirements"],
-          "links": [
-            { "target": "agile-change-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-change-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-change-03", "type": "Action", "label": "常用表达" },
-            { "target": "agile-change-04", "type": "Action", "label": "常用表达" }
-          ]
-        },
-        { "id": "agile-change-01", "label": "The client just brought up a new requirement.", "description": "客户刚提新需求。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-change-02", "label": "Is it a minor change, or will it affect the current logic?", "description": "是小改动还是会影响当前逻辑？", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-change-03", "label": "They want us to support role-based access control.", "description": "他们希望支持 RBAC。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-change-04", "label": "The scope is slightly different now.", "description": "现在范围有点不同。", "tags": ["phrase", "work", "requirements"] },
-        {
-          "id": "agile-impact",
-          "label": "影响范围 / Impact scope",
-          "description": "说明数据结构、前端、现有逻辑和 affected areas。",
-          "tags": ["intent", "work", "engineering", "requirements"],
-          "links": [
-            { "target": "agile-impact-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-impact-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-impact-03", "type": "Action", "label": "常用表达" },
-            { "target": "agile-impact-04", "type": "Action", "label": "常用表达" }
-          ]
-        },
-        { "id": "agile-impact-01", "label": "We might need to adjust the current data structure.", "description": "可能需要调整数据结构。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-impact-02", "label": "The frontend team will probably need to make quite a few changes as well.", "description": "前端可能也要改不少。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-impact-03", "label": "I'll assess the impact scope first.", "description": "先评估影响范围。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-impact-04", "label": "We need to understand the affected areas first.", "description": "先了解受影响区域。", "tags": ["phrase", "work", "requirements"] },
-        {
-          "id": "agile-timeline",
-          "label": "时间线 / Timeline",
-          "description": "询问或说明上线时间、客户期望和 sprint 安排。",
-          "tags": ["intent", "work", "engineering", "requirements"],
-          "links": [
-            { "target": "agile-timeline-01", "type": "Action", "label": "常用表达" },
-            { "target": "agile-timeline-02", "type": "Action", "label": "常用表达" },
-            { "target": "agile-timeline-03", "type": "Action", "label": "常用表达" },
-            { "target": "agile-timeline-04", "type": "Action", "label": "常用表达" }
-          ]
-        },
-        { "id": "agile-timeline-01", "label": "Is there a timeline for this requirement?", "description": "询问时间线。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-timeline-02", "label": "Do we have a target release date?", "description": "是否有目标上线日期？", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-timeline-03", "label": "The client wants this done as soon as possible.", "description": "客户希望越快越好。", "tags": ["phrase", "work", "requirements"] },
-        { "id": "agile-timeline-04", "label": "Let's put this into the current sprint for now.", "description": "先放进当前 sprint。", "tags": ["phrase", "work", "agile"] }
+        }
       ]
     },
     {
@@ -807,81 +3126,482 @@
         {
           "id": "common-corrections-root",
           "label": "常见表达纠错 / Common corrections",
-          "description": "根据之前英语训练中反复出现的问题，归纳中式直译、搭配错误、可数性和介词问题。纠错表达也作为可见英文节点展示。",
-          "tags": ["scenario", "correction", "english"],
+          "description": "按实际场景整理中式直译、词义误用、可数性和动词搭配问题，便于从错误表达快速替换成自然英文。",
+          "tags": [
+            "scenario",
+            "correction",
+            "english-expression"
+          ],
           "links": [
-            { "target": "corr-word", "type": "Concept", "label": "纠错类型" },
-            { "target": "corr-count", "type": "Concept", "label": "纠错类型" },
-            { "target": "corr-verb", "type": "Concept", "label": "纠错类型" },
-            { "target": "corr-translation", "type": "Concept", "label": "纠错类型" }
+            {
+              "target": "corr-life-healthcare",
+              "type": "Concept",
+              "label": "纠错类别"
+            },
+            {
+              "target": "corr-life-rental-banking",
+              "type": "Concept",
+              "label": "纠错类别"
+            },
+            {
+              "target": "corr-engineering",
+              "type": "Concept",
+              "label": "纠错类别"
+            },
+            {
+              "target": "corr-verb-shopping",
+              "type": "Concept",
+              "label": "纠错类别"
+            },
+            {
+              "target": "corr-direct-translation",
+              "type": "Concept",
+              "label": "纠错类别"
+            }
           ]
         },
         {
-          "id": "corr-word",
-          "label": "词义误用 / Word choice",
-          "description": "常见词义误用。",
-          "tags": ["intent", "correction", "english"],
+          "id": "corr-life-healthcare",
+          "label": "医疗与药房纠错 / Healthcare corrections",
+          "description": "预约、病人身份、保险、感冒鼻塞和吃药表达纠错。",
+          "tags": [
+            "intent",
+            "correction",
+            "healthcare",
+            "english-expression"
+          ],
           "links": [
-            { "target": "corr-word-01", "type": "Condition", "label": "纠错" },
-            { "target": "corr-word-02", "type": "Condition", "label": "纠错" },
-            { "target": "corr-word-03", "type": "Condition", "label": "纠错" },
-            { "target": "corr-word-04", "type": "Condition", "label": "纠错" }
+            {
+              "target": "life-correction-01",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-02",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-03",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-04",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-08",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-09",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-10",
+              "type": "Condition",
+              "label": "替换"
+            }
           ]
         },
-        { "id": "corr-word-01", "label": "otherwise ≠ also", "description": "otherwise 是“否则”，不是“另外”。", "tags": ["correction", "english"] },
-        { "id": "corr-word-02", "label": "internet / not network", "description": "生活场景里的网络说 internet。", "tags": ["correction", "english"] },
-        { "id": "corr-word-03", "label": "membership / not VIP plans", "description": "健身房会员说 membership。", "tags": ["correction", "english"] },
-        { "id": "corr-word-04", "label": "release / not always deployment", "description": "上线计划多说 release。", "tags": ["correction", "english"] },
         {
-          "id": "corr-count",
-          "label": "可数性 / Countability",
-          "description": "可数和不可数名词问题。",
-          "tags": ["intent", "correction", "english"],
-          "links": [
-            { "target": "corr-count-01", "type": "Condition", "label": "纠错" },
-            { "target": "corr-count-02", "type": "Condition", "label": "纠错" },
-            { "target": "corr-count-03", "type": "Condition", "label": "纠错" },
-            { "target": "corr-count-04", "type": "Condition", "label": "纠错" }
+          "id": "life-correction-01",
+          "label": "book an appointment / not book a reservation",
+          "description": "看医生、办事预约用 appointment。",
+          "tags": [
+            "correction",
+            "english-expression"
           ]
         },
-        { "id": "corr-count-01", "label": "too much business logic / not many business logics", "description": "business logic 不可数。", "tags": ["correction", "english"] },
-        { "id": "corr-count-02", "label": "furniture / not furnitures", "description": "furniture 不可数。", "tags": ["correction", "english"] },
-        { "id": "corr-count-03", "label": "legacy code / not old codes", "description": "code 通常不可数。", "tags": ["correction", "english"] },
-        { "id": "corr-count-04", "label": "savings account", "description": "固定说 savings account。", "tags": ["correction", "english"] },
         {
-          "id": "corr-verb",
-          "label": "动词搭配 / Verb patterns",
-          "description": "动词、介词和固定搭配。",
-          "tags": ["intent", "correction", "english"],
-          "links": [
-            { "target": "corr-verb-01", "type": "Condition", "label": "纠错" },
-            { "target": "corr-verb-02", "type": "Condition", "label": "纠错" },
-            { "target": "corr-verb-03", "type": "Condition", "label": "纠错" },
-            { "target": "corr-verb-04", "type": "Condition", "label": "纠错" },
-            { "target": "corr-verb-05", "type": "Condition", "label": "纠错" }
+          "id": "life-correction-02",
+          "label": "appointments available / not available seats",
+          "description": "诊所空位说 appointments available。",
+          "tags": [
+            "correction",
+            "english-expression"
           ]
         },
-        { "id": "corr-verb-01", "label": "return this item / not refund this good", "description": "退货说 return this item。", "tags": ["correction", "english"] },
-        { "id": "corr-verb-02", "label": "exchange it for a new one", "description": "换成新的要用 exchange it for。", "tags": ["correction", "english"] },
-        { "id": "corr-verb-03", "label": "move it into the service layer", "description": "不要说 separate to the service layer。", "tags": ["correction", "english"] },
-        { "id": "corr-verb-04", "label": "set up your own internet", "description": "办理网络说 set up internet。", "tags": ["correction", "english"] },
-        { "id": "corr-verb-05", "label": "check a few things with the API", "description": "确认 API 细节用 check with/about。", "tags": ["correction", "english"] },
         {
-          "id": "corr-translation",
-          "label": "中文直译 / Direct translation",
-          "description": "替换中式直译。",
-          "tags": ["intent", "correction", "english"],
-          "links": [
-            { "target": "corr-translation-01", "type": "Condition", "label": "纠错" },
-            { "target": "corr-translation-02", "type": "Condition", "label": "纠错" },
-            { "target": "corr-translation-03", "type": "Condition", "label": "纠错" },
-            { "target": "corr-translation-04", "type": "Condition", "label": "纠错" }
+          "id": "life-correction-03",
+          "label": "existing patient / not old patient",
+          "description": "老病人/已登记病人说 existing patient。",
+          "tags": [
+            "correction",
+            "english-expression"
           ]
         },
-        { "id": "corr-translation-01", "label": "How long do you think this will take?", "description": "不要说 How long can you finish this task。", "tags": ["correction", "english"] },
-        { "id": "corr-translation-02", "label": "What are you having for lunch?", "description": "不要说 What do you plan to eat this noon。", "tags": ["correction", "english"] },
-        { "id": "corr-translation-03", "label": "I'm not really into spicy food.", "description": "不要说 I cannot eat too spicy。", "tags": ["correction", "english"] },
-        { "id": "corr-translation-04", "label": "impact scope / affected areas", "description": "不要说 influence range。", "tags": ["correction", "english"] }
+        {
+          "id": "life-correction-04",
+          "label": "private health insurance / not personal insurance",
+          "description": "私人医疗保险说 private health insurance。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "life-correction-08",
+          "label": "I've got a cold / not I'm cold",
+          "description": "I'm cold 是觉得冷，不是感冒。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "life-correction-09",
+          "label": "blocked nose / not my nose is blocking",
+          "description": "鼻塞说 blocked nose。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "life-correction-10",
+          "label": "take medicine / not have medicine",
+          "description": "吃药通常说 take medicine。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "corr-life-rental-banking",
+          "label": "租房、银行与生活办理纠错 / Rental, banking and settlement corrections",
+          "description": "银行卡、租客、维修人员、网络、会员和账户类型相关纠错。",
+          "tags": [
+            "intent",
+            "correction",
+            "daily",
+            "english-expression"
+          ],
+          "links": [
+            {
+              "target": "life-correction-05",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-06",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "life-correction-07",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-word-02",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-word-03",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-count-02",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-count-04",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-verb-04",
+              "type": "Condition",
+              "label": "替换"
+            }
+          ]
+        },
+        {
+          "id": "life-correction-05",
+          "label": "card got declined / not card is unavailable",
+          "description": "银行卡被拒付用 got declined。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "life-correction-06",
+          "label": "tenant / not renter",
+          "description": "租房正式场景更常用 tenant。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "life-correction-07",
+          "label": "tradesperson / not maintainer",
+          "description": "租房维修人员可说 tradesperson、technician 或 plumber。",
+          "tags": [
+            "correction",
+            "english-expression"
+          ]
+        },
+        {
+          "id": "corr-word-02",
+          "label": "internet / not network",
+          "description": "生活场景里的网络说 internet。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-word-03",
+          "label": "membership / not VIP plans",
+          "description": "健身房会员说 membership。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-count-02",
+          "label": "furniture / not furnitures",
+          "description": "furniture 不可数。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-count-04",
+          "label": "savings account",
+          "description": "固定说 savings account。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-verb-04",
+          "label": "set up your own internet",
+          "description": "办理网络说 set up internet。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-engineering",
+          "label": "工程与架构表达纠错 / Engineering corrections",
+          "description": "代码、上线、service layer、API 确认和影响范围相关纠错。",
+          "tags": [
+            "intent",
+            "correction",
+            "engineering",
+            "english-expression"
+          ],
+          "links": [
+            {
+              "target": "corr-word-04",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-count-01",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-count-03",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-verb-03",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-verb-05",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-translation-04",
+              "type": "Condition",
+              "label": "替换"
+            }
+          ]
+        },
+        {
+          "id": "corr-word-04",
+          "label": "release / not always deployment",
+          "description": "上线计划多说 release。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-count-01",
+          "label": "too much business logic / not many business logics",
+          "description": "business logic 不可数。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-count-03",
+          "label": "legacy code / not old codes",
+          "description": "code 通常不可数。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-verb-03",
+          "label": "move it into the service layer",
+          "description": "不要说 separate to the service layer。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-verb-05",
+          "label": "check a few things with the API",
+          "description": "确认 API 细节用 check with/about。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-translation-04",
+          "label": "impact scope / affected areas",
+          "description": "不要说 influence range。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-verb-shopping",
+          "label": "购物动词搭配纠错 / Shopping verb patterns",
+          "description": "退货、换货等服务场景常见动词搭配。",
+          "tags": [
+            "intent",
+            "correction",
+            "shopping",
+            "english-expression"
+          ],
+          "links": [
+            {
+              "target": "corr-verb-01",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-verb-02",
+              "type": "Condition",
+              "label": "替换"
+            }
+          ]
+        },
+        {
+          "id": "corr-verb-01",
+          "label": "return this item / not refund this good",
+          "description": "退货说 return this item。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-verb-02",
+          "label": "exchange it for a new one",
+          "description": "换成新的要用 exchange it for。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-direct-translation",
+          "label": "中文直译纠错 / Direct translation corrections",
+          "description": "otherwise、估算耗时、午饭和吃辣等中式直译替换。",
+          "tags": [
+            "intent",
+            "correction",
+            "english-expression"
+          ],
+          "links": [
+            {
+              "target": "corr-word-01",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-translation-01",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-translation-02",
+              "type": "Condition",
+              "label": "替换"
+            },
+            {
+              "target": "corr-translation-03",
+              "type": "Condition",
+              "label": "替换"
+            }
+          ]
+        },
+        {
+          "id": "corr-word-01",
+          "label": "otherwise ≠ also",
+          "description": "otherwise 是“否则”，不是“另外”。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-translation-01",
+          "label": "How long do you think this will take?",
+          "description": "不要说 How long can you finish this task。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-translation-02",
+          "label": "What are you having for lunch?",
+          "description": "不要说 What do you plan to eat this noon。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        },
+        {
+          "id": "corr-translation-03",
+          "label": "I'm not really into spicy food.",
+          "description": "不要说 I cannot eat too spicy。",
+          "tags": [
+            "correction",
+            "english"
+          ]
+        }
       ]
     }
   ]
