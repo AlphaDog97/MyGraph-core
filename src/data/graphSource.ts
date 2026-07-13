@@ -20,7 +20,10 @@ export interface CategoryGraphDocument {
 
 export interface GraphSource {
   loadManifest(signal?: AbortSignal): Promise<Manifest>;
-  loadCategory(categoryId: string, signal?: AbortSignal): Promise<CategoryGraphEntry[]>;
+  loadCategory(
+    categoryId: string,
+    signal?: AbortSignal
+  ): Promise<CategoryGraphEntry[]>;
 }
 
 export interface HttpGraphSourceOptions {
@@ -37,6 +40,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function createDefaultFetch(): typeof fetch | undefined {
+  if (typeof globalThis.fetch !== "function") return undefined;
+
+  // Calling an extracted Window.fetch with another receiver throws
+  // "Illegal invocation" in browsers. Keep the receiver as globalThis.
+  return (input, init) => globalThis.fetch(input, init);
+}
+
 function parseManifest(raw: unknown): Manifest {
   if (!isRecord(raw) || !Array.isArray(raw.categories)) {
     throw new Error("graph-data/manifest.json must contain categories[].");
@@ -45,10 +56,16 @@ function parseManifest(raw: unknown): Manifest {
   const categoryIds = new Set<string>();
   const categories = raw.categories.map((rawCategory, categoryIndex) => {
     if (!isRecord(rawCategory)) {
-      throw new Error(`manifest.categories[${categoryIndex}] must be an object.`);
+      throw new Error(
+        `manifest.categories[${categoryIndex}] must be an object.`
+      );
     }
-    const id = typeof rawCategory.id === "string" ? rawCategory.id.trim() : "";
-    const label = typeof rawCategory.label === "string" ? rawCategory.label.trim() : "";
+
+    const id =
+      typeof rawCategory.id === "string" ? rawCategory.id.trim() : "";
+    const label =
+      typeof rawCategory.label === "string" ? rawCategory.label.trim() : "";
+
     if (!id || !label || !Array.isArray(rawCategory.graphs)) {
       throw new Error(
         `manifest.categories[${categoryIndex}] requires non-empty id, label, and graphs[].`
@@ -66,16 +83,21 @@ function parseManifest(raw: unknown): Manifest {
           `manifest.categories[${categoryIndex}].graphs[${graphIndex}] must be an object.`
         );
       }
-      const graphId = typeof rawGraph.id === "string" ? rawGraph.id.trim() : "";
+
+      const graphId =
+        typeof rawGraph.id === "string" ? rawGraph.id.trim() : "";
       const graphLabel =
         typeof rawGraph.label === "string" ? rawGraph.label.trim() : "";
+
       if (!graphId || !graphLabel) {
         throw new Error(
           `manifest.categories[${categoryIndex}].graphs[${graphIndex}] requires id and label.`
         );
       }
       if (graphIds.has(graphId)) {
-        throw new Error(`manifest category '${id}' contains duplicate graph id '${graphId}'.`);
+        throw new Error(
+          `manifest category '${id}' contains duplicate graph id '${graphId}'.`
+        );
       }
       graphIds.add(graphId);
       return { id: graphId, label: graphLabel };
@@ -98,12 +120,15 @@ export function parseCategoryGraphDocument(
   }
 
   const document = raw as CategoryGraphDocument;
-  const schemaVersion = document.schemaVersion ?? CURRENT_GRAPH_SCHEMA_VERSION;
+  const schemaVersion =
+    document.schemaVersion ?? CURRENT_GRAPH_SCHEMA_VERSION;
+
   if (schemaVersion !== CURRENT_GRAPH_SCHEMA_VERSION) {
     throw new Error(
       `graph-data/${expectedCategoryId}/graph.json uses unsupported schemaVersion '${schemaVersion}'.`
     );
   }
+
   if (
     typeof document.categoryId === "string" &&
     document.categoryId.trim() !== "" &&
@@ -113,6 +138,7 @@ export function parseCategoryGraphDocument(
       `graph-data/${expectedCategoryId}/graph.json declares categoryId '${document.categoryId}'.`
     );
   }
+
   if (!Array.isArray(document.graphs)) {
     throw new Error(
       `graph-data/${expectedCategoryId}/graph.json must contain graphs[].`
@@ -121,9 +147,11 @@ export function parseCategoryGraphDocument(
 
   const graphIds = new Set<string>();
   return document.graphs.map((graph, index) => {
-    const graphId = typeof graph.graphId === "string" ? graph.graphId.trim() : "";
+    const graphId =
+      typeof graph.graphId === "string" ? graph.graphId.trim() : "";
     const graphLabel =
       typeof graph.graphLabel === "string" ? graph.graphLabel.trim() : "";
+
     if (!graphId) {
       throw new Error(
         `graph-data/${expectedCategoryId}/graph.json: graphs[${index}].graphId is required.`
@@ -144,6 +172,7 @@ export function parseCategoryGraphDocument(
         `graph-data/${expectedCategoryId}/graph.json contains duplicate graphId '${graphId}'.`
       );
     }
+
     graphIds.add(graphId);
     return { graphId, graphLabel, nodes: graph.nodes };
   });
@@ -154,15 +183,21 @@ export class HttpGraphSource implements GraphSource {
   private readonly fetchImpl: typeof fetch;
   private readonly cacheEnabled: boolean;
   private manifestPromise?: Promise<Manifest>;
-  private readonly categoryPromises = new Map<string, Promise<CategoryGraphEntry[]>>();
+  private readonly categoryPromises = new Map<
+    string,
+    Promise<CategoryGraphEntry[]>
+  >();
 
   constructor(options: HttpGraphSourceOptions = {}) {
-    this.baseUrl = ensureTrailingSlash(options.baseUrl ?? "graph-data/");
-    this.fetchImpl = options.fetchImpl ?? globalThis.fetch;
-    this.cacheEnabled = options.cache ?? true;
-    if (!this.fetchImpl) {
+    const fetchImpl = options.fetchImpl ?? createDefaultFetch();
+
+    if (!fetchImpl) {
       throw new Error("HttpGraphSource requires a fetch implementation.");
     }
+
+    this.baseUrl = ensureTrailingSlash(options.baseUrl ?? "graph-data/");
+    this.fetchImpl = fetchImpl;
+    this.cacheEnabled = options.cache ?? true;
   }
 
   clearCache(): void {
@@ -174,7 +209,9 @@ export class HttpGraphSource implements GraphSource {
     if (!this.cacheEnabled || signal) {
       return this.fetchJson("manifest.json", signal).then(parseManifest);
     }
-    this.manifestPromise ??= this.fetchJson("manifest.json").then(parseManifest);
+
+    this.manifestPromise ??=
+      this.fetchJson("manifest.json").then(parseManifest);
     return this.manifestPromise;
   }
 
@@ -183,29 +220,38 @@ export class HttpGraphSource implements GraphSource {
     signal?: AbortSignal
   ): Promise<CategoryGraphEntry[]> {
     const load = () =>
-      this.fetchJson(`${encodeURIComponent(categoryId)}/graph.json`, signal).then((raw) =>
-        parseCategoryGraphDocument(raw, categoryId)
-      );
+      this.fetchJson(
+        `${encodeURIComponent(categoryId)}/graph.json`,
+        signal
+      ).then((raw) => parseCategoryGraphDocument(raw, categoryId));
 
     if (!this.cacheEnabled || signal) return load();
+
     const cached = this.categoryPromises.get(categoryId);
     if (cached) return cached;
+
     const promise = load().catch((error) => {
       this.categoryPromises.delete(categoryId);
       throw error;
     });
+
     this.categoryPromises.set(categoryId, promise);
     return promise;
   }
 
-  private async fetchJson(path: string, signal?: AbortSignal): Promise<unknown> {
+  private async fetchJson(
+    path: string,
+    signal?: AbortSignal
+  ): Promise<unknown> {
     const response = await this.fetchImpl(this.resolveUrl(path), {
       cache: "no-store",
       signal,
     });
+
     if (!response.ok) {
       throw new Error(`Failed to load ${path} (${response.status}).`);
     }
+
     try {
       return await response.json();
     } catch {
@@ -216,9 +262,11 @@ export class HttpGraphSource implements GraphSource {
   private resolveUrl(path: string): string {
     const relative = `${this.baseUrl}${path}`;
     if (/^[a-z][a-z\d+.-]*:/i.test(relative)) return relative;
+
     if (typeof document !== "undefined") {
       return new URL(relative, document.baseURI).toString();
     }
+
     return relative;
   }
 }
@@ -235,7 +283,9 @@ export class MemoryGraphSource implements GraphSource {
 
   async loadCategory(categoryId: string): Promise<CategoryGraphEntry[]> {
     const graphs = this.categoryGraphs[categoryId];
-    if (!graphs) throw new Error(`Category '${categoryId}' not found.`);
+    if (!graphs) {
+      throw new Error(`Category '${categoryId}' not found.`);
+    }
     return graphs;
   }
 }

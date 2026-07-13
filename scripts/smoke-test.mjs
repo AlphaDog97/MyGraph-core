@@ -105,6 +105,30 @@ const categoryDocument = {
     },
   ],
 };
+
+const originalFetch = globalThis.fetch;
+let defaultFetchReceiver;
+globalThis.fetch = function () {
+  defaultFetchReceiver = this;
+  return Promise.resolve(
+    new Response(JSON.stringify(manifest), { status: 200 })
+  );
+};
+try {
+  const defaultSource = new HttpGraphSource({
+    baseUrl: "https://example.test/graph-data/",
+    cache: false,
+  });
+  await defaultSource.loadManifest();
+  assert.equal(
+    defaultFetchReceiver,
+    globalThis,
+    "default browser fetch must keep the global receiver"
+  );
+} finally {
+  globalThis.fetch = originalFetch;
+}
+
 const source = new HttpGraphSource({
   baseUrl: "https://example.test/graph-data/",
   fetchImpl: async (input) => {
