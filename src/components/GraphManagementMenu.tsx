@@ -1,8 +1,8 @@
-import { EllipsisOutlined } from "@ant-design/icons";
+import { MoreOutlined } from "@ant-design/icons";
 import { Button, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 import type { SizeType } from "antd/es/config-provider/SizeContext";
-import { Manifest } from "../domain/types";
+import type { Manifest } from "../domain/types";
 
 interface Props {
   manifest: Manifest;
@@ -21,7 +21,9 @@ export default function GraphManagementMenu({
   onDelete,
   size = "middle",
 }: Props) {
-  const otherCategories = manifest.categories.filter((c) => c.id !== categoryId);
+  const otherCategories = manifest.categories.filter(
+    (category) => category.id !== categoryId
+  );
 
   const items: MenuProps["items"] = [
     ...otherCategories.map((category) => ({
@@ -32,15 +34,21 @@ export default function GraphManagementMenu({
     ...(otherCategories.length > 0 ? [{ type: "divider" as const }] : []),
     {
       key: "delete",
-      label: `Delete graph "${graphId}"`,
+      label: `Delete graph “${graphId}”`,
       danger: true,
       onClick: onDelete,
     },
   ];
 
   return (
-    <Dropdown menu={{ items }} trigger={["click"]}>
-      <Button size={size} icon={<EllipsisOutlined />} aria-label="Graph actions" />
+    <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
+      <Button
+        size={size}
+        icon={<MoreOutlined />}
+        aria-label="Graph actions"
+        title="Graph actions"
+        className="toolbar-icon-button"
+      />
     </Dropdown>
   );
 }

@@ -1,6 +1,7 @@
 import { CSSProperties } from "react";
+import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Card, List, Space, Typography } from "antd";
-import { TagColorAssignment } from "../domain/types";
+import type { TagColorAssignment } from "../domain/types";
 
 interface Props {
   tags: string[];
@@ -25,13 +26,18 @@ export default function TagLegend({ tags, tagColors, collapsed, onToggle }: Prop
           aria-expanded={!collapsed}
           onClick={onToggle}
         >
-          Tags
+          <span className="legend-card__title-wrap">
+            <span>Tags</span>
+            <span className="legend-card__count">{tags.length}</span>
+          </span>
+          {collapsed ? <RightOutlined /> : <DownOutlined />}
         </button>
       }
     >
       {!collapsed && (
         <List
           size="small"
+          className="legend-card__list"
           dataSource={tags}
           renderItem={(tag) => {
             const color = tagColors[tag] ?? DEFAULT_SWATCH;
@@ -42,7 +48,9 @@ export default function TagLegend({ tags, tagColors, collapsed, onToggle }: Prop
                     className="legend-card__swatch"
                     style={{ "--legend-swatch-color": color } as CSSProperties}
                   />
-                  <Typography.Text className="legend-card__label">{tag}</Typography.Text>
+                  <Typography.Text className="legend-card__label">
+                    {tag}
+                  </Typography.Text>
                 </Space>
               </List.Item>
             );

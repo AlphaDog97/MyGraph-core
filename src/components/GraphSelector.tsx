@@ -1,6 +1,11 @@
-import { ManifestCategory, ManifestGraph } from "../domain/types";
-import { Select, Space, Typography } from "antd";
+import {
+  ApartmentOutlined,
+  AppstoreOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
+import { Select } from "antd";
 import type { SizeType } from "antd/es/config-provider/SizeContext";
+import type { ManifestCategory, ManifestGraph } from "../domain/types";
 
 interface Props {
   categories: ManifestCategory[];
@@ -24,30 +29,45 @@ export default function GraphSelector({
   showGraphSelect = true,
 }: Props) {
   return (
-    <Space size={8} className="graph-selector" align="center">
-      <Select
-        size={size}
-        value={categoryId}
-        onChange={onCategoryChange}
-        aria-label="Select category"
-        className="graph-selector-item"
-        options={categories.map((category) => ({ value: category.id, label: category.label }))}
-      />
+    <div className="graph-selector" aria-label="Graph location">
+      <div className="graph-selector__segment">
+        <AppstoreOutlined className="graph-selector__icon" />
+        <Select
+          size={size}
+          value={categoryId}
+          onChange={onCategoryChange}
+          aria-label="Select category"
+          variant="borderless"
+          popupMatchSelectWidth={false}
+          className="graph-selector-item graph-selector-item--category"
+          options={categories.map((category) => ({
+            value: category.id,
+            label: category.label,
+          }))}
+        />
+      </div>
 
       {showGraphSelect && (
         <>
-          <Typography.Text type="secondary">/</Typography.Text>
-
-          <Select
-            size={size}
-            value={graphId}
-            onChange={onGraphChange}
-            aria-label="Select graph"
-            className="graph-selector-item"
-            options={graphs.map((graph) => ({ value: graph.id, label: graph.label }))}
-          />
+          <RightOutlined className="graph-selector__divider" />
+          <div className="graph-selector__segment">
+            <ApartmentOutlined className="graph-selector__icon" />
+            <Select
+              size={size}
+              value={graphId}
+              onChange={onGraphChange}
+              aria-label="Select graph"
+              variant="borderless"
+              popupMatchSelectWidth={false}
+              className="graph-selector-item graph-selector-item--graph"
+              options={graphs.map((graph) => ({
+                value: graph.id,
+                label: graph.label,
+              }))}
+            />
+          </div>
         </>
       )}
-    </Space>
+    </div>
   );
 }
