@@ -1,4 +1,5 @@
 import {
+  GraphNodeProvenance,
   Manifest,
   KnowledgeNode,
   KnowledgeEdge,
@@ -6,20 +7,21 @@ import {
   KnowledgeNodeFile,
   TagColorAssignment,
 } from "../domain/types";
+import {
+  diagnoseGraphNodes,
+  formatGraphDiagnostic,
+  GraphDiagnostic,
+} from "../domain/diagnostics";
 import { resolveEdgeTypeColor } from "../domain/edgeTypes";
+import {
+  CategoryGraphEntry,
+  defaultGraphSource,
+  GraphSource,
+} from "./graphSource";
 
-const BASE = import.meta.env.BASE_URL;
+export type { CategoryGraphEntry, GraphSource } from "./graphSource";
 
-interface MultiGraphCategoryFile {
-  categoryId?: string;
-  graphs?: Array<{
-    graphId?: string;
-    graphLabel?: string;
-    nodes?: KnowledgeNodeFile[];
-  }>;
-}
-
-interface GraphNodeSource {
+export interface GraphNodeSource {
   categoryId: string;
   graphId: string;
   graphLabel: string;
@@ -31,10 +33,67 @@ export interface ParsedInlineSource {
   categoryGraphs: Record<string, CategoryGraphEntry[]>;
 }
 
-export interface CategoryGraphEntry {
-  graphId: string;
-  graphLabel: string;
-  nodes: KnowledgeNodeFile[];
+interface AggregateNodeDraft {
+  raw: KnowledgeNodeFile;
+  localId: string;
+  provenance: GraphNodeProvenance[];
+}
+
+function diagnosticsToWarnings(diagnostics: GraphDiagnostic[]): string[] {
+  return diagnostics
+    .filter((diagnostic) => diagnostic.severity !== "info")
+    .map(formatGraphDiagnostic);
+}
+
+function buildEdges(nodes: KnowledgeNode[]): KnowledgeEdge[] {
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const edgeMap = new Map<string, KnowledgeEdge>();
+
+  for (const node of nodes) {
+    for (const link of node.links) {
+      if (!nodeIds.has(link.target)) continue;
+      const id = `${node.id}--${link.type}--${link.target}`;
+      if (edgeMap.has(id)) continue;
+      edgeMap.set(id, {
+        id,
+        source: node.id,
+        target: link.target,
+        type: link.type,
+        label: link.label ?? link.type,
+      });
+    }
+  }
+
+  return [...edgeMap.values()];
+}
+
+function collectTags(nodes: KnowledgeNode[]): string[] {
+  return [...new Set(nodes.flatMap((node) => node.tags))].sort();
+}
+
+function createProvenance(
+  categoryId: string,
+  graphId: string,
+  graphLabel: string,
+  localNodeId: string
+): GraphNodeProvenance {
+  return { categoryId, graphId, graphLabel, localNodeId };
+}
+
+function encodeIdentityPart(value: string): string {
+  return encodeURIComponent(value.trim());
+}
+
+export function createScopedNodeId(
+  categoryId: string,
+  graphId: string,
+  localNodeId: string
+): string {
+  return [categoryId, graphId, localNodeId].map(encodeIdentityPart).join("::");
+}
+
+function createGlobalConceptNodeId(globalConceptId: string): string {
+  return `concept::${encodeIdentityPart(globalConceptId)}`;
 }
 
 export function parseInlineGraphJson(text: string): ParsedInlineSource {
@@ -69,21 +128,30 @@ export function parseInlineGraphJson(text: string): ParsedInlineSource {
     throw new Error("nodes must be an array");
   }
 
-  const payload = parsed as MultiGraphCategoryFile;
+  const payload = parsed as {
+    categoryId?: string;
+    graphs?: Array<{
+      graphId?: string;
+      graphLabel?: string;
+      nodes?: KnowledgeNodeFile[];
+    }>;
+  };
   if (!Array.isArray(payload.graphs)) {
     throw new Error("nodes must be an array");
   }
 
   const categoryId = payload.categoryId?.trim() || "inline";
+  const seenGraphIds = new Set<string>();
   const categoryEntries = payload.graphs.map((graph, index) => {
-    if (typeof graph.graphId !== "string" || graph.graphId.trim() === "") {
-      throw new Error(`graphs[${index}].graphId is required`);
+    const graphId = graph.graphId?.trim() ?? "";
+    if (!graphId) throw new Error(`graphs[${index}].graphId is required`);
+    if (seenGraphIds.has(graphId)) {
+      throw new Error(`graphs[${index}].graphId '${graphId}' is duplicated`);
     }
-    if (!Array.isArray(graph.nodes)) {
-      throw new Error("nodes must be an array");
-    }
+    if (!Array.isArray(graph.nodes)) throw new Error("nodes must be an array");
+    seenGraphIds.add(graphId);
     return {
-      graphId: graph.graphId,
+      graphId,
       graphLabel: graph.graphLabel?.trim() || "Inline",
       nodes: graph.nodes,
     };
@@ -102,152 +170,66 @@ export function parseInlineGraphJson(text: string): ParsedInlineSource {
         },
       ],
     },
-    categoryGraphs: {
-      [categoryId]: categoryEntries,
-    },
+    categoryGraphs: { [categoryId]: categoryEntries },
   };
 }
 
-async function fetchGraphDataJson(url: string): Promise<Response> {
-  return fetch(url, { cache: "no-store" });
-}
-
-async function loadCategoryGraphFile(
-  categoryId: string
-): Promise<MultiGraphCategoryFile> {
-  const categoryUrl = `${BASE}graph-data/${categoryId}/graph.json`;
-  const categoryRes = await fetchGraphDataJson(categoryUrl);
-  if (!categoryRes.ok) {
-    throw new Error(
-      `Failed to load graph-data/${categoryId}/graph.json (${categoryRes.status}).`
-    );
-  }
-
-  try {
-    return (await categoryRes.json()) as MultiGraphCategoryFile;
-  } catch {
-    throw new Error(`graph-data/${categoryId}/graph.json: invalid JSON.`);
-  }
-}
-
 export async function loadCategoryGraphs(
-  categoryId: string
+  categoryId: string,
+  source: GraphSource = defaultGraphSource,
+  signal?: AbortSignal
 ): Promise<CategoryGraphEntry[]> {
-  const parsed = await loadCategoryGraphFile(categoryId);
-  if (!Array.isArray(parsed.graphs)) {
-    throw new Error(
-      `graph-data/${categoryId}/graph.json must be a JSON object with graphs[].`
-    );
-  }
-
-  return parsed.graphs.map((graph, index) => {
-    if (typeof graph.graphId !== "string" || graph.graphId.trim() === "") {
-      throw new Error(
-        `graph-data/${categoryId}/graph.json: graphs[${index}].graphId is required.`
-      );
-    }
-    if (
-      typeof graph.graphLabel !== "string" ||
-      graph.graphLabel.trim() === ""
-    ) {
-      throw new Error(
-        `graph-data/${categoryId}/graph.json: graphs[${index}].graphLabel is required.`
-      );
-    }
-    if (!Array.isArray(graph.nodes)) {
-      throw new Error(
-        `graph-data/${categoryId}/graph.json: graphs[${index}].nodes must be an array.`
-      );
-    }
-    return {
-      graphId: graph.graphId,
-      graphLabel: graph.graphLabel,
-      nodes: graph.nodes,
-    };
-  });
+  return source.loadCategory(categoryId, signal);
 }
 
-export async function loadManifest(): Promise<Manifest> {
-  const res = await fetchGraphDataJson(`${BASE}graph-data/manifest.json`);
-  if (!res.ok) {
-    throw new Error(
-      `Failed to load manifest (${res.status}). ` +
-        `Make sure graph-data/manifest.json exists.`
-    );
-  }
-  return res.json();
+export async function loadManifest(
+  source: GraphSource = defaultGraphSource,
+  signal?: AbortSignal
+): Promise<Manifest> {
+  return source.loadManifest(signal);
 }
 
 export function buildGraphFromRaw(
   rawArray: unknown,
   categoryId: string,
-  graphId: string
+  graphId: string,
+  graphLabel = graphId
 ): KnowledgeGraph {
-  if (!Array.isArray(rawArray)) {
+  const { validNodes, diagnostics } = diagnoseGraphNodes(rawArray, {
+    categoryId,
+    graphId,
+  });
+
+  if (validNodes.length === 0 && diagnostics.some((item) => item.severity === "error")) {
     throw new Error(
-      `${categoryId}/${graphId}/graph.json must be a JSON array of nodes.`
+      "No valid nodes loaded.\n" + diagnosticsToWarnings(diagnostics).join("\n")
     );
   }
 
-  const warnings: string[] = [];
-  const nodes: KnowledgeNode[] = [];
-  const seenIds = new Set<string>();
-
-  for (let i = 0; i < rawArray.length; i++) {
-    const result = KnowledgeNode.validate(rawArray[i]);
-    if (!result.ok) {
-      warnings.push(`Node [${i}]: ${result.error}`);
-      continue;
-    }
-    if (seenIds.has(result.value.id)) {
-      warnings.push(`Node [${i}]: duplicate id '${result.value.id}'.`);
-      continue;
-    }
-    seenIds.add(result.value.id);
-    nodes.push(new KnowledgeNode(result.value));
-  }
-
-  if (nodes.length === 0 && warnings.length > 0) {
-    throw new Error("No valid nodes loaded.\n" + warnings.join("\n"));
-  }
-
-  const edges: KnowledgeEdge[] = [];
-  for (const node of nodes) {
-    for (const link of node.links) {
-      if (!seenIds.has(link.target)) {
-        warnings.push(
-          `Node '${node.id}': link target '${link.target}' does not exist.`
-        );
-        continue;
-      }
-      edges.push({
-        id: `${node.id}--${link.type}--${link.target}`,
-        source: node.id,
-        target: link.target,
-        type: link.type,
-        label: link.label ?? link.type,
-      });
-    }
-  }
-
-  const tagSet = new Set<string>();
-  for (const node of nodes) {
-    for (const tag of node.tags) tagSet.add(tag);
-  }
+  const nodes = validNodes.map(
+    (node) =>
+      new KnowledgeNode(node, {
+        localId: node.id,
+        provenance: [createProvenance(categoryId, graphId, graphLabel, node.id)],
+      })
+  );
 
   return {
     nodes,
-    edges,
-    tags: [...tagSet].sort(),
-    warnings,
+    edges: buildEdges(nodes),
+    tags: collectTags(nodes),
+    warnings: diagnosticsToWarnings(diagnostics),
+    diagnostics,
   };
 }
 
 export async function loadLocalGraphNodes(
   categoryId: string,
-  graphId: string
+  graphId: string,
+  source: GraphSource = defaultGraphSource,
+  signal?: AbortSignal
 ): Promise<KnowledgeNodeFile[]> {
-  const graphs = await loadCategoryGraphs(categoryId);
+  const graphs = await loadCategoryGraphs(categoryId, source, signal);
   const matched = graphs.find((graph) => graph.graphId === graphId);
   if (!matched) {
     throw new Error(
@@ -259,137 +241,184 @@ export async function loadLocalGraphNodes(
 
 export async function loadGraphData(
   categoryId: string,
-  graphId: string
+  graphId: string,
+  source: GraphSource = defaultGraphSource,
+  signal?: AbortSignal
 ): Promise<KnowledgeGraph> {
-  const rawArray = await loadLocalGraphNodes(categoryId, graphId);
-  return buildGraphFromRaw(rawArray, categoryId, graphId);
+  const graphs = await loadCategoryGraphs(categoryId, source, signal);
+  const matched = graphs.find((graph) => graph.graphId === graphId);
+  if (!matched) {
+    throw new Error(
+      `graph-data/${categoryId}/graph.json: graphId '${graphId}' not found.`
+    );
+  }
+  return buildGraphFromRaw(matched.nodes, categoryId, graphId, matched.graphLabel);
 }
 
-function upsertMergedNode(
-  mergedNodes: Map<string, KnowledgeNodeFile>,
-  node: KnowledgeNodeFile,
-  source: Pick<GraphNodeSource, "categoryId" | "graphId" | "graphLabel">,
-  warnings: string[]
-) {
-  const existing = mergedNodes.get(node.id);
+function mergeAggregateNode(
+  drafts: Map<string, AggregateNodeDraft>,
+  aggregateId: string,
+  incoming: AggregateNodeDraft,
+  diagnostics: GraphDiagnostic[]
+): void {
+  const existing = drafts.get(aggregateId);
   if (!existing) {
-    mergedNodes.set(node.id, {
-      id: node.id,
-      label: node.label,
-      description: node.description,
-      tags: [...new Set(node.tags)],
-      links: node.links ? [...node.links] : undefined,
-    });
+    drafts.set(aggregateId, incoming);
     return;
   }
 
-  warnings.push(
-    `Node '${node.id}' duplicated in ${source.categoryId}/${source.graphId} (${source.graphLabel}); merged tags/links.`
-  );
-
-  if (existing.label !== node.label) {
-    warnings.push(
-      `Node '${node.id}' label conflict: keep '${existing.label}', ignore '${node.label}' from ${source.categoryId}/${source.graphId}.`
-    );
+  const source = incoming.provenance[0];
+  if (existing.raw.label !== incoming.raw.label) {
+    diagnostics.push({
+      severity: "warning",
+      code: "GLOBAL_CONCEPT_LABEL_CONFLICT",
+      path: `${source.categoryId}/${source.graphId}/node('${source.localNodeId}')`,
+      message: `globalConceptId '${incoming.raw.globalConceptId}' has conflicting labels; keeping '${existing.raw.label}'.`,
+    });
   }
 
-  const existingDescription = existing.description ?? "";
-  const incomingDescription = node.description ?? "";
-  if (
+  const existingDescription = existing.raw.description ?? "";
+  const incomingDescription = incoming.raw.description ?? "";
+  if (!existingDescription && incomingDescription) {
+    existing.raw.description = incomingDescription;
+  } else if (
     existingDescription &&
     incomingDescription &&
     existingDescription !== incomingDescription
   ) {
-    warnings.push(
-      `Node '${node.id}' description conflict in ${source.categoryId}/${source.graphId}; keep first non-empty description.`
-    );
-  } else if (!existingDescription && incomingDescription) {
-    existing.description = incomingDescription;
+    diagnostics.push({
+      severity: "warning",
+      code: "GLOBAL_CONCEPT_DESCRIPTION_CONFLICT",
+      path: `${source.categoryId}/${source.graphId}/node('${source.localNodeId}')`,
+      message: `globalConceptId '${incoming.raw.globalConceptId}' has conflicting descriptions; keeping the first non-empty value.`,
+    });
   }
 
-  existing.tags = [...new Set([...existing.tags, ...node.tags])];
-
-  const links = [...(existing.links ?? []), ...(node.links ?? [])];
-  const seenLinkIds = new Set<string>();
-  existing.links = links.filter((link) => {
+  existing.raw.tags = [...new Set([...existing.raw.tags, ...incoming.raw.tags])];
+  const linkMap = new Map<string, NonNullable<KnowledgeNodeFile["links"]>[number]>();
+  for (const link of [...(existing.raw.links ?? []), ...(incoming.raw.links ?? [])]) {
     const key = `${link.target}--${link.type}--${link.label ?? ""}`;
-    if (seenLinkIds.has(key)) {
-      return false;
+    if (!linkMap.has(key)) linkMap.set(key, link);
+  }
+  existing.raw.links = [...linkMap.values()];
+
+  const provenanceKeys = new Set(
+    existing.provenance.map(
+      (item) => `${item.categoryId}::${item.graphId}::${item.localNodeId}`
+    )
+  );
+  for (const item of incoming.provenance) {
+    const key = `${item.categoryId}::${item.graphId}::${item.localNodeId}`;
+    if (!provenanceKeys.has(key)) {
+      provenanceKeys.add(key);
+      existing.provenance.push(item);
     }
-    seenLinkIds.add(key);
-    return true;
-  });
+  }
 }
 
 export function aggregateGraphsToKnowledgeGraph(
   graphSources: GraphNodeSource[]
 ): KnowledgeGraph {
-  const warnings: string[] = [];
-  const mergedNodes = new Map<string, KnowledgeNodeFile>();
+  const diagnostics: GraphDiagnostic[] = [];
+  const drafts = new Map<string, AggregateNodeDraft>();
 
   for (const source of graphSources) {
-    source.nodes.forEach((rawNode, index) => {
-      const result = KnowledgeNode.validate(rawNode);
-      if (!result.ok) {
-        warnings.push(
-          `${source.categoryId}/${source.graphId} node[${index}]: ${result.error}`
-        );
-        return;
-      }
-      upsertMergedNode(mergedNodes, result.value, source, warnings);
+    const validation = diagnoseGraphNodes(source.nodes, {
+      categoryId: source.categoryId,
+      graphId: source.graphId,
     });
-  }
+    diagnostics.push(...validation.diagnostics);
 
-  const nodes = [...mergedNodes.values()].map((node) => new KnowledgeNode(node));
-  const nodeIds = new Set(nodes.map((node) => node.id));
-  const edgeMap = new Map<string, KnowledgeEdge>();
+    const localToAggregateId = new Map<string, string>();
+    for (const node of validation.validNodes) {
+      const aggregateId = node.globalConceptId
+        ? createGlobalConceptNodeId(node.globalConceptId)
+        : createScopedNodeId(source.categoryId, source.graphId, node.id);
+      localToAggregateId.set(node.id, aggregateId);
+    }
 
-  for (const node of nodes) {
-    for (const link of node.links) {
-      if (!nodeIds.has(link.target)) {
-        warnings.push(
-          `Node '${node.id}': link target '${link.target}' does not exist.`
-        );
-        continue;
-      }
-      const id = `${node.id}--${link.type}--${link.target}`;
-      if (!edgeMap.has(id)) {
-        edgeMap.set(id, {
-          id,
-          source: node.id,
-          target: link.target,
-          type: link.type,
-          label: link.label ?? link.type,
-        });
-      }
+    for (const node of validation.validNodes) {
+      const aggregateId = localToAggregateId.get(node.id);
+      if (!aggregateId) continue;
+      const rewrittenLinks = (node.links ?? [])
+        .map((link) => {
+          const target = localToAggregateId.get(link.target);
+          return target ? { ...link, target } : null;
+        })
+        .filter((link): link is NonNullable<typeof link> => link !== null);
+
+      mergeAggregateNode(
+        drafts,
+        aggregateId,
+        {
+          raw: {
+            ...node,
+            id: aggregateId,
+            links: rewrittenLinks,
+          },
+          localId: node.id,
+          provenance: [
+            createProvenance(
+              source.categoryId,
+              source.graphId,
+              source.graphLabel,
+              node.id
+            ),
+          ],
+        },
+        diagnostics
+      );
     }
   }
 
-  const tags = [...new Set(nodes.flatMap((node) => node.tags))].sort();
+  const nodes = [...drafts.values()].map(
+    (draft) =>
+      new KnowledgeNode(draft.raw, {
+        localId: draft.localId,
+        provenance: draft.provenance,
+      })
+  );
 
   return {
     nodes,
-    edges: [...edgeMap.values()],
-    tags,
-    warnings,
+    edges: buildEdges(nodes),
+    tags: collectTags(nodes),
+    warnings: diagnosticsToWarnings(diagnostics),
+    diagnostics,
   };
 }
 
 export async function loadAllGraphsAsKnowledgeGraph(
-  manifest: Manifest
+  manifest: Manifest,
+  source: GraphSource = defaultGraphSource,
+  signal?: AbortSignal
 ): Promise<KnowledgeGraph> {
+  const categoryResults = await Promise.all(
+    manifest.categories.map(async (category) => ({
+      category,
+      entries: await loadCategoryGraphs(category.id, source, signal),
+    }))
+  );
+
   const graphSources: GraphNodeSource[] = [];
-  for (const category of manifest.categories) {
+  for (const { category, entries } of categoryResults) {
+    const entryById = new Map(entries.map((entry) => [entry.graphId, entry]));
     for (const graph of category.graphs) {
-      const nodes = await loadLocalGraphNodes(category.id, graph.id);
+      const entry = entryById.get(graph.id);
+      if (!entry) {
+        throw new Error(
+          `Manifest graph '${category.id}/${graph.id}' was not found in its category document.`
+        );
+      }
       graphSources.push({
         categoryId: category.id,
         graphId: graph.id,
-        graphLabel: graph.label,
-        nodes,
+        graphLabel: entry.graphLabel || graph.label,
+        nodes: entry.nodes,
       });
     }
   }
+
   return aggregateGraphsToKnowledgeGraph(graphSources);
 }
 
@@ -397,15 +426,15 @@ export function toCytoscapeElements(
   graph: KnowledgeGraph,
   tagColors: TagColorAssignment
 ): cytoscape.ElementDefinition[] {
-  const nodeEls = graph.nodes.map((n) => n.toCytoscapeNode(tagColors));
-  const edgeEls: cytoscape.ElementDefinition[] = graph.edges.map((e) => ({
+  const nodeElements = graph.nodes.map((node) => node.toCytoscapeNode(tagColors));
+  const edgeElements: cytoscape.ElementDefinition[] = graph.edges.map((edge) => ({
     data: {
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      label: e.label,
-      edgeColor: resolveEdgeTypeColor(e.type),
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      label: edge.label,
+      edgeColor: resolveEdgeTypeColor(edge.type),
     },
   }));
-  return [...nodeEls, ...edgeEls];
+  return [...nodeElements, ...edgeElements];
 }

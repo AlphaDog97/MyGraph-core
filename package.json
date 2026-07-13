@@ -3,15 +3,22 @@
   "private": false,
   "version": "1.1.0",
   "type": "module",
-  "description": "Reusable core graph modeling and loading toolkit for MyGraph projects.",
+  "description": "Reusable core graph modeling, validation, loading, and visualization adapters for MyGraph projects.",
   "scripts": {
     "dev": "vite",
+    "typecheck": "tsc -b --pretty false",
     "build:app": "tsc -b && vite build",
     "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.lib.config.ts",
+    "test:smoke": "node scripts/smoke-test.mjs",
+    "test": "npm run build:lib && npm run test:smoke",
     "build": "npm run build:app && npm run build:lib",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm test"
   },
   "license": "MIT",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "dependencies": {
     "antd": "^5.27.6",
     "cytoscape": "^3.31.0",
@@ -50,12 +57,12 @@
     "typescript",
     "visualization"
   ],
-  "homepage": "https://github.com/mygraph/MyGraph-core#readme",
+  "homepage": "https://github.com/AlphaDog97/MyGraph-core#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mygraph/MyGraph-core.git"
+    "url": "git+https://github.com/AlphaDog97/MyGraph-core.git"
   },
   "bugs": {
-    "url": "https://github.com/mygraph/MyGraph-core/issues"
+    "url": "https://github.com/AlphaDog97/MyGraph-core/issues"
   }
 }

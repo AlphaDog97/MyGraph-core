@@ -1,24 +1,25 @@
 import { TagColorAssignment } from "../domain/types";
+import {
+  getBrowserStorage,
+  KeyValueStorage,
+  readStoredJson,
+  writeStoredJson,
+} from "./storage";
 
 const TAG_COLORS_KEY = "mygraph-tag-colors";
 const LAST_VIEWED_KEY = "mygraph-last-viewed";
 
-export function loadTagColors(): TagColorAssignment {
-  try {
-    const raw = localStorage.getItem(TAG_COLORS_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    /* ignore */
-  }
-  return {};
+export function loadTagColors(
+  storage: KeyValueStorage | null = getBrowserStorage()
+): TagColorAssignment {
+  return readStoredJson<TagColorAssignment>(TAG_COLORS_KEY, {}, storage);
 }
 
-export function saveTagColors(colors: TagColorAssignment): void {
-  try {
-    localStorage.setItem(TAG_COLORS_KEY, JSON.stringify(colors));
-  } catch {
-    /* ignore */
-  }
+export function saveTagColors(
+  colors: TagColorAssignment,
+  storage: KeyValueStorage | null = getBrowserStorage()
+): void {
+  writeStoredJson(TAG_COLORS_KEY, colors, storage);
 }
 
 export interface LastViewed {
@@ -26,20 +27,15 @@ export interface LastViewed {
   graphId: string;
 }
 
-export function loadLastViewed(): LastViewed | null {
-  try {
-    const raw = localStorage.getItem(LAST_VIEWED_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    /* ignore */
-  }
-  return null;
+export function loadLastViewed(
+  storage: KeyValueStorage | null = getBrowserStorage()
+): LastViewed | null {
+  return readStoredJson<LastViewed | null>(LAST_VIEWED_KEY, null, storage);
 }
 
-export function saveLastViewed(lv: LastViewed): void {
-  try {
-    localStorage.setItem(LAST_VIEWED_KEY, JSON.stringify(lv));
-  } catch {
-    /* ignore */
-  }
+export function saveLastViewed(
+  lastViewed: LastViewed,
+  storage: KeyValueStorage | null = getBrowserStorage()
+): void {
+  writeStoredJson(LAST_VIEWED_KEY, lastViewed, storage);
 }
