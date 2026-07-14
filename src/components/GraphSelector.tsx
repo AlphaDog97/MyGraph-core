@@ -56,14 +56,17 @@ export default function GraphSelector({
               size={size}
               value={graphId}
               onChange={onGraphChange}
-              aria-label="Select graph"
+              aria-label="Select graph to focus"
               variant="borderless"
               popupMatchSelectWidth={false}
               className="graph-selector-item graph-selector-item--graph"
-              options={graphs.map((graph) => ({
-                value: graph.id,
-                label: graph.label,
-              }))}
+              options={[
+                { value: "", label: "全部图谱" },
+                ...graphs.map((graph) => ({
+                  value: graph.id,
+                  label: graph.label,
+                })),
+              ]}
             />
           </div>
         </>
