@@ -5,12 +5,26 @@ const LAYOUT_DEPTH_X_STEP = 260;
 const BASE_VERTICAL_GAP = 88;
 const DEGREE_GAP_WEIGHT = 10;
 const TINY_ZOOM_THRESHOLD = 0.1;
+const GRAPH_GROUP_HORIZONTAL_GAP = 420;
+const GRAPH_GROUP_VERTICAL_GAP = 300;
 
 interface GraphMetrics {
   indegree: Map<string, number>;
   outdegree: Map<string, number>;
   parentsById: Map<string, string[]>;
   childrenById: Map<string, string[]>;
+}
+
+interface LayoutPlan {
+  depthById: Map<string, number>;
+  positions: Map<string, cytoscape.Position>;
+}
+
+interface GroupLayoutPlan extends LayoutPlan {
+  width: number;
+  height: number;
+  minX: number;
+  minY: number;
 }
 
 function buildGraphMetrics(graph: KnowledgeGraph): GraphMetrics {
@@ -147,6 +161,93 @@ function planNodePositions(
   return positions;
 }
 
+function createSingleGraphLayoutPlan(graph: KnowledgeGraph): LayoutPlan {
+  const roots = resolveLayoutRoots(graph);
+  const { depthById, maxDepth } = buildDepthMap(graph, roots);
+  const positions = planNodePositions(graph, depthById, maxDepth);
+  return { depthById, positions };
+}
+
+function resolveGraphGroupKey(node: KnowledgeGraph["nodes"][number]): string {
+  const source = node.provenance[0];
+  return source ? `${source.categoryId}::${source.graphId}` : "__ungrouped";
+}
+
+function createGraphGroups(graph: KnowledgeGraph): KnowledgeGraph[] {
+  const nodeIdsByGroup = new Map<string, Set<string>>();
+  for (const node of graph.nodes) {
+    const key = resolveGraphGroupKey(node);
+    const nodeIds = nodeIdsByGroup.get(key) ?? new Set<string>();
+    nodeIds.add(node.id);
+    nodeIdsByGroup.set(key, nodeIds);
+  }
+
+  return [...nodeIdsByGroup.values()].map((nodeIds) => ({
+    nodes: graph.nodes.filter((node) => nodeIds.has(node.id)),
+    edges: graph.edges.filter(
+      (edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target)
+    ),
+    tags: graph.tags,
+    warnings: [],
+  }));
+}
+
+function measureGroupLayout(graph: KnowledgeGraph): GroupLayoutPlan {
+  const plan = createSingleGraphLayoutPlan(graph);
+  const values = [...plan.positions.values()];
+  if (values.length === 0) {
+    return { ...plan, width: 0, height: 0, minX: 0, minY: 0 };
+  }
+
+  const xs = values.map((position) => position.x);
+  const ys = values.map((position) => position.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  return {
+    ...plan,
+    width: Math.max(LAYOUT_DEPTH_X_STEP, maxX - minX),
+    height: Math.max(BASE_VERTICAL_GAP * 2, maxY - minY),
+    minX,
+    minY,
+  };
+}
+
+function createGroupedLayoutPlan(graph: KnowledgeGraph): LayoutPlan {
+  const groups = createGraphGroups(graph);
+  if (groups.length <= 1) return createSingleGraphLayoutPlan(graph);
+
+  const plans = groups.map(measureGroupLayout);
+  const columns = Math.ceil(Math.sqrt(plans.length));
+  const rows = Math.ceil(plans.length / columns);
+  const cellWidth =
+    Math.max(...plans.map((plan) => plan.width)) + GRAPH_GROUP_HORIZONTAL_GAP;
+  const cellHeight =
+    Math.max(...plans.map((plan) => plan.height)) + GRAPH_GROUP_VERTICAL_GAP;
+  const totalWidth = (columns - 1) * cellWidth;
+  const totalHeight = (rows - 1) * cellHeight;
+  const depthById = new Map<string, number>();
+  const positions = new Map<string, cytoscape.Position>();
+
+  plans.forEach((plan, index) => {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    const offsetX = column * cellWidth - totalWidth / 2;
+    const offsetY = row * cellHeight - totalHeight / 2;
+
+    plan.depthById.forEach((depth, nodeId) => depthById.set(nodeId, depth));
+    plan.positions.forEach((position, nodeId) => {
+      positions.set(nodeId, {
+        x: position.x - plan.minX + offsetX,
+        y: position.y - plan.minY + offsetY,
+      });
+    });
+  });
+
+  return { depthById, positions };
+}
+
 function buildLayout(
   noMotion: boolean,
   positions: Map<string, cytoscape.Position>,
@@ -166,11 +267,8 @@ function buildLayout(
   } as cytoscape.LayoutOptions;
 }
 
-export function createGraphLayoutPlan(graph: KnowledgeGraph) {
-  const roots = resolveLayoutRoots(graph);
-  const { depthById, maxDepth } = buildDepthMap(graph, roots);
-  const positions = planNodePositions(graph, depthById, maxDepth);
-  return { depthById, positions };
+export function createGraphLayoutPlan(graph: KnowledgeGraph): LayoutPlan {
+  return createGroupedLayoutPlan(graph);
 }
 
 export function initialGraphLayout(
@@ -183,7 +281,8 @@ export function initialGraphLayout(
 export function runLayoutWithAdaptiveFit(
   cy: Core,
   noMotion: boolean,
-  positions: Map<string, cytoscape.Position>
+  positions: Map<string, cytoscape.Position>,
+  onComplete?: () => void
 ): void {
   const fitToAll = (padding: number) => {
     cy.fit(cy.elements(), padding);
@@ -193,9 +292,14 @@ export function runLayoutWithAdaptiveFit(
   cy.one("layoutstop", () => {
     fitToAll(40);
     if (cy.zoom() <= TINY_ZOOM_THRESHOLD) {
-      cy.one("layoutstop", () => fitToAll(24));
+      cy.one("layoutstop", () => {
+        fitToAll(24);
+        onComplete?.();
+      });
       cy.layout(buildLayout(noMotion, positions, true)).run();
+      return;
     }
+    onComplete?.();
   });
 }
 
