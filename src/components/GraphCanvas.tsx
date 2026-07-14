@@ -3,9 +3,10 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import type { MutableRefObject } from "react";
-import cytoscape, { type Core } from "cytoscape";
+import cytoscape, { type Core, type EventObject } from "cytoscape";
 import type { KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
 import {
@@ -15,6 +16,7 @@ import {
   runLayoutWithAdaptiveFit,
 } from "./graphCanvasLayout";
 import { buildGraphCanvasStyles, type GraphTheme } from "./graphCanvasStyles";
+import "./GraphCanvas.css";
 
 interface Props {
   graph: KnowledgeGraph;
@@ -26,8 +28,20 @@ interface Props {
   onNodeSelect: (node: KnowledgeNode | null) => void;
 }
 
+type TooltipPlacement = "above" | "below";
+
+interface NodeTooltipState {
+  description: string;
+  x: number;
+  y: number;
+  placement: TooltipPlacement;
+}
+
 const MIN_ZOOM = 0.1;
 const VIEW_PADDING = 64;
+const TOOLTIP_MAX_WIDTH = 360;
+const TOOLTIP_EDGE_GAP = 16;
+const TOOLTIP_TOP_THRESHOLD = 120;
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
@@ -64,6 +78,32 @@ function focusGraph(
   });
 }
 
+function createTooltipState(
+  container: HTMLDivElement,
+  description: string,
+  renderedPosition: cytoscape.Position
+): NodeTooltipState | null {
+  const text = description.trim();
+  if (!text) return null;
+
+  const availableWidth = Math.max(0, container.clientWidth - TOOLTIP_EDGE_GAP * 2);
+  const tooltipWidth = Math.min(TOOLTIP_MAX_WIDTH, availableWidth);
+  const horizontalInset = tooltipWidth / 2 + TOOLTIP_EDGE_GAP;
+  const maxX = Math.max(horizontalInset, container.clientWidth - horizontalInset);
+  const x = Math.min(Math.max(renderedPosition.x, horizontalInset), maxX);
+  const y = Math.min(
+    Math.max(renderedPosition.y, TOOLTIP_EDGE_GAP),
+    Math.max(TOOLTIP_EDGE_GAP, container.clientHeight - TOOLTIP_EDGE_GAP)
+  );
+
+  return {
+    description: text,
+    x,
+    y,
+    placement: y < TOOLTIP_TOP_THRESHOLD ? "below" : "above",
+  };
+}
+
 export default function GraphCanvas({
   graph,
   focusedGraphId,
@@ -78,6 +118,7 @@ export default function GraphCanvas({
   const tagColorsRef = useRef(tagColors);
   const themeRef = useRef(theme);
   const focusedGraphIdRef = useRef(focusedGraphId);
+  const [nodeTooltip, setNodeTooltip] = useState<NodeTooltipState | null>(null);
   tagColorsRef.current = tagColors;
   themeRef.current = theme;
   focusedGraphIdRef.current = focusedGraphId;
@@ -88,15 +129,17 @@ export default function GraphCanvas({
   );
 
   const initCy = useCallback(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
     revealTimerRef.current.forEach((timer) => window.clearTimeout(timer));
     revealTimerRef.current = [];
+    setNodeTooltip(null);
     cyRef.current?.destroy();
 
     const noMotion = prefersReducedMotion();
     const { depthById, positions } = createGraphLayoutPlan(graph);
     const cy = cytoscape({
-      container: containerRef.current,
+      container,
       elements: toCytoscapeElements(graph, tagColorsRef.current),
       style: buildGraphCanvasStyles(noMotion, themeRef.current),
       layout: initialGraphLayout(noMotion, positions),
@@ -113,6 +156,23 @@ export default function GraphCanvas({
       depthById,
       noMotion
     );
+
+    const updateNodeTooltip = (event: EventObject) => {
+      const hoveredNode = nodeById.get(event.target.id());
+      if (!hoveredNode) {
+        setNodeTooltip(null);
+        return;
+      }
+      setNodeTooltip(
+        createTooltipState(container, hoveredNode.description, event.renderedPosition)
+      );
+    };
+    const hideNodeTooltip = () => setNodeTooltip(null);
+
+    cy.on("mouseover", "node", updateNodeTooltip);
+    cy.on("mousemove", "node", updateNodeTooltip);
+    cy.on("mouseout", "node", hideNodeTooltip);
+    cy.on("grab pan zoom", hideNodeTooltip);
 
     cy.on("tap", "node", (event) => {
       const selected = nodeById.get(event.target.id());
@@ -143,6 +203,7 @@ export default function GraphCanvas({
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
+    setNodeTooltip(null);
     focusGraph(cy, focusedGraphId, nodeById);
   }, [cyRef, focusedGraphId, nodeById]);
 
@@ -188,6 +249,7 @@ export default function GraphCanvas({
     });
 
     if (query) {
+      setNodeTooltip(null);
       const matched = cy.nodes(".highlighted");
       if (matched.length > 0) {
         cy.animate({
@@ -200,11 +262,28 @@ export default function GraphCanvas({
 
   useEffect(() => {
     const cy = cyRef.current;
-    if (!cy || !containerRef.current) return;
-    const resizeObserver = new ResizeObserver(() => cy.resize());
-    resizeObserver.observe(containerRef.current);
+    const container = containerRef.current;
+    if (!cy || !container) return;
+    const resizeObserver = new ResizeObserver(() => {
+      setNodeTooltip(null);
+      cy.resize();
+    });
+    resizeObserver.observe(container);
     return () => resizeObserver.disconnect();
   }, [cyRef]);
 
-  return <div ref={containerRef} className="graph-canvas-root" />;
+  return (
+    <div className="graph-canvas-root">
+      <div ref={containerRef} className="graph-canvas-surface" />
+      {nodeTooltip && (
+        <div
+          className={`graph-node-tooltip graph-node-tooltip--${nodeTooltip.placement}`}
+          style={{ left: nodeTooltip.x, top: nodeTooltip.y }}
+          role="tooltip"
+        >
+          {nodeTooltip.description}
+        </div>
+      )}
+    </div>
+  );
 }
