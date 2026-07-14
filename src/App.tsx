@@ -1,22 +1,24 @@
-import { CSSProperties, useState, useEffect, useRef, useCallback } from "react";
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { Core } from "cytoscape";
 import {
   Manifest,
+  KnowledgeGraph,
   KnowledgeNode,
   KnowledgeNodeFile,
-  KnowledgeGraph,
   TagColorAssignment,
 } from "./domain/types";
 import {
-  aggregateGraphsToKnowledgeGraph,
-  buildGraphFromRaw,
-  loadCategoryGraphs,
   loadAllGraphsAsKnowledgeGraph,
-  loadLocalGraphNodes,
   loadManifest,
   parseInlineGraphJson,
   ParsedInlineSource,
 } from "./data/loader";
+import {
+  buildInlineCategoryBundle,
+  buildInlineOverview,
+  loadLocalCategoryBundle,
+  type CategoryGraphBundle,
+} from "./data/categoryBundle";
 import {
   loadTagColors,
   saveTagColors,
@@ -34,15 +36,50 @@ import NodeDetailPanel from "./components/NodeDetailPanel";
 import ErrorDisplay from "./components/ErrorDisplay";
 import InlineGraphLoader from "./components/InlineGraphLoader";
 import Overview3DCanvas from "./components/Overview3DCanvas";
-import { Button, ConfigProvider, Dropdown, Flex, Grid, Layout, Spin, Switch, theme as antdTheme, Typography } from "antd";
-import { EllipsisOutlined, GithubOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import {
+  Button,
+  ConfigProvider,
+  Dropdown,
+  Flex,
+  Grid,
+  Layout,
+  Spin,
+  Switch,
+  theme as antdTheme,
+  Typography,
+} from "antd";
+import {
+  EllipsisOutlined,
+  GithubOutlined,
+  MoonOutlined,
+  SunOutlined,
+} from "@ant-design/icons";
 import type { MenuProps } from "antd";
 
-type GraphOption = { id: string; label: string };
+interface ReadyState {
+  status: "ready";
+  manifest: Manifest;
+  graphOptions: CategoryGraphBundle["graphOptions"];
+  categoryId: string;
+  graphId: string;
+  graph: KnowledgeGraph;
+  sourceGraphs: Record<string, KnowledgeGraph>;
+  overviewGraph: KnowledgeGraph;
+}
+
+type AppState =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | ReadyState;
+
 type Theme = "light" | "dark";
 type DataSourceMode = "local" | "inline";
 type LegendState = { tagsOpen: boolean; relationsOpen: boolean };
-type ViewMode = "single" | "overview3d";
+type ViewMode = "category" | "overview3d";
+type InlineLoadState =
+  | { status: "ready" }
+  | { status: "loading" }
+  | { status: "error"; message: string };
 
 const THEME_STORAGE_KEY = "mygraph-theme";
 const INLINE_JSON_STORAGE_KEY = "mygraph-inline-json";
@@ -65,80 +102,51 @@ const getInitialTheme = (): Theme => {
   return stored === "light" || stored === "dark" ? stored : getSystemTheme();
 };
 
-type AppState =
-  | { status: "loading" }
-  | { status: "error"; message: string }
-  | {
-      status: "ready";
-      manifest: Manifest;
-      graphOptions: GraphOption[];
-      categoryId: string;
-      graphId: string;
-      graph: KnowledgeGraph;
-      overviewGraph: KnowledgeGraph;
-    };
-
-type InlineLoadState =
-  | { status: "ready" }
-  | { status: "loading" }
-  | { status: "error"; message: string };
-
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function rebuildGraph(nodes: KnowledgeNode[]): KnowledgeGraph {
-  const seenIds = new Set(nodes.map((n) => n.id));
-  const warnings: string[] = [];
-  const edges = nodes.flatMap((n) =>
-    n.links
-      .filter((l) => {
-        if (!seenIds.has(l.target)) {
-          warnings.push(
-            `Node '${n.id}': link target '${l.target}' does not exist.`
-          );
-          return false;
-        }
-        return true;
-      })
-      .map((l) => ({
-        id: `${n.id}--${l.type}--${l.target}`,
-        source: n.id,
-        target: l.target,
-        type: l.type,
-        label: l.label ?? l.type,
-      }))
-  );
-  const tagSet = new Set<string>();
-  for (const n of nodes) for (const t of n.tags) tagSet.add(t);
-  return { nodes, edges, tags: [...tagSet].sort(), warnings };
+function downloadGraphJson(graph: KnowledgeGraph) {
+  const raw: KnowledgeNodeFile[] = graph.nodes.map((node) => {
+    const output: KnowledgeNodeFile = {
+      id: node.id,
+      label: node.label,
+      tags: node.tags,
+    };
+    if (node.description) output.description = node.description;
+    if (node.globalConceptId) output.globalConceptId = node.globalConceptId;
+    if (node.links.length > 0) {
+      output.links = node.links.map((link) => ({
+        target: link.target,
+        type: link.type,
+        ...(link.label ? { label: link.label } : {}),
+      }));
+    }
+    return output;
+  });
+
+  const blob = new Blob([`${JSON.stringify(raw, null, 2)}\n`], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "graph.json";
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
 }
 
-function downloadGraphJson(graph: KnowledgeGraph) {
-  const raw: KnowledgeNodeFile[] = graph.nodes.map((n) => {
-    const obj: KnowledgeNodeFile = { id: n.id, label: n.label, tags: n.tags };
-    if (n.description) obj.description = n.description;
-    if (n.links.length > 0)
-      obj.links = n.links.map((l) => {
-        const link: { target: string; type: string; label?: string } = {
-          target: l.target,
-          type: l.type,
-        };
-        if (l.label) link.label = l.label;
-        return link;
-      });
-    return obj;
-  });
-  const json = JSON.stringify(raw, null, 2) + "\n";
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "graph.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function resolveInitialFocus(
+  categoryId: string,
+  graphOptions: ReadyState["graphOptions"]
+): string {
+  const lastViewed = loadLastViewed();
+  if (!lastViewed || lastViewed.categoryId !== categoryId) return "";
+  return graphOptions.some((graph) => graph.id === lastViewed.graphId)
+    ? lastViewed.graphId
+    : "";
 }
 
 export default function App() {
@@ -152,9 +160,11 @@ export default function App() {
   const [inlineLoadState, setInlineLoadState] = useState<InlineLoadState>({
     status: "ready",
   });
-  const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("local");
-  const [viewMode, setViewMode] = useState<ViewMode>("single");
-  const [inlineSource, setInlineSource] = useState<ParsedInlineSource | null>(null);
+  const [dataSourceMode, setDataSourceMode] =
+    useState<DataSourceMode>("local");
+  const [viewMode, setViewMode] = useState<ViewMode>("category");
+  const [inlineSource, setInlineSource] =
+    useState<ParsedInlineSource | null>(null);
   const [isInlineDrawerOpen, setIsInlineDrawerOpen] = useState(false);
   const [inlineInitialText, setInlineInitialText] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -166,7 +176,9 @@ export default function App() {
     return stored === "light" || stored === "dark";
   });
   const [legendState, setLegendState] = useState<LegendState>(() => {
-    if (typeof window === "undefined") return { tagsOpen: true, relationsOpen: true };
+    if (typeof window === "undefined") {
+      return { tagsOpen: true, relationsOpen: true };
+    }
     try {
       const stored = window.localStorage.getItem(LEGEND_STATE_STORAGE_KEY);
       if (!stored) return { tagsOpen: true, relationsOpen: true };
@@ -181,47 +193,6 @@ export default function App() {
   });
   const cyRef = useRef<Core | null>(null);
   const overviewGraphRef = useRef<KnowledgeGraph | null>(null);
-
-  const resolveGraph = useCallback(
-    async (categoryId: string, graphId: string): Promise<KnowledgeGraph> => {
-      if (dataSourceMode === "inline") {
-        if (!inlineSource) {
-          throw new Error("Inline source is not available.");
-        }
-        const graphs = inlineSource.categoryGraphs[categoryId];
-        if (!graphs) {
-          throw new Error(`category '${categoryId}' not found.`);
-        }
-        const matched = graphs.find((graph) => graph.graphId === graphId);
-        if (!matched) {
-          throw new Error(`graphId '${graphId}' not found.`);
-        }
-        return buildGraphFromRaw(matched.nodes, categoryId, graphId);
-      }
-      const localNodes = await loadLocalGraphNodes(categoryId, graphId);
-      return buildGraphFromRaw(localNodes, categoryId, graphId);
-    },
-    [dataSourceMode, inlineSource]
-  );
-
-  const resolveGraphOptions = useCallback(
-    async (categoryId: string) => {
-      if (dataSourceMode === "inline") {
-        const graphs = inlineSource?.categoryGraphs[categoryId];
-        if (!graphs) return [];
-        return graphs.map((graph) => ({
-          id: graph.graphId,
-          label: graph.graphLabel,
-        }));
-      }
-      const graphs = await loadCategoryGraphs(categoryId);
-      return graphs.map((graph) => ({
-        id: graph.graphId,
-        label: graph.graphLabel,
-      }));
-    },
-    [dataSourceMode, inlineSource]
-  );
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -238,7 +209,10 @@ export default function App() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.localStorage.setItem(LEGEND_STATE_STORAGE_KEY, JSON.stringify(legendState));
+    window.localStorage.setItem(
+      LEGEND_STATE_STORAGE_KEY,
+      JSON.stringify(legendState)
+    );
   }, [legendState]);
 
   useEffect(() => {
@@ -252,133 +226,135 @@ export default function App() {
   }, [isThemeOverridden]);
 
   useEffect(() => {
-    if (dataSourceMode !== "local") {
-      return;
-    }
-    (async () => {
+    if (dataSourceMode !== "local") return;
+    let cancelled = false;
+
+    void (async () => {
       try {
         const manifest = await loadManifest();
         if (manifest.categories.length === 0) {
-          setState({
-            status: "error",
-            message: "No categories found in graph-data/.",
-          });
-          return;
+          throw new Error("No categories found in graph-data/.");
         }
 
         const lastViewed = loadLastViewed();
-        let catId = manifest.categories[0].id;
-        let graphOptions = await resolveGraphOptions(catId);
-        let gId = graphOptions[0]?.id;
-
-        if (lastViewed) {
-          const cat = manifest.categories.find(
-            (c) => c.id === lastViewed.categoryId
-          );
-          if (cat) {
-            catId = cat.id;
-            graphOptions = await resolveGraphOptions(catId);
-            const gr = graphOptions.find((g) => g.id === lastViewed.graphId);
-            gId = gr ? gr.id : graphOptions[0]?.id;
-          }
-        }
-
-        if (!gId) {
-          setState({
-            status: "error",
-            message: `Category '${catId}' has no graphs.`,
-          });
-          return;
-        }
-
-        const [graph, overviewGraph] = await Promise.all([
-          resolveGraph(catId, gId),
+        const categoryId =
+          manifest.categories.find(
+            (category) => category.id === lastViewed?.categoryId
+          )?.id ?? manifest.categories[0].id;
+        const [bundle, overviewGraph] = await Promise.all([
+          loadLocalCategoryBundle(manifest, categoryId),
           loadAllGraphsAsKnowledgeGraph(manifest),
         ]);
+        if (cancelled) return;
+
+        const graphId = resolveInitialFocus(categoryId, bundle.graphOptions);
         overviewGraphRef.current = overviewGraph;
-        saveLastViewed({ categoryId: catId, graphId: gId });
-        setDataSourceMode("local");
+        saveLastViewed({ categoryId, graphId });
         setState({
           status: "ready",
           manifest,
-          graphOptions,
-          categoryId: catId,
-          graphId: gId,
-          graph,
+          graphOptions: bundle.graphOptions,
+          categoryId,
+          graphId,
+          graph: bundle.graph,
+          sourceGraphs: bundle.sourceGraphs,
           overviewGraph,
         });
-      } catch (err) {
-        setState({
-          status: "error",
-          message: (err as Error).message,
-        });
+      } catch (error) {
+        if (cancelled) return;
+        setState({ status: "error", message: (error as Error).message });
       }
     })();
-  }, [dataSourceMode, resolveGraph, resolveGraphOptions]);
 
-  const switchGraph = useCallback(
-    async (manifest: Manifest, catId: string, gId: string) => {
-      setState((prev) => {
-        if (prev.status !== "ready") return prev;
-        return { ...prev, status: "loading" as const } as AppState;
-      });
-      try {
-        const graphOptions = await resolveGraphOptions(catId);
-        const selectedGraph =
-          graphOptions.find((graph) => graph.id === gId) ?? graphOptions[0];
-        if (!selectedGraph) {
-          throw new Error(`Category '${catId}' has no graphs.`);
+    return () => {
+      cancelled = true;
+    };
+  }, [dataSourceMode]);
+
+  const loadCategoryBundle = useCallback(
+    async (manifest: Manifest, categoryId: string) => {
+      if (dataSourceMode === "inline") {
+        if (!inlineSource) {
+          throw new Error("Inline source is not available.");
         }
-        const graph = await resolveGraph(catId, selectedGraph.id);
-        saveLastViewed({ categoryId: catId, graphId: selectedGraph.id });
+        return buildInlineCategoryBundle(inlineSource, categoryId);
+      }
+      return loadLocalCategoryBundle(manifest, categoryId);
+    },
+    [dataSourceMode, inlineSource]
+  );
+
+  const switchCategory = useCallback(
+    async (manifest: Manifest, categoryId: string, graphId = "") => {
+      setState({ status: "loading" });
+      try {
+        const bundle = await loadCategoryBundle(manifest, categoryId);
+        const focusedGraphId = bundle.graphOptions.some(
+          (graph) => graph.id === graphId
+        )
+          ? graphId
+          : "";
+        saveLastViewed({ categoryId, graphId: focusedGraphId });
         setSelectedNode(null);
         setSearchQuery("");
         setState({
           status: "ready",
           manifest,
-          graphOptions,
-          categoryId: catId,
-          graphId: selectedGraph.id,
-          graph,
-          overviewGraph: overviewGraphRef.current ?? graph,
+          graphOptions: bundle.graphOptions,
+          categoryId,
+          graphId: focusedGraphId,
+          graph: bundle.graph,
+          sourceGraphs: bundle.sourceGraphs,
+          overviewGraph: overviewGraphRef.current ?? bundle.graph,
         });
-      } catch (err) {
-        setState({
-          status: "error",
-          message: (err as Error).message,
-        });
+      } catch (error) {
+        setState({ status: "error", message: (error as Error).message });
       }
     },
-    [resolveGraph, resolveGraphOptions]
+    [loadCategoryBundle]
   );
 
   const handleCategoryChange = useCallback(
-    (newCatId: string) => {
+    (newCategoryId: string) => {
       if (state.status !== "ready") return;
-      const cat = state.manifest.categories.find((c) => c.id === newCatId);
-      if (!cat) return;
-      switchGraph(state.manifest, newCatId, "");
+      if (!state.manifest.categories.some((item) => item.id === newCategoryId)) {
+        return;
+      }
+      void switchCategory(state.manifest, newCategoryId);
     },
-    [state, switchGraph]
+    [state, switchCategory]
   );
 
   const handleGraphChange = useCallback(
     (newGraphId: string) => {
       if (state.status !== "ready") return;
-      switchGraph(state.manifest, state.categoryId, newGraphId);
+      if (newGraphId && !state.sourceGraphs[newGraphId]) return;
+
+      saveLastViewed({ categoryId: state.categoryId, graphId: newGraphId });
+      setSelectedNode(null);
+      setSearchQuery("");
+      setState({ ...state, graphId: newGraphId });
     },
-    [state, switchGraph]
+    [state]
   );
+
+  const handleResetView = useCallback(() => {
+    if (state.status === "ready" && state.graphId) {
+      saveLastViewed({ categoryId: state.categoryId, graphId: "" });
+      setState({ ...state, graphId: "" });
+    }
+    cyRef.current?.animate({
+      fit: { eles: cyRef.current.elements(), padding: 40 },
+      duration: prefersReducedMotion() ? 0 : 400,
+    });
+  }, [state]);
 
   const handleTagColorChange = useCallback(
     (tag: string, color: string | undefined) => {
-      setTagColors((prev) => {
-        const next = { ...prev };
-        if (color) {
-          next[tag] = color;
-        } else {
-          delete next[tag];
-        }
+      setTagColors((current) => {
+        const next = { ...current };
+        if (color) next[tag] = color;
+        else delete next[tag];
         saveTagColors(next);
         return next;
       });
@@ -386,109 +362,72 @@ export default function App() {
     []
   );
 
-  const handleResetView = useCallback(() => {
-    cyRef.current?.animate({
-      fit: { eles: cyRef.current.elements(), padding: 40 },
-      duration: prefersReducedMotion() ? 0 : 400,
-    });
-  }, []);
-
   const handleNodeSelect = useCallback((node: KnowledgeNode | null) => {
     setSelectedNode(node);
   }, []);
 
   const handleViewModeToggle = useCallback(() => {
-    setViewMode((currentMode) =>
-      currentMode === "single" ? "overview3d" : "single"
+    setViewMode((current) =>
+      current === "category" ? "overview3d" : "category"
     );
     setSelectedNode(null);
   }, []);
 
   const handleThemeToggle = useCallback(() => {
-    setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
+    setTheme((current) => (current === "light" ? "dark" : "light"));
     setIsThemeOverridden(true);
   }, []);
 
   const handleInlineGraphLoad = useCallback(
-    async (rawText: string) => {
+    (rawText: string) => {
       if (state.status !== "ready") return;
       setInlineLoadState({ status: "loading" });
       try {
         const parsed = parseInlineGraphJson(rawText);
         const firstCategory = parsed.manifestLike.categories[0];
-        const firstGraph = firstCategory?.graphs[0];
-        if (!firstCategory || !firstGraph) {
-          throw new Error("nodes must be an array");
-        }
-        const graphEntries = parsed.categoryGraphs[firstCategory.id];
-        const selected = graphEntries?.find((g) => g.graphId === firstGraph.id);
-        if (!selected) {
-          throw new Error(`graphId '${firstGraph.id}' not found.`);
-        }
-        const graph = buildGraphFromRaw(
-          selected.nodes,
-          firstCategory.id,
-          firstGraph.id
-        );
+        if (!firstCategory) throw new Error("nodes must be an array");
 
+        const bundle = buildInlineCategoryBundle(parsed, firstCategory.id);
+        const overviewGraph = buildInlineOverview(parsed);
         if (typeof window !== "undefined") {
           window.localStorage.setItem(INLINE_JSON_STORAGE_KEY, rawText);
         }
+
         setInlineInitialText(rawText);
         setInlineSource(parsed);
         setDataSourceMode("inline");
-        const overviewGraph = aggregateGraphsToKnowledgeGraph(
-          Object.entries(parsed.categoryGraphs).flatMap(([categoryId, graphs]) =>
-            graphs.map((entry) => ({
-              categoryId,
-              graphId: entry.graphId,
-              graphLabel: entry.graphLabel,
-              nodes: entry.nodes,
-            }))
-          )
-        );
         overviewGraphRef.current = overviewGraph;
+        saveLastViewed({ categoryId: firstCategory.id, graphId: "" });
         setState({
           status: "ready",
           manifest: parsed.manifestLike,
-          graphOptions: firstCategory.graphs,
+          graphOptions: bundle.graphOptions,
           categoryId: firstCategory.id,
-          graphId: firstGraph.id,
-          graph,
+          graphId: "",
+          graph: bundle.graph,
+          sourceGraphs: bundle.sourceGraphs,
           overviewGraph,
         });
         setSearchQuery("");
         setSelectedNode(null);
         setInlineLoadState({ status: "ready" });
       } catch (error) {
-        const message = (error as Error).message;
-        setInlineLoadState({ status: "error", message });
+        setInlineLoadState({
+          status: "error",
+          message: (error as Error).message,
+        });
       }
     },
-    [state]
-  );
-
-  const handleNodeSave = useCallback(
-    (updated: KnowledgeNodeFile) => {
-      if (state.status !== "ready") return;
-      const newNode = new KnowledgeNode(updated);
-      const newNodes = state.graph.nodes.map((n) =>
-        n.id === updated.id ? newNode : n
-      );
-      const newGraph = rebuildGraph(newNodes);
-
-      downloadGraphJson(newGraph);
-
-      setState({ ...state, graph: newGraph });
-      setSelectedNode(newNode);
-    },
-    [state]
+    [state.status]
   );
 
   const handleMoveGraph = useCallback(
     (targetCategoryId: string) => {
-      if (state.status !== "ready") return;
-      downloadGraphJson(state.graph);
+      if (state.status !== "ready" || !state.graphId) return;
+      const selectedGraph = state.sourceGraphs[state.graphId];
+      if (!selectedGraph) return;
+
+      downloadGraphJson(selectedGraph);
       alert(
         `graph.json has been downloaded.\n\n` +
           `To complete the move:\n` +
@@ -501,19 +440,20 @@ export default function App() {
   );
 
   const handleDeleteGraph = useCallback(() => {
-    if (state.status !== "ready") return;
+    if (state.status !== "ready" || !state.graphId) return;
     const { manifest, categoryId, graphId } = state;
+    const categories = manifest.categories
+      .map((category) =>
+        category.id === categoryId
+          ? {
+              ...category,
+              graphs: category.graphs.filter((graph) => graph.id !== graphId),
+            }
+          : category
+      )
+      .filter((category) => category.graphs.length > 0);
 
-    const newCategories = manifest.categories
-      .map((c) => {
-        if (c.id !== categoryId) return c;
-        return { ...c, graphs: c.graphs.filter((g) => g.id !== graphId) };
-      })
-      .filter((c) => c.graphs.length > 0);
-
-    const newManifest: Manifest = { categories: newCategories };
-
-    if (newCategories.length === 0) {
+    if (categories.length === 0) {
       setState({
         status: "error",
         message: "All graphs have been removed. Add data to graph-data/ and redeploy.",
@@ -526,18 +466,19 @@ export default function App() {
       return;
     }
 
-    const newCat = newCategories.find((c) => c.id === categoryId) ?? newCategories[0];
-    const newGraphId = newCat.graphs[0].id;
-
+    const newManifest: Manifest = { categories };
+    const nextCategory =
+      categories.find((category) => category.id === categoryId) ?? categories[0];
     alert(
       `Graph removed from view.\n\n` +
         `To permanently delete, remove it from:\n` +
         `graph-data/${categoryId}/graph.json\n` +
         `Then commit and redeploy.`
     );
+    void switchCategory(newManifest, nextCategory.id);
+  }, [state, switchCategory]);
 
-    switchGraph(newManifest, newCat.id, newGraphId);
-  }, [state, switchGraph]);
+  const handleNodeSave = useCallback(() => undefined, []);
 
   if (state.status === "loading") {
     return (
@@ -554,22 +495,31 @@ export default function App() {
     return <ErrorDisplay error={state.message} />;
   }
 
-  const { manifest, graphOptions, categoryId, graphId, graph, overviewGraph } = state;
+  const {
+    manifest,
+    graphOptions,
+    categoryId,
+    graphId,
+    graph,
+    sourceGraphs,
+    overviewGraph,
+  } = state;
   const categoryOptions = manifest.categories.map((category) => ({
     ...category,
     graphs: [],
   }));
   const toolbarControlSize = screens.md ? "middle" : "small";
   const isCompactToolbar = !screens.lg;
+  const hasSelectedGraph = Boolean(graphId && sourceGraphs[graphId]);
   const compactActionItems: MenuProps["items"] = [
     {
       key: "inline-json",
       label: "JSON加载",
-      onClick: () => setIsInlineDrawerOpen((prev) => !prev),
+      onClick: () => setIsInlineDrawerOpen((current) => !current),
     },
     {
       key: "fit-view",
-      label: "Fit view",
+      label: "显示全部图谱",
       onClick: handleResetView,
     },
     {
@@ -582,7 +532,10 @@ export default function App() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: theme === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        algorithm:
+          theme === "dark"
+            ? antdTheme.darkAlgorithm
+            : antdTheme.defaultAlgorithm,
         token: {
           colorPrimary: "#5a67d8",
           borderRadius: 8,
@@ -604,42 +557,54 @@ export default function App() {
               onCategoryChange={handleCategoryChange}
               onGraphChange={handleGraphChange}
               size={toolbarControlSize}
-              showGraphSelect={viewMode === "single"}
+              showGraphSelect={viewMode === "category"}
             />
           </Flex>
 
-          {viewMode === "single" && (
+          {viewMode === "category" && (
             <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
-              <SearchBar value={searchQuery} onChange={setSearchQuery} size={toolbarControlSize} />
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                size={toolbarControlSize}
+              />
             </Flex>
           )}
 
-          {viewMode === "single" && (
-            <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
-              <GraphManagementMenu
-                manifest={manifest}
-                categoryId={categoryId}
-                graphId={graphId}
-                onMove={handleMoveGraph}
-                onDelete={handleDeleteGraph}
-                size={toolbarControlSize}
-              />
+          {viewMode === "category" && (
+            <Flex
+              className="toolbar-group toolbar-group--graph-actions"
+              align="center"
+              gap={8}
+            >
+              {hasSelectedGraph && (
+                <GraphManagementMenu
+                  manifest={manifest}
+                  categoryId={categoryId}
+                  graphId={graphId}
+                  onMove={handleMoveGraph}
+                  onDelete={handleDeleteGraph}
+                  size={toolbarControlSize}
+                />
+              )}
               {isCompactToolbar ? (
                 <Dropdown menu={{ items: compactActionItems }} trigger={["click"]}>
-                  <Button size={toolbarControlSize} icon={<EllipsisOutlined />}>图操作</Button>
+                  <Button size={toolbarControlSize} icon={<EllipsisOutlined />}>
+                    图操作
+                  </Button>
                 </Dropdown>
               ) : (
                 <>
                   <Button
                     size={toolbarControlSize}
-                    onClick={() => setIsInlineDrawerOpen((prev) => !prev)}
+                    onClick={() => setIsInlineDrawerOpen((current) => !current)}
                     aria-expanded={isInlineDrawerOpen}
                     aria-controls="inline-loader-drawer"
                   >
                     JSON加载
                   </Button>
                   <Button size={toolbarControlSize} onClick={handleResetView}>
-                    Fit view
+                    显示全部
                   </Button>
                   <Button
                     size={toolbarControlSize}
@@ -655,7 +620,7 @@ export default function App() {
 
           <Flex className="toolbar-group toolbar-group--global" align="center" gap={8}>
             <Button size={toolbarControlSize} onClick={handleViewModeToggle}>
-              {viewMode === "single" ? "总览" : "返回单图"}
+              {viewMode === "category" ? "3D 总览" : "返回分类图"}
             </Button>
             <Switch
               size="small"
@@ -665,7 +630,6 @@ export default function App() {
               onChange={handleThemeToggle}
               title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
             />
-
             <Button
               size={toolbarControlSize}
               icon={<GithubOutlined />}
@@ -688,11 +652,13 @@ export default function App() {
             } as CSSProperties
           }
         >
-          {viewMode === "single" ? (
+          {viewMode === "category" ? (
             <>
               <div
                 id="inline-loader-drawer"
-                className={`inline-loader-drawer${isInlineDrawerOpen ? " is-open" : ""}`}
+                className={`inline-loader-drawer${
+                  isInlineDrawerOpen ? " is-open" : ""
+                }`}
                 aria-hidden={!isInlineDrawerOpen}
               >
                 <InlineGraphLoader
@@ -700,7 +666,9 @@ export default function App() {
                   initialText={inlineInitialText}
                   isLoading={inlineLoadState.status === "loading"}
                   errorMessage={
-                    inlineLoadState.status === "error" ? inlineLoadState.message : null
+                    inlineLoadState.status === "error"
+                      ? inlineLoadState.message
+                      : null
                   }
                 />
               </div>
@@ -708,6 +676,7 @@ export default function App() {
               <div className="graph-canvas-layer">
                 <GraphCanvas
                   graph={graph}
+                  focusedGraphId={graphId || null}
                   tagColors={tagColors}
                   searchQuery={searchQuery}
                   theme={theme}
@@ -715,28 +684,28 @@ export default function App() {
                   onNodeSelect={handleNodeSelect}
                 />
               </div>
-              <div
-                className="legend-container"
-              >
+              <div className="legend-container">
                 <TagLegend
                   tags={graph.tags}
                   tagColors={tagColors}
                   collapsed={!legendState.tagsOpen}
                   onToggle={() =>
-                    setLegendState((prev) => ({ ...prev, tagsOpen: !prev.tagsOpen }))
+                    setLegendState((current) => ({
+                      ...current,
+                      tagsOpen: !current.tagsOpen,
+                    }))
                   }
                 />
                 <EdgeTypeLegend
                   collapsed={!legendState.relationsOpen}
                   onToggle={() =>
-                    setLegendState((prev) => ({
-                      ...prev,
-                      relationsOpen: !prev.relationsOpen,
+                    setLegendState((current) => ({
+                      ...current,
+                      relationsOpen: !current.relationsOpen,
                     }))
                   }
                 />
               </div>
-
             </>
           ) : (
             <Overview3DCanvas
@@ -749,7 +718,7 @@ export default function App() {
           {selectedNode && (
             <NodeDetailPanel
               node={selectedNode}
-              allNodeIds={graph.nodes.map((n) => n.id)}
+              allNodeIds={graph.nodes.map((node) => node.id)}
               zIndex={OVERLAY_Z_INDEX.detailDrawer}
               onClose={() => {
                 setSelectedNode(null);
@@ -760,17 +729,17 @@ export default function App() {
           )}
         </Layout.Content>
 
-        {viewMode === "single" && graph.warnings.length > 0 && (
+        {viewMode === "category" && graph.warnings.length > 0 && (
           <div className="warnings-bar">
-            {graph.warnings.map((w, i) => (
-              <Typography.Text key={i} className="warning-item">
-                ⚠ {w}
+            {graph.warnings.map((warning, index) => (
+              <Typography.Text key={index} className="warning-item">
+                ⚠ {warning}
               </Typography.Text>
             ))}
           </div>
         )}
 
-        {viewMode === "single" && editorOpen && (
+        {viewMode === "category" && editorOpen && (
           <TagColorEditor
             tags={graph.tags}
             tagColors={tagColors}
