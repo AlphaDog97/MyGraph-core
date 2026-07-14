@@ -18,6 +18,7 @@ import { buildGraphCanvasStyles, type GraphTheme } from "./graphCanvasStyles";
 
 interface Props {
   graph: KnowledgeGraph;
+  focusedGraphId?: string | null;
   tagColors: TagColorAssignment;
   searchQuery: string;
   theme: GraphTheme;
@@ -26,13 +27,46 @@ interface Props {
 }
 
 const MIN_ZOOM = 0.1;
+const VIEW_PADDING = 64;
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+function focusGraph(
+  cy: Core,
+  graphId: string | null | undefined,
+  nodeById: Map<string, KnowledgeNode>,
+  animate = true
+): void {
+  const duration = animate && !prefersReducedMotion() ? 420 : 0;
+  if (!graphId) {
+    cy.animate({
+      fit: { eles: cy.elements(), padding: 40 },
+      duration,
+    });
+    return;
+  }
+
+  const matchedNodes = cy.nodes().filter((node) =>
+    nodeById
+      .get(node.id())
+      ?.provenance.some((source) => source.graphId === graphId) ?? false
+  );
+  if (matchedNodes.length === 0) return;
+
+  const internalEdges = matchedNodes.connectedEdges().filter((edge) =>
+    matchedNodes.contains(edge.source()) && matchedNodes.contains(edge.target())
+  );
+  cy.animate({
+    fit: { eles: matchedNodes.union(internalEdges), padding: VIEW_PADDING },
+    duration,
+  });
+}
+
 export default function GraphCanvas({
   graph,
+  focusedGraphId,
   tagColors,
   searchQuery,
   theme,
@@ -43,8 +77,10 @@ export default function GraphCanvas({
   const revealTimerRef = useRef<number[]>([]);
   const tagColorsRef = useRef(tagColors);
   const themeRef = useRef(theme);
+  const focusedGraphIdRef = useRef(focusedGraphId);
   tagColorsRef.current = tagColors;
   themeRef.current = theme;
+  focusedGraphIdRef.current = focusedGraphId;
 
   const nodeById = useMemo(
     () => new Map(graph.nodes.map((node) => [node.id, node])),
@@ -68,7 +104,9 @@ export default function GraphCanvas({
       maxZoom: 4,
     });
 
-    runLayoutWithAdaptiveFit(cy, noMotion, positions);
+    runLayoutWithAdaptiveFit(cy, noMotion, positions, () => {
+      focusGraph(cy, focusedGraphIdRef.current, nodeById, false);
+    });
     revealTimerRef.current = runDepthStaggerReveal(
       cy,
       graph,
@@ -101,6 +139,12 @@ export default function GraphCanvas({
       cyRef.current = null;
     };
   }, [initCy, cyRef]);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    focusGraph(cy, focusedGraphId, nodeById);
+  }, [cyRef, focusedGraphId, nodeById]);
 
   useEffect(() => {
     const cy = cyRef.current;
