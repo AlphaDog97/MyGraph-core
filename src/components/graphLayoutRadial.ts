@@ -5,6 +5,7 @@ import {
   createInitialBranchOrder,
   type BranchAssignment,
 } from "./graphLayoutBranches";
+import { ensureEdgeLabelClearance } from "./graphLayoutEdgeClearance";
 import {
   buildDepthMap,
   buildGraphMetrics,
@@ -19,6 +20,23 @@ export type { LayoutPlan } from "./graphLayoutModel";
 
 const MAX_ORDER_PASSES = 3;
 
+function createCandidatePositions(
+  graph: KnowledgeGraph,
+  roots: string[],
+  assignment: BranchAssignment,
+  order: string[],
+  metrics: GraphMetrics
+): Map<string, cytoscape.Position> {
+  const positions = createPositionsForOrder(
+    graph,
+    roots,
+    assignment,
+    order,
+    metrics
+  );
+  return ensureEdgeLabelClearance(graph, positions);
+}
+
 function optimizeBranchOrder(
   graph: KnowledgeGraph,
   roots: string[],
@@ -27,11 +45,17 @@ function optimizeBranchOrder(
   metrics: GraphMetrics
 ): Map<string, cytoscape.Position> {
   if (initialOrder.length <= 2) {
-    return createPositionsForOrder(graph, roots, assignment, initialOrder, metrics);
+    return createCandidatePositions(
+      graph,
+      roots,
+      assignment,
+      initialOrder,
+      metrics
+    );
   }
 
   let bestOrder = [...initialOrder];
-  let bestPositions = createPositionsForOrder(
+  let bestPositions = createCandidatePositions(
     graph,
     roots,
     assignment,
@@ -49,7 +73,7 @@ function optimizeBranchOrder(
         candidateOrder[nextIndex],
         candidateOrder[index],
       ];
-      const candidatePositions = createPositionsForOrder(
+      const candidatePositions = createCandidatePositions(
         graph,
         roots,
         assignment,
