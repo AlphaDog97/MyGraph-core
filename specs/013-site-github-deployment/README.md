@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: complete
 created: '2026-09-22'
 tags:
   - sites
@@ -12,7 +12,7 @@ created_at: '2026-09-22T02:46:52.303182108+00:00'
 
 # Sites App and GitHub Deployment
 
-> **Status**: in-progress · **Priority**: high · **Created**: 2026-09-22
+> **Status**: complete · **Priority**: high · **Created**: 2026-09-22
 
 ## Overview
 
@@ -46,7 +46,7 @@ package or Vite demo. Establish a repeatable deployment path so merges to
 - [x] Add the current Sites application under `site/`.
 - [x] Document local development, authentication, and repository layout.
 - [x] Verify the nested application production build.
-- [ ] Push the change on a dedicated GitHub branch and open a Pull Request.
+- [x] Push the change on a dedicated GitHub branch and open a Pull Request.
 - [x] Create the merged-PR deployment automation.
 
 ## Test
@@ -55,7 +55,7 @@ package or Vite demo. Establish a repeatable deployment path so merges to
 - [x] `pnpm build` in `site/` (all application, API, auth, and callback routes built successfully).
 - [x] `npm run typecheck && npm test` at repository root.
 - [x] `npx lean-spec validate` at repository root (all specs passed).
-- [ ] Confirm the GitHub branch and Pull Request contain no secrets or generated
+- [x] Confirm the GitHub branch and Pull Request contain no secrets or generated
   dependency/build directories.
 - [x] Confirm the deployment automation is enabled for merged Pull Requests and
   ignores merges whose base branch is not `main`.
