@@ -1,0 +1,188 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "as-no-tracking",
+  "graphLabel": "AsNoTracking",
+  "nodes": [
+    {
+      "id": "no-tracking",
+      "label": "AsNoTracking",
+      "description": "改变当前实体查询的跟踪行为，使查询结果不进入 DbContext 的 Change Tracker；它不会关闭整个上下文的跟踪器。",
+      "tags": [
+        "performance",
+        "readonly",
+        "query-behavior"
+      ],
+      "links": [
+        {
+          "target": "tracking-query",
+          "type": "Action",
+          "label": "替代默认跟踪模式"
+        },
+        {
+          "target": "entity-entry-overhead",
+          "type": "Condition",
+          "label": "跳过跟踪记录创建"
+        },
+        {
+          "target": "identity-map",
+          "type": "Condition",
+          "label": "默认不执行身份解析"
+        },
+        {
+          "target": "navigation-fixup",
+          "type": "Condition",
+          "label": "不参与上下文级持续关系修复"
+        },
+        {
+          "target": "readonly-scenarios",
+          "type": "Concept",
+          "label": "适用于只读场景"
+        },
+        {
+          "target": "detached-entity",
+          "type": "Condition",
+          "label": "返回未跟踪实体"
+        },
+        {
+          "target": "identity-resolution-query",
+          "type": "Concept",
+          "label": "可选择无跟踪身份解析"
+        }
+      ]
+    },
+    {
+      "id": "entity-entry-overhead",
+      "label": "EntityEntry Overhead",
+      "description": "跟踪查询会为每个实体维护 EntityEntry、EntityState、原始值或关系快照等元数据。AsNoTracking 跳过这些结构，可降低大量只读实体查询的 CPU 与内存开销。",
+      "tags": [
+        "entity-entry",
+        "memory",
+        "cpu"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Condition",
+          "label": "无跟踪查询跳过"
+        },
+        {
+          "target": "change-tracker",
+          "type": "Description",
+          "label": "跟踪模式由其维护"
+        }
+      ]
+    },
+    {
+      "id": "identity-map",
+      "label": "Identity Map",
+      "description": "Change Tracker 按实体类型和主键维护实例映射，使同一上下文中的跟踪查询遇到相同主键时复用同一个实体实例。普通 AsNoTracking 不使用上下文 Identity Map，重复数据行可能物化为多个实例。",
+      "tags": [
+        "identity",
+        "instance",
+        "change-tracker"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Condition",
+          "label": "普通无跟踪查询跳过"
+        },
+        {
+          "target": "identity-resolution-query",
+          "type": "Concept",
+          "label": "临时跟踪器可提供身份解析"
+        }
+      ]
+    },
+    {
+      "id": "navigation-fixup",
+      "label": "Navigation Fixup",
+      "description": "跟踪查询会根据已跟踪实体和外键持续修复导航属性。AsNoTracking 不会与 DbContext 中既有跟踪实体进行持续修复，但 Include 等查询仍可在当前结果内部建立导航关系。",
+      "tags": [
+        "navigation",
+        "relationship",
+        "fixup"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Condition",
+          "label": "不参与上下文级修复"
+        },
+        {
+          "target": "identity-map",
+          "type": "Concept",
+          "label": "跟踪模式下协同工作"
+        }
+      ]
+    },
+    {
+      "id": "readonly-scenarios",
+      "label": "Read-only Scenarios",
+      "description": "列表查询、报表、搜索接口、详情展示和不需要 SaveChanges 的 API 通常适合使用 AsNoTracking。只需要少量字段时，应进一步使用 Select 投影。",
+      "tags": [
+        "api",
+        "reporting",
+        "projection"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Description",
+          "label": "推荐应用场景"
+        },
+        {
+          "target": "projection",
+          "type": "Action",
+          "label": "只选择所需字段"
+        }
+      ]
+    },
+    {
+      "id": "detached-entity",
+      "label": "Detached Entity",
+      "description": "AsNoTracking 返回的实体未被当前上下文跟踪，修改属性后直接调用 SaveChanges 不会自动生成更新。需要写入时应重新查询跟踪实体，或明确使用 Attach、Update 并谨慎设置属性状态。",
+      "tags": [
+        "detached",
+        "update",
+        "savechanges"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Description",
+          "label": "查询结果状态"
+        },
+        {
+          "target": "tracking-query",
+          "type": "Condition",
+          "label": "写入流程通常需要跟踪"
+        }
+      ]
+    },
+    {
+      "id": "identity-resolution-query",
+      "label": "AsNoTrackingWithIdentityResolution",
+      "description": "在不把结果加入当前 DbContext Change Tracker 的前提下，使用查询期间的临时跟踪器执行 Identity Resolution，使同一查询结果中相同主键只物化一个实体实例；枚举完成后临时跟踪器即可被回收。",
+      "tags": [
+        "no-tracking",
+        "identity-resolution",
+        "temporary-tracker"
+      ],
+      "links": [
+        {
+          "target": "no-tracking",
+          "type": "Concept",
+          "label": "保留无跟踪语义"
+        },
+        {
+          "target": "identity-map",
+          "type": "Action",
+          "label": "在单次查询内解析重复身份"
+        }
+      ]
+    }
+  ]
+}
+

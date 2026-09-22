@@ -1,0 +1,482 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "daily-service",
+  "graphLabel": "澳洲日常服务表达",
+  "nodes": [
+    {
+      "id": "daily-service-root",
+      "label": "澳洲日常服务表达 / Daily service phrase bank",
+      "description": "按日常服务场景整理：寒暄、咖啡点单、购物退换货、付款、礼貌回应和健身房咨询。",
+      "tags": [
+        "scenario",
+        "daily",
+        "australia",
+        "service",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "daily-greeting",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "daily-coffee",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "daily-shopping-return",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "daily-payment",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "daily-polite-response",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "daily-gym-membership",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "daily-greeting",
+      "label": "开场寒暄 / Greeting",
+      "description": "日常服务、咖啡店和柜台场景的轻量寒暄。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "service"
+      ],
+      "links": [
+        {
+          "target": "daily-service-greeting-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-greeting-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-greeting-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-greeting-01",
+      "label": "How ya going?",
+      "description": "澳洲服务场景常见寒暄。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-greeting-02",
+      "label": "How's it going?",
+      "description": "较通用的自然寒暄。",
+      "tags": [
+        "phrase",
+        "daily",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-greeting-03",
+      "label": "Yeah, not too bad. Yourself?",
+      "description": "回答寒暄并自然反问。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-coffee",
+      "label": "咖啡点单 / Coffee ordering",
+      "description": "咖啡店点单、外带、少甜、等待和堂食外带确认。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "coffee"
+      ],
+      "links": [
+        {
+          "target": "life-coffee-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-coffee-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-coffee-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-coffee-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-coffee-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-request-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-options-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-options-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-options-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "life-coffee-01",
+      "label": "Can I get a medium latte, takeaway, please?",
+      "description": "澳洲咖啡店自然点单；takeaway 比 to go 更本地化。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "coffee"
+      ]
+    },
+    {
+      "id": "life-coffee-02",
+      "label": "Takeaway, please.",
+      "description": "回答外带。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "coffee"
+      ]
+    },
+    {
+      "id": "life-coffee-03",
+      "label": "Could you make it less sweet?",
+      "description": "请求少甜；比 reduce the sugar 更自然。",
+      "tags": [
+        "phrase",
+        "daily",
+        "coffee"
+      ]
+    },
+    {
+      "id": "life-coffee-04",
+      "label": "How long's the wait?",
+      "description": "询问大概要等多久。",
+      "tags": [
+        "phrase",
+        "daily",
+        "service"
+      ]
+    },
+    {
+      "id": "life-coffee-05",
+      "label": "I'll just wait over there.",
+      "description": "说明自己在旁边等。",
+      "tags": [
+        "phrase",
+        "daily",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-request-01",
+      "label": "Can I get a medium oat latte, please?",
+      "description": "点单用 Can I get... 很自然。",
+      "tags": [
+        "phrase",
+        "daily",
+        "coffee"
+      ]
+    },
+    {
+      "id": "daily-service-options-01",
+      "label": "For here or takeaway?",
+      "description": "询问堂食或外带；澳洲常用 takeaway。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-options-02",
+      "label": "Takeaway, please.",
+      "description": "回答外带。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-options-03",
+      "label": "Any sugar?",
+      "description": "服务场景里询问是否加糖。",
+      "tags": [
+        "phrase",
+        "daily",
+        "coffee"
+      ]
+    },
+    {
+      "id": "daily-shopping-return",
+      "label": "购物退换货 / Shopping returns and exchanges",
+      "description": "退货、换货、退款和商品故障相关表达。",
+      "tags": [
+        "intent",
+        "daily",
+        "shopping",
+        "service"
+      ],
+      "links": [
+        {
+          "target": "daily-service-request-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-return-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-return-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-return-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-return-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-request-02",
+      "label": "I'd like to return this item.",
+      "description": "退货说 return this item，不说 refund this good。",
+      "tags": [
+        "phrase",
+        "daily",
+        "shopping"
+      ]
+    },
+    {
+      "id": "daily-service-return-01",
+      "label": "What seems to be the problem?",
+      "description": "服务人员询问商品问题。",
+      "tags": [
+        "phrase",
+        "daily",
+        "shopping"
+      ]
+    },
+    {
+      "id": "daily-service-return-02",
+      "label": "I realised it was faulty.",
+      "description": "说明买回去后发现有故障。",
+      "tags": [
+        "phrase",
+        "daily",
+        "shopping"
+      ]
+    },
+    {
+      "id": "daily-service-return-03",
+      "label": "We can give you a refund or exchange it for a new one.",
+      "description": "说明可以退款或换新。",
+      "tags": [
+        "phrase",
+        "daily",
+        "shopping"
+      ]
+    },
+    {
+      "id": "daily-service-return-04",
+      "label": "I'll take a replacement, please.",
+      "description": "选择换货/替换件。",
+      "tags": [
+        "phrase",
+        "daily",
+        "shopping"
+      ]
+    },
+    {
+      "id": "daily-payment",
+      "label": "付款 / Payment",
+      "description": "柜台付款、金额和刷卡相关表达。",
+      "tags": [
+        "intent",
+        "daily",
+        "payment",
+        "service"
+      ],
+      "links": [
+        {
+          "target": "daily-service-payment-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-payment-02",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-payment-01",
+      "label": "That'll be six fifty.",
+      "description": "$6.50 读作 six fifty。",
+      "tags": [
+        "phrase",
+        "daily",
+        "payment"
+      ]
+    },
+    {
+      "id": "daily-service-payment-02",
+      "label": "Can I pay by card?",
+      "description": "询问是否可以刷卡/银行卡支付。",
+      "tags": [
+        "phrase",
+        "daily",
+        "payment"
+      ]
+    },
+    {
+      "id": "daily-polite-response",
+      "label": "礼貌回应 / Polite responses",
+      "description": "等待、递交物品和回应对方时的自然短句。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "service"
+      ],
+      "links": [
+        {
+          "target": "daily-service-response-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-response-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-response-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-response-01",
+      "label": "No worries.",
+      "description": "澳洲高频表达：没问题、不客气、可以。",
+      "tags": [
+        "phrase",
+        "daily",
+        "australia"
+      ]
+    },
+    {
+      "id": "daily-service-response-02",
+      "label": "Just give me a moment.",
+      "description": "请稍等。",
+      "tags": [
+        "phrase",
+        "daily",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-service-response-03",
+      "label": "Sure, here you go.",
+      "description": "递交物品、小票、证件时常用。",
+      "tags": [
+        "phrase",
+        "daily",
+        "service"
+      ]
+    },
+    {
+      "id": "daily-gym-membership",
+      "label": "健身房咨询 / Gym membership",
+      "description": "咨询健身房会员和服务计划。",
+      "tags": [
+        "intent",
+        "daily",
+        "gym",
+        "service"
+      ],
+      "links": [
+        {
+          "target": "settlement-purpose-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "settlement-purpose-03",
+      "label": "I'd like to ask about your membership plans.",
+      "description": "咨询健身房会员。",
+      "tags": [
+        "phrase",
+        "daily",
+        "gym"
+      ]
+    }
+  ]
+}
+

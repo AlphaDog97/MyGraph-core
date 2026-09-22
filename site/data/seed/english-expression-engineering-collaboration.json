@@ -1,0 +1,925 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "engineering-collaboration",
+  "graphLabel": "工程协作与敏捷交付表达",
+  "nodes": [
+    {
+      "id": "engineering-collaboration-root",
+      "label": "工程协作与敏捷交付表达 / Engineering collaboration and agile delivery phrase bank",
+      "description": "把站会进度、澄清同步、问题风险、依赖阻塞、估算时间线和需求变更集中整理。",
+      "tags": [
+        "scenario",
+        "work",
+        "engineering",
+        "collaboration",
+        "agile"
+      ],
+      "links": [
+        {
+          "target": "eng-progress",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "eng-clarify-sync",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "eng-issues-blockers",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "eng-estimate-timeline",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "eng-requirements-impact",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "eng-progress",
+      "label": "进度沟通 / Progress updates",
+      "description": "站会、任务进度询问和完成情况汇报。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "standup"
+      ],
+      "links": [
+        {
+          "target": "eng-ask-progress-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-ask-progress-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-ask-progress-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-ask-progress-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-report-progress-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-report-progress-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-report-progress-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-report-progress-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "eng-ask-progress-01",
+      "label": "Do you think you can finish this feature today?",
+      "description": "比 Can you finish... 更委婉。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-ask-progress-02",
+      "label": "How's it going?",
+      "description": "询问进展。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-ask-progress-03",
+      "label": "What did you work on yesterday?",
+      "description": "站会问昨天做了什么。",
+      "tags": [
+        "phrase",
+        "work",
+        "standup"
+      ]
+    },
+    {
+      "id": "eng-ask-progress-04",
+      "label": "Any updates on this?",
+      "description": "询问是否有更新。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-report-progress-01",
+      "label": "I should be able to.",
+      "description": "表达应该可以。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-report-progress-02",
+      "label": "I finished refactoring the login module yesterday.",
+      "description": "汇报完成重构。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-report-progress-03",
+      "label": "Overall it's been pretty smooth.",
+      "description": "整体还算顺利。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-report-progress-04",
+      "label": "I'll add more test coverage today.",
+      "description": "补测试覆盖。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-clarify-sync",
+      "label": "澄清与同步 / Clarifying and syncing",
+      "description": "说明不确定点，并和 PM、后端或相关方同步确认。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "collaboration"
+      ],
+      "links": [
+        {
+          "target": "eng-uncertainty-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-uncertainty-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-uncertainty-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-uncertainty-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-sync-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-sync-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-sync-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-sync-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "eng-uncertainty-01",
+      "label": "I still need to check a few things with the API.",
+      "description": "还需要确认 API 细节。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-uncertainty-02",
+      "label": "The user permission logic is still a bit unclear.",
+      "description": "用户权限逻辑还不清晰。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-uncertainty-03",
+      "label": "I need to clarify that part first.",
+      "description": "需要先澄清那部分。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-uncertainty-04",
+      "label": "I'm not 100% sure about the API contract yet.",
+      "description": "API contract 还不完全确定。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-sync-01",
+      "label": "Maybe sync with the PM this afternoon.",
+      "description": "下午和 PM 对一下。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-sync-02",
+      "label": "Should we sync with the backend team first?",
+      "description": "是否先和后端同步。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-sync-03",
+      "label": "I'll continue once I've clarified that part.",
+      "description": "澄清后继续。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-sync-04",
+      "label": "Might be worth confirming with the backend side first.",
+      "description": "委婉建议先和后端确认。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-issues-blockers",
+      "label": "问题、风险与阻塞 / Issues, risks and blockers",
+      "description": "描述问题、旧系统风险、依赖、blocker 和测试风险。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "risk",
+        "dependency"
+      ],
+      "links": [
+        {
+          "target": "eng-problem-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-problem-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-problem-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-problem-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-problem-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-dependency-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-dependency-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-dependency-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-dependency-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-dependency-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-risk-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-risk-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-risk-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-risk-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "eng-problem-01",
+      "label": "We ran into some issues.",
+      "description": "描述遇到问题。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-problem-02",
+      "label": "I found a few issues in the legacy code.",
+      "description": "旧代码里发现问题。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-problem-03",
+      "label": "The legacy system uses inconsistent data formats.",
+      "description": "旧系统数据格式不统一。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-problem-04",
+      "label": "There are a few edge cases we haven't covered yet.",
+      "description": "还有边界情况没覆盖。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-problem-05",
+      "label": "This part is still a bit unclear.",
+      "description": "这部分仍然不太清楚。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-dependency-01",
+      "label": "There's a dependency that hasn't been confirmed.",
+      "description": "有一个依赖还没确认。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-dependency-02",
+      "label": "We're waiting on the backend team.",
+      "description": "正在等后端团队。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-dependency-03",
+      "label": "This depends on the API changes.",
+      "description": "这取决于 API 变更。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-dependency-04",
+      "label": "The backend contract hasn't been finalised yet.",
+      "description": "后端 contract 还没最终确定。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-dependency-05",
+      "label": "This might become a blocker.",
+      "description": "这可能变成阻塞点。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "agile-risk-01",
+      "label": "Any risks?",
+      "description": "询问风险。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-risk-02",
+      "label": "Any blockers?",
+      "description": "询问阻塞点。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-risk-03",
+      "label": "The main risk is the legacy data format.",
+      "description": "主要风险是旧数据格式。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-risk-04",
+      "label": "We might run into issues during testing.",
+      "description": "测试时可能遇到问题。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "eng-estimate-timeline",
+      "label": "估算与时间线 / Estimates and timeline",
+      "description": "估算工作量、说明前提、上线影响和目标发布日期。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "agile",
+        "timeline"
+      ],
+      "links": [
+        {
+          "target": "eng-timeline-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-timeline-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-timeline-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-timeline-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "eng-timeline-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-estimate-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-estimate-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-estimate-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-estimate-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-assumption-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-assumption-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-assumption-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-timeline-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-timeline-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-timeline-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-timeline-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "eng-timeline-01",
+      "label": "This might impact the timeline.",
+      "description": "可能影响时间线。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-timeline-02",
+      "label": "This could affect this week's release.",
+      "description": "可能影响本周上线。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-timeline-03",
+      "label": "It might push the release back.",
+      "description": "可能推迟上线。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-timeline-04",
+      "label": "It could take longer than expected.",
+      "description": "可能比预期更久。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "eng-timeline-05",
+      "label": "We may need to adjust the timeline.",
+      "description": "可能需要调整时间线。",
+      "tags": [
+        "phrase",
+        "work",
+        "engineering"
+      ]
+    },
+    {
+      "id": "agile-estimate-01",
+      "label": "How long do you think this will take?",
+      "description": "询问耗时。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-estimate-02",
+      "label": "What's your estimate for this task?",
+      "description": "询问 estimate。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-estimate-03",
+      "label": "It should take around two days.",
+      "description": "大约两天。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-estimate-04",
+      "label": "I'll estimate the effort first.",
+      "description": "先评估工作量。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-assumption-01",
+      "label": "Assuming there are no API changes, it should take around two days.",
+      "description": "说明估算前提。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-assumption-02",
+      "label": "As long as the API stays the same, it should be fine.",
+      "description": "只要 API 不变就可以。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-assumption-03",
+      "label": "This estimate assumes the backend contract is stable.",
+      "description": "估算假设后端 contract 稳定。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "agile-timeline-01",
+      "label": "Is there a timeline for this requirement?",
+      "description": "询问时间线。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-timeline-02",
+      "label": "Do we have a target release date?",
+      "description": "是否有目标上线日期？",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-timeline-03",
+      "label": "The client wants this done as soon as possible.",
+      "description": "客户希望越快越好。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-timeline-04",
+      "label": "Let's put this into the current sprint for now.",
+      "description": "先放进当前 sprint。",
+      "tags": [
+        "phrase",
+        "work",
+        "agile"
+      ]
+    },
+    {
+      "id": "eng-requirements-impact",
+      "label": "需求变更与影响范围 / Requirement changes and impact scope",
+      "description": "客户新需求、范围变化、数据结构和前后端影响范围。",
+      "tags": [
+        "intent",
+        "work",
+        "requirements",
+        "agile"
+      ],
+      "links": [
+        {
+          "target": "agile-change-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-change-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-change-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-change-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-impact-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-impact-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-impact-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "agile-impact-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "agile-change-01",
+      "label": "The client just brought up a new requirement.",
+      "description": "客户刚提新需求。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-change-02",
+      "label": "Is it a minor change, or will it affect the current logic?",
+      "description": "是小改动还是会影响当前逻辑？",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-change-03",
+      "label": "They want us to support role-based access control.",
+      "description": "他们希望支持 RBAC。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-change-04",
+      "label": "The scope is slightly different now.",
+      "description": "现在范围有点不同。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-impact-01",
+      "label": "We might need to adjust the current data structure.",
+      "description": "可能需要调整数据结构。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-impact-02",
+      "label": "The frontend team will probably need to make quite a few changes as well.",
+      "description": "前端可能也要改不少。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-impact-03",
+      "label": "I'll assess the impact scope first.",
+      "description": "先评估影响范围。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    },
+    {
+      "id": "agile-impact-04",
+      "label": "We need to understand the affected areas first.",
+      "description": "先了解受影响区域。",
+      "tags": [
+        "phrase",
+        "work",
+        "requirements"
+      ]
+    }
+  ]
+}
+

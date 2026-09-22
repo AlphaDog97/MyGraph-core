@@ -1,0 +1,151 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "performance",
+  "graphLabel": "Performance Optimization",
+  "nodes": [
+    {
+      "id": "performance",
+      "label": "Performance",
+      "description": "EF Core 性能优化围绕减少开销、缩小数据量与改进查询形状展开。",
+      "tags": [
+        "optimization",
+        "efficiency"
+      ],
+      "links": [
+        {
+          "target": "compiled-query",
+          "type": "Concept",
+          "label": "可复用查询编译"
+        },
+        {
+          "target": "batching",
+          "type": "Concept",
+          "label": "批量发送命令"
+        },
+        {
+          "target": "projection-only",
+          "type": "Concept",
+          "label": "只取必要字段"
+        }
+      ]
+    },
+    {
+      "id": "compiled-query",
+      "label": "Compiled Query",
+      "description": "预编译查询可减少重复解析表达式树的成本。",
+      "tags": [
+        "cache",
+        "query-plan"
+      ],
+      "links": [
+        {
+          "target": "query-cache",
+          "type": "Description",
+          "label": "利用缓存结果"
+        },
+        {
+          "target": "performance",
+          "type": "Description",
+          "label": "服务整体优化"
+        }
+      ]
+    },
+    {
+      "id": "query-cache",
+      "label": "Query Cache",
+      "description": "查询缓存复用表达式到命令生成过程的中间成果。",
+      "tags": [
+        "cache",
+        "reuse"
+      ],
+      "links": [
+        {
+          "target": "compiled-query",
+          "type": "Concept",
+          "label": "支撑预编译收益"
+        }
+      ]
+    },
+    {
+      "id": "batching",
+      "label": "Batching",
+      "description": "批处理可将多条修改命令合并发送以减少往返次数。",
+      "tags": [
+        "save",
+        "roundtrip"
+      ],
+      "links": [
+        {
+          "target": "savechanges-cost",
+          "type": "Action",
+          "label": "降低保存成本"
+        },
+        {
+          "target": "performance",
+          "type": "Description",
+          "label": "属于优化手段"
+        }
+      ]
+    },
+    {
+      "id": "savechanges-cost",
+      "label": "SaveChanges Cost",
+      "description": "保存成本受命令数量、跟踪规模与数据库往返次数影响。",
+      "tags": [
+        "cost",
+        "save"
+      ],
+      "links": [
+        {
+          "target": "batching",
+          "type": "Description",
+          "label": "可被批处理优化"
+        }
+      ]
+    },
+    {
+      "id": "projection-only",
+      "label": "Projection",
+      "description": "只投影所需列可减少网络传输与对象物化负担。",
+      "tags": [
+        "select",
+        "payload"
+      ],
+      "links": [
+        {
+          "target": "tracking-off",
+          "type": "Condition",
+          "label": "常与不跟踪搭配"
+        },
+        {
+          "target": "performance",
+          "type": "Description",
+          "label": "减少查询开销"
+        }
+      ]
+    },
+    {
+      "id": "tracking-off",
+      "label": "No Tracking",
+      "description": "关闭跟踪能减少内存与状态管理开销，适合只读场景。",
+      "tags": [
+        "readonly",
+        "memory"
+      ],
+      "links": [
+        {
+          "target": "projection-only",
+          "type": "Action",
+          "label": "增强只读查询效率"
+        },
+        {
+          "target": "no-tracking",
+          "type": "Description",
+          "label": "详细机制见独立 AsNoTracking 图"
+        }
+      ]
+    }
+  ]
+}
+

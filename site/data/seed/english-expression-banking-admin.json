@@ -1,0 +1,369 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "banking-admin",
+  "graphLabel": "澳洲银行与办理表达",
+  "nodes": [
+    {
+      "id": "banking-admin-root",
+      "label": "澳洲银行与办理表达 / Banking and admin phrase bank",
+      "description": "把银行开户、证件地址、银行卡问题、安全提醒和办理流程归到同一类。",
+      "tags": [
+        "scenario",
+        "daily",
+        "australia",
+        "banking",
+        "admin"
+      ],
+      "links": [
+        {
+          "target": "bank-account-opening",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "bank-documents-address",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "bank-card-security",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "bank-admin-next-step",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "bank-account-opening",
+      "label": "开户与账户类型 / Account opening",
+      "description": "银行开户、选择账户类型和日常交易账户表达。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "banking"
+      ],
+      "links": [
+        {
+          "target": "daily-service-request-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-purpose-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "daily-service-options-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-documents-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-request-03",
+      "label": "I'd like to open a bank account.",
+      "description": "银行开户的标准表达。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "settlement-purpose-02",
+      "label": "I'm looking to open an account.",
+      "description": "银行开户表达，比 I want to open 更自然。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "daily-service-options-04",
+      "label": "Just a transaction account for now.",
+      "description": "银行开户时表示先开日常消费账户。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "settlement-documents-03",
+      "label": "Would you like a savings account or a transaction account?",
+      "description": "银行账户类型。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "bank-documents-address",
+      "label": "证件和地址 / Documents and address",
+      "description": "银行等机构确认澳洲地址、护照、签证和电子签证。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "banking",
+        "documents"
+      ],
+      "links": [
+        {
+          "target": "settlement-booking-address-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-documents-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-documents-02",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "settlement-booking-address-03",
+      "label": "Do you currently have an Australian address?",
+      "description": "银行等机构询问澳洲地址。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "settlement-documents-01",
+      "label": "I'll also need your passport and visa.",
+      "description": "说明需要护照和签证。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "settlement-documents-02",
+      "label": "Is an electronic visa okay?",
+      "description": "询问电子签证是否可以。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "bank-card-security",
+      "label": "银行卡与安全提醒 / Card issues and security",
+      "description": "银行卡刷不了、交易失败、安全提醒、异常活动、解冻、补卡和手机支付。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "banking",
+        "payment"
+      ],
+      "links": [
+        {
+          "target": "life-bank-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-06",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-bank-07",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "life-bank-01",
+      "label": "My card got declined today.",
+      "description": "银行卡刷不了/被拒付。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "life-bank-02",
+      "label": "The payment didn't go through.",
+      "description": "付款没成功。",
+      "tags": [
+        "phrase",
+        "daily",
+        "payment"
+      ]
+    },
+    {
+      "id": "life-bank-03",
+      "label": "I got a security alert from my bank.",
+      "description": "收到银行安全提醒。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "life-bank-04",
+      "label": "There might be unusual activity on my account.",
+      "description": "账户可能有异常活动。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "life-bank-05",
+      "label": "Can this card be reactivated today?",
+      "description": "询问这张卡今天能否重新激活。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "life-bank-06",
+      "label": "Could you order me a replacement card?",
+      "description": "请银行补办/寄送新卡。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking"
+      ]
+    },
+    {
+      "id": "life-bank-07",
+      "label": "Can I still use my phone to pay in the meantime?",
+      "description": "询问期间是否还能用手机支付。",
+      "tags": [
+        "phrase",
+        "daily",
+        "banking",
+        "payment"
+      ]
+    },
+    {
+      "id": "bank-admin-next-step",
+      "label": "办理流程和下一步 / Admin next steps",
+      "description": "说明工作日、询问下一步和提交申请。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "admin",
+        "settlement"
+      ],
+      "links": [
+        {
+          "target": "daily-service-payment-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-next-step-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-next-step-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-next-step-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-payment-03",
+      "label": "within a few business days",
+      "description": "银行、物流、行政场景里的“几个工作日内”。",
+      "tags": [
+        "phrase",
+        "daily",
+        "admin"
+      ]
+    },
+    {
+      "id": "settlement-next-step-01",
+      "label": "What should I do next?",
+      "description": "询问下一步流程。",
+      "tags": [
+        "phrase",
+        "daily",
+        "settlement"
+      ]
+    },
+    {
+      "id": "settlement-next-step-02",
+      "label": "What's the next step?",
+      "description": "更通用的下一步问法。",
+      "tags": [
+        "phrase",
+        "daily",
+        "settlement"
+      ]
+    },
+    {
+      "id": "settlement-next-step-03",
+      "label": "You'll need to submit an application.",
+      "description": "提交申请。",
+      "tags": [
+        "phrase",
+        "daily",
+        "settlement"
+      ]
+    }
+  ]
+}
+

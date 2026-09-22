@@ -1,0 +1,446 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "code-architecture",
+  "graphLabel": "Code Review 与架构表达",
+  "nodes": [
+    {
+      "id": "code-architecture-root",
+      "label": "Code Review 与架构表达 / Code review and architecture phrase bank",
+      "description": "PR 反馈、代码质量、职责边界、重构、抽象和可维护性讨论的表达归纳。",
+      "tags": [
+        "scenario",
+        "work",
+        "engineering",
+        "architecture",
+        "code-review"
+      ],
+      "links": [
+        {
+          "target": "code-review-feedback",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "code-ask-fix",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "code-concern",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "code-responsibility",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "code-refactor",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "code-maintainability",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "code-review-feedback",
+      "label": "给 Review 反馈 / Review feedback",
+      "description": "给 PR Review 反馈和总体评价。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "code-review"
+      ],
+      "links": [
+        {
+          "target": "code-review-feedback-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-review-feedback-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-review-feedback-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-review-feedback-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-review-feedback-01",
+      "label": "I just had a look at your PR.",
+      "description": "刚看了你的 PR。",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-review-feedback-02",
+      "label": "Overall it looks good.",
+      "description": "整体看起来不错。",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-review-feedback-03",
+      "label": "There are still a few areas we could improve.",
+      "description": "还有几个地方可以优化。",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-review-feedback-04",
+      "label": "A couple of things could be cleaned up.",
+      "description": "有几个地方可以清理。",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-ask-fix",
+      "label": "询问修改 / Asking what to fix",
+      "description": "询问是否需要修改。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "code-review"
+      ],
+      "links": [
+        {
+          "target": "code-ask-fix-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-ask-fix-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-ask-fix-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-ask-fix-01",
+      "label": "Anything I should fix?",
+      "description": "有什么需要我修吗？",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-ask-fix-02",
+      "label": "Any changes needed?",
+      "description": "需要改什么吗？",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-ask-fix-03",
+      "label": "Anything I need to update?",
+      "description": "有什么需要我更新吗？",
+      "tags": [
+        "phrase",
+        "work",
+        "code-review"
+      ]
+    },
+    {
+      "id": "code-concern",
+      "label": "提出担心 / Raising concerns",
+      "description": "提出性能、结构或维护风险。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "architecture"
+      ],
+      "links": [
+        {
+          "target": "code-concern-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-concern-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-concern-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-concern-01",
+      "label": "There's one thing I'm a bit concerned about.",
+      "description": "有一点我有点担心。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-concern-02",
+      "label": "I have a small concern around this part.",
+      "description": "我对这一部分有点担心。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-concern-03",
+      "label": "This might be a performance issue.",
+      "description": "这可能是性能问题。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-responsibility",
+      "label": "职责边界 / Responsibility boundaries",
+      "description": "说明 service、controller 或 class 职责过多。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "architecture"
+      ],
+      "links": [
+        {
+          "target": "code-responsibility-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-responsibility-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-responsibility-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-responsibility-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-responsibility-01",
+      "label": "This service has too many responsibilities.",
+      "description": "这个 service 职责太多。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-responsibility-02",
+      "label": "This service is handling too much logic.",
+      "description": "这个 service 处理太多逻辑。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-responsibility-03",
+      "label": "There seems to be too much business logic in the controller.",
+      "description": "controller 里业务逻辑太多。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-responsibility-04",
+      "label": "This class is doing too much.",
+      "description": "这个 class 做太多事。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-refactor",
+      "label": "建议重构 / Refactoring suggestions",
+      "description": "建议拆分、抽象、移动到 service 层。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "refactor"
+      ],
+      "links": [
+        {
+          "target": "code-refactor-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-refactor-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-refactor-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-refactor-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-refactor-01",
+      "label": "Should we move it into the service layer?",
+      "description": "是否移到 service 层？",
+      "tags": [
+        "phrase",
+        "work",
+        "refactor"
+      ]
+    },
+    {
+      "id": "code-refactor-02",
+      "label": "Should we extract this into a separate service?",
+      "description": "是否抽成单独 service？",
+      "tags": [
+        "phrase",
+        "work",
+        "refactor"
+      ]
+    },
+    {
+      "id": "code-refactor-03",
+      "label": "We could split this logic up.",
+      "description": "可以拆分这段逻辑。",
+      "tags": [
+        "phrase",
+        "work",
+        "refactor"
+      ]
+    },
+    {
+      "id": "code-refactor-04",
+      "label": "Some of the logic could be abstracted further.",
+      "description": "部分逻辑可以进一步抽象。",
+      "tags": [
+        "phrase",
+        "work",
+        "refactor"
+      ]
+    },
+    {
+      "id": "code-maintainability",
+      "label": "可维护性与技术债 / Maintainability and technical debt",
+      "description": "说明后续维护成本和技术债风险。",
+      "tags": [
+        "intent",
+        "work",
+        "engineering",
+        "architecture"
+      ],
+      "links": [
+        {
+          "target": "code-maintainability-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-maintainability-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "code-maintainability-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "code-maintainability-01",
+      "label": "It could cause maintainability issues later.",
+      "description": "后面可能有可维护性问题。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-maintainability-02",
+      "label": "It might become harder to maintain later on.",
+      "description": "后面可能更难维护。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    },
+    {
+      "id": "code-maintainability-03",
+      "label": "This might introduce technical debt.",
+      "description": "这可能引入技术债。",
+      "tags": [
+        "phrase",
+        "work",
+        "architecture"
+      ]
+    }
+  ]
+}
+

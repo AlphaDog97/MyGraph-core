@@ -1,0 +1,125 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "change-tracker",
+  "graphLabel": "Change Tracker",
+  "nodes": [
+    {
+      "id": "change-tracker",
+      "label": "Change Tracker",
+      "description": "负责监视实体实例及其属性变化的组件。",
+      "tags": [
+        "tracking",
+        "state-management"
+      ],
+      "links": [
+        {
+          "target": "entity-state",
+          "type": "Concept",
+          "label": "维护实体状态"
+        },
+        {
+          "target": "detect-changes",
+          "type": "Action",
+          "label": "执行变更检测"
+        }
+      ]
+    },
+    {
+      "id": "entity-state",
+      "label": "EntityState",
+      "description": "实体可处于 Added、Modified、Deleted、Unchanged 或 Detached 等状态。",
+      "tags": [
+        "state",
+        "lifecycle"
+      ],
+      "links": [
+        {
+          "target": "change-tracker",
+          "type": "Description",
+          "label": "由跟踪器维护"
+        },
+        {
+          "target": "save-pipeline",
+          "type": "Condition",
+          "label": "决定保存行为"
+        }
+      ]
+    },
+    {
+      "id": "detect-changes",
+      "label": "DetectChanges",
+      "description": "扫描实体和属性，识别当前值与原始值的差异。",
+      "tags": [
+        "detection",
+        "runtime"
+      ],
+      "links": [
+        {
+          "target": "property-values",
+          "type": "Condition",
+          "label": "比较属性值"
+        },
+        {
+          "target": "entity-state",
+          "type": "Action",
+          "label": "更新实体状态"
+        }
+      ]
+    },
+    {
+      "id": "property-values",
+      "label": "Property Values",
+      "description": "实体属性的当前值与原始值共同支持修改判断。",
+      "tags": [
+        "properties",
+        "comparison"
+      ],
+      "links": [
+        {
+          "target": "detect-changes",
+          "type": "Description",
+          "label": "供变更检测使用"
+        }
+      ]
+    },
+    {
+      "id": "save-pipeline",
+      "label": "Save Pipeline",
+      "description": "保存流程根据跟踪状态生成对应的数据库命令。",
+      "tags": [
+        "save",
+        "commands"
+      ],
+      "links": [
+        {
+          "target": "entity-state",
+          "type": "Concept",
+          "label": "读取状态"
+        },
+        {
+          "target": "accept-changes",
+          "type": "Action",
+          "label": "保存后确认状态"
+        }
+      ]
+    },
+    {
+      "id": "accept-changes",
+      "label": "Accept Changes",
+      "description": "保存成功后将实体状态重置为已接受状态。",
+      "tags": [
+        "post-save",
+        "state-reset"
+      ],
+      "links": [
+        {
+          "target": "save-pipeline",
+          "type": "Description",
+          "label": "在保存后发生"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,167 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "relationships-loading",
+  "graphLabel": "Relationships & Loading",
+  "nodes": [
+    {
+      "id": "relationship-data",
+      "label": "Related Data",
+      "description": "相关数据加载关注如何把有关联的实体一并取回。",
+      "tags": [
+        "relations",
+        "loading"
+      ],
+      "links": [
+        {
+          "target": "eager-loading",
+          "type": "Concept",
+          "label": "支持预先加载"
+        },
+        {
+          "target": "lazy-loading",
+          "type": "Concept",
+          "label": "支持按需加载"
+        },
+        {
+          "target": "explicit-loading",
+          "type": "Concept",
+          "label": "支持显式加载"
+        }
+      ]
+    },
+    {
+      "id": "eager-loading",
+      "label": "Eager Loading",
+      "description": "使用 Include 在主查询执行时把关联实体一起加载。",
+      "tags": [
+        "include",
+        "single-query"
+      ],
+      "links": [
+        {
+          "target": "include",
+          "type": "Action",
+          "label": "通过 Include 指定"
+        },
+        {
+          "target": "relationship-data",
+          "type": "Description",
+          "label": "是一种加载策略"
+        }
+      ]
+    },
+    {
+      "id": "include",
+      "label": "Include",
+      "description": "Include 与 ThenInclude 指定需要展开的导航路径。",
+      "tags": [
+        "api",
+        "navigation-path"
+      ],
+      "links": [
+        {
+          "target": "split-query",
+          "type": "Condition",
+          "label": "复杂图可拆分查询"
+        },
+        {
+          "target": "eager-loading",
+          "type": "Description",
+          "label": "实现预加载"
+        }
+      ]
+    },
+    {
+      "id": "lazy-loading",
+      "label": "Lazy Loading",
+      "description": "在首次访问导航属性时再触发数据库查询加载关联对象。",
+      "tags": [
+        "deferred",
+        "proxy"
+      ],
+      "links": [
+        {
+          "target": "proxies",
+          "type": "Condition",
+          "label": "通常依赖代理或拦截"
+        },
+        {
+          "target": "relationship-data",
+          "type": "Description",
+          "label": "是一种按需策略"
+        }
+      ]
+    },
+    {
+      "id": "proxies",
+      "label": "Proxies",
+      "description": "代理对象可拦截导航访问并触发延迟加载行为。",
+      "tags": [
+        "proxy",
+        "runtime"
+      ],
+      "links": [
+        {
+          "target": "lazy-loading",
+          "type": "Action",
+          "label": "支持延迟加载"
+        }
+      ]
+    },
+    {
+      "id": "explicit-loading",
+      "label": "Explicit Loading",
+      "description": "开发者在需要时显式调用 API 加载某个导航属性。",
+      "tags": [
+        "manual",
+        "controlled"
+      ],
+      "links": [
+        {
+          "target": "entry-api",
+          "type": "Action",
+          "label": "通过 Entry API 触发"
+        },
+        {
+          "target": "relationship-data",
+          "type": "Description",
+          "label": "是一种手动策略"
+        }
+      ]
+    },
+    {
+      "id": "entry-api",
+      "label": "Entry API",
+      "description": "Entry(...).Reference(...).Load 或 Collection(...).Load 用于显式加载。",
+      "tags": [
+        "api",
+        "load"
+      ],
+      "links": [
+        {
+          "target": "explicit-loading",
+          "type": "Description",
+          "label": "实现显式加载"
+        }
+      ]
+    },
+    {
+      "id": "split-query",
+      "label": "Split Query",
+      "description": "拆分查询可降低多表联接导致的数据重复和笛卡尔膨胀风险。",
+      "tags": [
+        "performance",
+        "query-shape"
+      ],
+      "links": [
+        {
+          "target": "include",
+          "type": "Description",
+          "label": "常用于复杂 Include"
+        }
+      ]
+    }
+  ]
+}
+

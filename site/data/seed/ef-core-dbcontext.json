@@ -1,0 +1,146 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "dbcontext",
+  "graphLabel": "DbContext",
+  "nodes": [
+    {
+      "id": "dbcontext",
+      "label": "DbContext",
+      "description": "EF Core 的核心会话对象，负责协调实体查询、跟踪与保存。",
+      "tags": [
+        "core",
+        "session"
+      ],
+      "links": [
+        {
+          "target": "dbset",
+          "type": "Concept",
+          "label": "暴露实体集合"
+        },
+        {
+          "target": "savechanges",
+          "type": "Action",
+          "label": "提交变更"
+        },
+        {
+          "target": "options",
+          "type": "Description",
+          "label": "依赖配置选项"
+        }
+      ]
+    },
+    {
+      "id": "dbset",
+      "label": "DbSet",
+      "description": "表示某个实体类型的集合，用于查询和增删改操作。",
+      "tags": [
+        "entity-set",
+        "query"
+      ],
+      "links": [
+        {
+          "target": "dbcontext",
+          "type": "Concept",
+          "label": "由上下文管理"
+        },
+        {
+          "target": "entity-model",
+          "type": "Concept",
+          "label": "对应实体类型"
+        }
+      ]
+    },
+    {
+      "id": "savechanges",
+      "label": "SaveChanges",
+      "description": "将跟踪到的更改转换为数据库命令并执行。",
+      "tags": [
+        "persistence",
+        "unit-of-work"
+      ],
+      "links": [
+        {
+          "target": "change-tracking",
+          "type": "Condition",
+          "label": "依赖已跟踪状态"
+        },
+        {
+          "target": "dbcontext",
+          "type": "Action",
+          "label": "由上下文触发"
+        }
+      ]
+    },
+    {
+      "id": "options",
+      "label": "DbContextOptions",
+      "description": "定义上下文使用的数据库提供程序、连接与行为配置。",
+      "tags": [
+        "configuration",
+        "provider"
+      ],
+      "links": [
+        {
+          "target": "dbcontext",
+          "type": "Description",
+          "label": "配置上下文行为"
+        },
+        {
+          "target": "provider",
+          "type": "Concept",
+          "label": "指定数据库提供程序"
+        }
+      ]
+    },
+    {
+      "id": "provider",
+      "label": "Provider",
+      "description": "数据库提供程序负责把 EF Core 操作翻译为特定数据库能力。",
+      "tags": [
+        "database",
+        "translation"
+      ],
+      "links": [
+        {
+          "target": "options",
+          "type": "Concept",
+          "label": "由选项选择"
+        }
+      ]
+    },
+    {
+      "id": "entity-model",
+      "label": "Entity Model",
+      "description": "上下文中注册的实体结构与映射元数据集合。",
+      "tags": [
+        "model",
+        "metadata"
+      ],
+      "links": [
+        {
+          "target": "dbset",
+          "type": "Description",
+          "label": "被集合访问"
+        }
+      ]
+    },
+    {
+      "id": "change-tracking",
+      "label": "Tracked State",
+      "description": "上下文记录实体当前状态以判断需要插入、更新还是删除。",
+      "tags": [
+        "state",
+        "tracking"
+      ],
+      "links": [
+        {
+          "target": "savechanges",
+          "type": "Action",
+          "label": "驱动保存决策"
+        }
+      ]
+    }
+  ]
+}
+

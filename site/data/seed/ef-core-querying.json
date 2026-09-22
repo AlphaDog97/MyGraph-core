@@ -1,0 +1,167 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "querying",
+  "graphLabel": "Querying",
+  "nodes": [
+    {
+      "id": "linq-query",
+      "label": "LINQ Query",
+      "description": "EF Core 通过 LINQ 表达式构建面向对象的查询语义。",
+      "tags": [
+        "linq",
+        "query"
+      ],
+      "links": [
+        {
+          "target": "query-provider",
+          "type": "Concept",
+          "label": "交给查询提供程序"
+        },
+        {
+          "target": "projection",
+          "type": "Action",
+          "label": "可投影结果"
+        }
+      ]
+    },
+    {
+      "id": "query-provider",
+      "label": "Query Provider",
+      "description": "查询提供程序负责解析表达式树并转译为数据库查询。",
+      "tags": [
+        "translation",
+        "provider"
+      ],
+      "links": [
+        {
+          "target": "sql-translation",
+          "type": "Action",
+          "label": "生成 SQL"
+        },
+        {
+          "target": "linq-query",
+          "type": "Description",
+          "label": "接收 LINQ 表达式"
+        }
+      ]
+    },
+    {
+      "id": "sql-translation",
+      "label": "SQL Translation",
+      "description": "将可翻译的查询表达式转换成底层数据库命令文本。",
+      "tags": [
+        "sql",
+        "translation"
+      ],
+      "links": [
+        {
+          "target": "execution",
+          "type": "Action",
+          "label": "交给执行阶段"
+        },
+        {
+          "target": "client-eval",
+          "type": "Condition",
+          "label": "不可翻译时受限制"
+        }
+      ]
+    },
+    {
+      "id": "execution",
+      "label": "Execution",
+      "description": "执行阶段向数据库发送命令并读取结果集。",
+      "tags": [
+        "database",
+        "runtime"
+      ],
+      "links": [
+        {
+          "target": "materialization",
+          "type": "Action",
+          "label": "产生对象结果"
+        },
+        {
+          "target": "sql-translation",
+          "type": "Description",
+          "label": "执行已翻译命令"
+        }
+      ]
+    },
+    {
+      "id": "materialization",
+      "label": "Materialization",
+      "description": "把结果行转换为实体对象或投影对象。",
+      "tags": [
+        "objects",
+        "mapping"
+      ],
+      "links": [
+        {
+          "target": "tracking-query",
+          "type": "Condition",
+          "label": "可进入跟踪模式"
+        },
+        {
+          "target": "projection",
+          "type": "Concept",
+          "label": "也可形成投影结果"
+        }
+      ]
+    },
+    {
+      "id": "tracking-query",
+      "label": "Tracking Query",
+      "description": "默认实体查询会将结果纳入 Change Tracker，用于状态管理、Identity Map 和后续 SaveChanges。",
+      "tags": [
+        "tracking",
+        "default"
+      ],
+      "links": [
+        {
+          "target": "materialization",
+          "type": "Description",
+          "label": "作用于实体结果"
+        },
+        {
+          "target": "no-tracking",
+          "type": "Condition",
+          "label": "只读场景可切换为不跟踪"
+        }
+      ]
+    },
+    {
+      "id": "projection",
+      "label": "Projection",
+      "description": "通过 Select 仅返回所需列或自定义形状的数据。",
+      "tags": [
+        "select",
+        "shape"
+      ],
+      "links": [
+        {
+          "target": "linq-query",
+          "type": "Description",
+          "label": "由查询定义"
+        }
+      ]
+    },
+    {
+      "id": "client-eval",
+      "label": "Client Evaluation",
+      "description": "部分表达式若无法翻译，通常需要改写以避免客户端求值问题。",
+      "tags": [
+        "translation-limit",
+        "warning"
+      ],
+      "links": [
+        {
+          "target": "sql-translation",
+          "type": "Condition",
+          "label": "受翻译能力约束"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,319 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "office-small-talk",
+  "graphLabel": "澳洲办公室闲聊表达",
+  "nodes": [
+    {
+      "id": "office-small-talk-root",
+      "label": "澳洲办公室闲聊表达 / Office small talk phrase bank",
+      "description": "同事之间轻量聊天时使用的澳洲口语归纳，按午饭咖啡、饮食偏好、忙碌状态和短回应整理。",
+      "tags": [
+        "scenario",
+        "work",
+        "australia",
+        "office-chat"
+      ],
+      "links": [
+        {
+          "target": "office-lunch",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "office-food",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "office-busy",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "office-soft",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "office-lunch",
+      "label": "约午饭和咖啡 / Lunch and coffee",
+      "description": "办公室午休、咖啡和附近餐厅闲聊。",
+      "tags": [
+        "intent",
+        "work",
+        "australia",
+        "office-chat"
+      ],
+      "links": [
+        {
+          "target": "office-lunch-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-lunch-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-lunch-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-lunch-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-lunch-05",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "office-lunch-01",
+      "label": "Any lunch plans today?",
+      "description": "问午饭安排。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-lunch-02",
+      "label": "What are you having for lunch today?",
+      "description": "问对方中午吃什么。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-lunch-03",
+      "label": "I might just grab something quick.",
+      "description": "随便买点快的。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-lunch-04",
+      "label": "A new Thai place just opened downstairs.",
+      "description": "楼下新开泰餐店。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-lunch-05",
+      "label": "Keen to try it?",
+      "description": "澳洲口语：想试试吗？",
+      "tags": [
+        "phrase",
+        "work",
+        "australia"
+      ]
+    },
+    {
+      "id": "office-food",
+      "label": "饮食偏好 / Food preferences",
+      "description": "表达能不能吃辣、有没有不辣选项。",
+      "tags": [
+        "intent",
+        "work",
+        "australia",
+        "office-chat"
+      ],
+      "links": [
+        {
+          "target": "office-food-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-food-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-food-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "office-food-01",
+      "label": "I'm not really into spicy food.",
+      "description": "不太喜欢/不太能吃辣。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-food-02",
+      "label": "I can't really handle spicy food.",
+      "description": "不太能吃辣。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-food-03",
+      "label": "They've got non-spicy options too.",
+      "description": "他们也有不辣选择。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-busy",
+      "label": "忙碌加班 / Being busy",
+      "description": "表达最近忙、项目赶或加班。",
+      "tags": [
+        "intent",
+        "work",
+        "australia",
+        "office-chat"
+      ],
+      "links": [
+        {
+          "target": "office-busy-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-busy-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-busy-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-busy-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "office-busy-01",
+      "label": "Have you been working overtime lately?",
+      "description": "问最近是否经常加班。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-busy-02",
+      "label": "We've been pretty flat out lately.",
+      "description": "澳洲口语：最近很忙。",
+      "tags": [
+        "phrase",
+        "work",
+        "australia"
+      ]
+    },
+    {
+      "id": "office-busy-03",
+      "label": "The project's been pretty hectic lately.",
+      "description": "项目最近比较赶/乱。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-busy-04",
+      "label": "I've been pretty slammed this week.",
+      "description": "这周忙爆了。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-soft",
+      "label": "轻量回应 / Short responses",
+      "description": "办公室闲聊里的自然短句。",
+      "tags": [
+        "intent",
+        "work",
+        "australia",
+        "office-chat"
+      ],
+      "links": [
+        {
+          "target": "office-soft-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-soft-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "office-soft-03",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "office-soft-01",
+      "label": "Sounds good.",
+      "description": "自然回应。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-soft-02",
+      "label": "Might grab a coffee as well.",
+      "description": "顺便也买杯咖啡。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    },
+    {
+      "id": "office-soft-03",
+      "label": "Probably just gonna grab something nearby.",
+      "description": "大概就在附近随便买点。",
+      "tags": [
+        "phrase",
+        "work",
+        "office-chat"
+      ]
+    }
+  ]
+}
+
