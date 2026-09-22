@@ -1,0 +1,322 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "rental-housing",
+  "graphLabel": "澳洲租房与居住表达",
+  "nodes": [
+    {
+      "id": "rental-housing-root",
+      "label": "澳洲租房与居住表达 / Rental and housing phrase bank",
+      "description": "按租房流程整理：看房预约、租客身份、报修维护、房型家具、租金费用和网络设置。",
+      "tags": [
+        "scenario",
+        "daily",
+        "australia",
+        "rental",
+        "housing"
+      ],
+      "links": [
+        {
+          "target": "housing-inspection",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "housing-tenant-address",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "housing-maintenance",
+          "type": "Concept",
+          "label": "表达场景"
+        },
+        {
+          "target": "housing-rent-utilities",
+          "type": "Concept",
+          "label": "表达场景"
+        }
+      ]
+    },
+    {
+      "id": "housing-inspection",
+      "label": "看房预约 / Rental inspection",
+      "description": "看房说明来意、确认是否预约以及预约时间。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "rental"
+      ],
+      "links": [
+        {
+          "target": "daily-service-request-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-purpose-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-booking-address-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-booking-address-02",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "daily-service-request-04",
+      "label": "I'm here for the inspection.",
+      "description": "澳洲租房看房常说 inspection。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-purpose-01",
+      "label": "I'm here for the inspection.",
+      "description": "看房说明来意。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-booking-address-01",
+      "label": "Have you booked an inspection?",
+      "description": "询问是否预约看房。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-booking-address-02",
+      "label": "I booked the 2 pm inspection.",
+      "description": "说明预约时间。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "housing-tenant-address",
+      "label": "租客身份和住址 / Tenant and address",
+      "description": "说明租客身份、房号地址和刚租好住处。",
+      "tags": [
+        "intent",
+        "daily",
+        "rental",
+        "address"
+      ],
+      "links": [
+        {
+          "target": "life-rental-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-booking-address-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "life-rental-01",
+      "label": "I'm the tenant in Unit 302 at 18 Brisbane Road.",
+      "description": "说明租客身份和澳洲地址。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-booking-address-04",
+      "label": "I recently rented a place.",
+      "description": "说明刚租好住处。",
+      "tags": [
+        "phrase",
+        "daily",
+        "settlement"
+      ]
+    },
+    {
+      "id": "housing-maintenance",
+      "label": "租房报修 / Rental maintenance",
+      "description": "联系 property manager 报修热水器、说明问题持续时间和预约维修上门。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "rental",
+        "maintenance"
+      ],
+      "links": [
+        {
+          "target": "life-rental-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-rental-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-rental-04",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-rental-05",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "life-rental-06",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "life-rental-02",
+      "label": "I'd like to report an issue with the hot water system.",
+      "description": "报修热水器；report an issue with 很自然。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "life-rental-03",
+      "label": "There's no hot water when I shower.",
+      "description": "洗澡时没有热水。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "life-rental-04",
+      "label": "It's been going on for two days.",
+      "description": "问题已经持续两天。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "life-rental-05",
+      "label": "Tomorrow morning would be best.",
+      "description": "礼貌说明最好明天上午上门。",
+      "tags": [
+        "phrase",
+        "daily",
+        "booking"
+      ]
+    },
+    {
+      "id": "life-rental-06",
+      "label": "Could you send me a confirmation by text or email?",
+      "description": "请对方通过短信或邮件确认。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "housing-rent-utilities",
+      "label": "租金与居住费用 / Rent and utilities",
+      "description": "房型、家具、费用包含和网络设置。",
+      "tags": [
+        "intent",
+        "daily",
+        "australia",
+        "rental",
+        "utilities"
+      ],
+      "links": [
+        {
+          "target": "settlement-rent-cost-01",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-rent-cost-02",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-rent-cost-03",
+          "type": "Action",
+          "label": "常用表达"
+        },
+        {
+          "target": "settlement-rent-cost-04",
+          "type": "Action",
+          "label": "常用表达"
+        }
+      ]
+    },
+    {
+      "id": "settlement-rent-cost-01",
+      "label": "This is a two-bedroom apartment.",
+      "description": "两室公寓标准表达。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-rent-cost-02",
+      "label": "Most of the furniture is included.",
+      "description": "furniture 不可数。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-rent-cost-03",
+      "label": "Are utilities included in the rent?",
+      "description": "询问水电网等费用是否包含。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    },
+    {
+      "id": "settlement-rent-cost-04",
+      "label": "You'll need to set up your own internet.",
+      "description": "需要自己办理网络。",
+      "tags": [
+        "phrase",
+        "daily",
+        "rental"
+      ]
+    }
+  ]
+}
+

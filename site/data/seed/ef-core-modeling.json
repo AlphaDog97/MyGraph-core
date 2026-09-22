@@ -1,0 +1,130 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "modeling",
+  "graphLabel": "Modeling",
+  "nodes": [
+    {
+      "id": "entity-type",
+      "label": "Entity Type",
+      "description": "实体类型描述领域对象及其在模型中的结构。",
+      "tags": [
+        "entity",
+        "model"
+      ],
+      "links": [
+        {
+          "target": "key",
+          "type": "Concept",
+          "label": "定义主键"
+        },
+        {
+          "target": "property",
+          "type": "Concept",
+          "label": "包含属性"
+        },
+        {
+          "target": "relationship",
+          "type": "Concept",
+          "label": "建立关系"
+        }
+      ]
+    },
+    {
+      "id": "key",
+      "label": "Key",
+      "description": "键用于唯一标识实体实例，并支持关系映射。",
+      "tags": [
+        "primary-key",
+        "identity"
+      ],
+      "links": [
+        {
+          "target": "entity-type",
+          "type": "Description",
+          "label": "标识实体"
+        },
+        {
+          "target": "relationship",
+          "type": "Condition",
+          "label": "支持外键关联"
+        }
+      ]
+    },
+    {
+      "id": "property",
+      "label": "Property",
+      "description": "属性表示要映射到数据库列的数据成员。",
+      "tags": [
+        "column",
+        "member"
+      ],
+      "links": [
+        {
+          "target": "value-conversion",
+          "type": "Action",
+          "label": "可应用值转换"
+        },
+        {
+          "target": "entity-type",
+          "type": "Description",
+          "label": "属于实体"
+        }
+      ]
+    },
+    {
+      "id": "relationship",
+      "label": "Relationship",
+      "description": "关系定义实体之间的一对一、一对多或多对多关联。",
+      "tags": [
+        "navigation",
+        "foreign-key"
+      ],
+      "links": [
+        {
+          "target": "navigation",
+          "type": "Concept",
+          "label": "通过导航属性体现"
+        },
+        {
+          "target": "key",
+          "type": "Condition",
+          "label": "依赖键与外键"
+        }
+      ]
+    },
+    {
+      "id": "navigation",
+      "label": "Navigation",
+      "description": "导航属性允许代码层面在实体间遍历关系。",
+      "tags": [
+        "reference",
+        "collection"
+      ],
+      "links": [
+        {
+          "target": "relationship",
+          "type": "Description",
+          "label": "表达关系访问"
+        }
+      ]
+    },
+    {
+      "id": "value-conversion",
+      "label": "Value Converter",
+      "description": "值转换器在 CLR 类型和值库表示之间执行转换。",
+      "tags": [
+        "conversion",
+        "mapping"
+      ],
+      "links": [
+        {
+          "target": "property",
+          "type": "Description",
+          "label": "作用于属性"
+        }
+      ]
+    }
+  ]
+}
+

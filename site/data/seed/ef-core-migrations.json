@@ -1,0 +1,135 @@
+{
+  "categoryId": "ef-core",
+  "categoryLabel": "EF Core",
+  "graphId": "migrations",
+  "graphLabel": "Migrations",
+  "nodes": [
+    {
+      "id": "migration",
+      "label": "Migration",
+      "description": "迁移记录模型结构变化，并提供可重复执行的数据库演进步骤。",
+      "tags": [
+        "schema",
+        "evolution"
+      ],
+      "links": [
+        {
+          "target": "model-snapshot",
+          "type": "Concept",
+          "label": "比较模型快照"
+        },
+        {
+          "target": "up-method",
+          "type": "Action",
+          "label": "应用升级操作"
+        },
+        {
+          "target": "down-method",
+          "type": "Action",
+          "label": "支持回滚"
+        }
+      ]
+    },
+    {
+      "id": "model-snapshot",
+      "label": "Model Snapshot",
+      "description": "模型快照保存上一次迁移后的模型状态，用于差异比较。",
+      "tags": [
+        "snapshot",
+        "comparison"
+      ],
+      "links": [
+        {
+          "target": "migration",
+          "type": "Description",
+          "label": "为迁移生成提供基线"
+        }
+      ]
+    },
+    {
+      "id": "up-method",
+      "label": "Up",
+      "description": "Up 方法描述将数据库结构升级到新版本所需的操作。",
+      "tags": [
+        "upgrade",
+        "ddl"
+      ],
+      "links": [
+        {
+          "target": "migration-builder",
+          "type": "Action",
+          "label": "通过构建器定义操作"
+        },
+        {
+          "target": "migration",
+          "type": "Description",
+          "label": "属于迁移"
+        }
+      ]
+    },
+    {
+      "id": "down-method",
+      "label": "Down",
+      "description": "Down 方法描述撤销当前迁移时应执行的操作。",
+      "tags": [
+        "rollback",
+        "revert"
+      ],
+      "links": [
+        {
+          "target": "migration-builder",
+          "type": "Action",
+          "label": "通过构建器定义回退"
+        },
+        {
+          "target": "migration",
+          "type": "Description",
+          "label": "属于迁移"
+        }
+      ]
+    },
+    {
+      "id": "migration-builder",
+      "label": "MigrationBuilder",
+      "description": "迁移构建器用于声明建表、改列、加索引等结构操作。",
+      "tags": [
+        "operations",
+        "builder"
+      ],
+      "links": [
+        {
+          "target": "up-method",
+          "type": "Description",
+          "label": "服务于升级脚本"
+        },
+        {
+          "target": "down-method",
+          "type": "Description",
+          "label": "服务于回滚脚本"
+        },
+        {
+          "target": "database-update",
+          "type": "Action",
+          "label": "最终作用到数据库"
+        }
+      ]
+    },
+    {
+      "id": "database-update",
+      "label": "Database Update",
+      "description": "更新数据库命令会按顺序执行未应用迁移。",
+      "tags": [
+        "apply",
+        "deployment"
+      ],
+      "links": [
+        {
+          "target": "migration-builder",
+          "type": "Concept",
+          "label": "执行已生成操作"
+        }
+      ]
+    }
+  ]
+}
+

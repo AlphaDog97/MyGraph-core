@@ -28,6 +28,21 @@ npm run build
 npm pack --dry-run
 ```
 
+## Sites 应用
+
+带登录和云端增删改查能力的 MyGraph 网站位于 [`site/`](site/)，与核心包和
+Vite Demo 独立安装、构建。它使用 Supabase Auth（GitHub OAuth / 邮箱注册）
+以及 Sites 提供的数据库与托管环境。
+
+```bash
+cd site
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+合并到 `main` 的 Pull Request 会触发 Sites 部署流程。网站运行时配置保存在
+Sites 项目中，本地 `.env` 文件不应提交到仓库。
+
 ## 在项目中使用
 
 ```ts
@@ -135,6 +150,10 @@ src/
 ├── domain/       # 类型、关系类型、诊断
 ├── data/         # GraphSource、加载、聚合、存储
 └── components/   # Demo 可视化组件
+
+site/             # Supabase Auth + 云端 CRUD 的 Sites 应用
+graph-data/       # 核心库与 Demo 使用的图数据
+specs/            # LeanSpec 规格
 ```
 
 ## LeanSpec

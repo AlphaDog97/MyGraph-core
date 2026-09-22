@@ -1,0 +1,488 @@
+{
+  "categoryId": "english-expression",
+  "categoryLabel": "English Expression",
+  "graphId": "common-corrections",
+  "graphLabel": "常见表达纠错",
+  "nodes": [
+    {
+      "id": "common-corrections-root",
+      "label": "常见表达纠错 / Common corrections",
+      "description": "按实际场景整理中式直译、词义误用、可数性和动词搭配问题，便于从错误表达快速替换成自然英文。",
+      "tags": [
+        "scenario",
+        "correction",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "corr-life-healthcare",
+          "type": "Concept",
+          "label": "纠错类别"
+        },
+        {
+          "target": "corr-life-rental-banking",
+          "type": "Concept",
+          "label": "纠错类别"
+        },
+        {
+          "target": "corr-engineering",
+          "type": "Concept",
+          "label": "纠错类别"
+        },
+        {
+          "target": "corr-verb-shopping",
+          "type": "Concept",
+          "label": "纠错类别"
+        },
+        {
+          "target": "corr-direct-translation",
+          "type": "Concept",
+          "label": "纠错类别"
+        }
+      ]
+    },
+    {
+      "id": "corr-life-healthcare",
+      "label": "医疗与药房纠错 / Healthcare corrections",
+      "description": "预约、病人身份、保险、感冒鼻塞和吃药表达纠错。",
+      "tags": [
+        "intent",
+        "correction",
+        "healthcare",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "life-correction-01",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-02",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-03",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-04",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-08",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-09",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-10",
+          "type": "Condition",
+          "label": "替换"
+        }
+      ]
+    },
+    {
+      "id": "life-correction-01",
+      "label": "book an appointment / not book a reservation",
+      "description": "看医生、办事预约用 appointment。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-02",
+      "label": "appointments available / not available seats",
+      "description": "诊所空位说 appointments available。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-03",
+      "label": "existing patient / not old patient",
+      "description": "老病人/已登记病人说 existing patient。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-04",
+      "label": "private health insurance / not personal insurance",
+      "description": "私人医疗保险说 private health insurance。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-08",
+      "label": "I've got a cold / not I'm cold",
+      "description": "I'm cold 是觉得冷，不是感冒。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-09",
+      "label": "blocked nose / not my nose is blocking",
+      "description": "鼻塞说 blocked nose。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-10",
+      "label": "take medicine / not have medicine",
+      "description": "吃药通常说 take medicine。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "corr-life-rental-banking",
+      "label": "租房、银行与生活办理纠错 / Rental, banking and settlement corrections",
+      "description": "银行卡、租客、维修人员、网络、会员和账户类型相关纠错。",
+      "tags": [
+        "intent",
+        "correction",
+        "daily",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "life-correction-05",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-06",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "life-correction-07",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-word-02",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-word-03",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-count-02",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-count-04",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-verb-04",
+          "type": "Condition",
+          "label": "替换"
+        }
+      ]
+    },
+    {
+      "id": "life-correction-05",
+      "label": "card got declined / not card is unavailable",
+      "description": "银行卡被拒付用 got declined。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-06",
+      "label": "tenant / not renter",
+      "description": "租房正式场景更常用 tenant。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "life-correction-07",
+      "label": "tradesperson / not maintainer",
+      "description": "租房维修人员可说 tradesperson、technician 或 plumber。",
+      "tags": [
+        "correction",
+        "english-expression"
+      ]
+    },
+    {
+      "id": "corr-word-02",
+      "label": "internet / not network",
+      "description": "生活场景里的网络说 internet。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-word-03",
+      "label": "membership / not VIP plans",
+      "description": "健身房会员说 membership。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-count-02",
+      "label": "furniture / not furnitures",
+      "description": "furniture 不可数。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-count-04",
+      "label": "savings account",
+      "description": "固定说 savings account。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-verb-04",
+      "label": "set up your own internet",
+      "description": "办理网络说 set up internet。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-engineering",
+      "label": "工程与架构表达纠错 / Engineering corrections",
+      "description": "代码、上线、service layer、API 确认和影响范围相关纠错。",
+      "tags": [
+        "intent",
+        "correction",
+        "engineering",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "corr-word-04",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-count-01",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-count-03",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-verb-03",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-verb-05",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-translation-04",
+          "type": "Condition",
+          "label": "替换"
+        }
+      ]
+    },
+    {
+      "id": "corr-word-04",
+      "label": "release / not always deployment",
+      "description": "上线计划多说 release。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-count-01",
+      "label": "too much business logic / not many business logics",
+      "description": "business logic 不可数。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-count-03",
+      "label": "legacy code / not old codes",
+      "description": "code 通常不可数。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-verb-03",
+      "label": "move it into the service layer",
+      "description": "不要说 separate to the service layer。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-verb-05",
+      "label": "check a few things with the API",
+      "description": "确认 API 细节用 check with/about。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-translation-04",
+      "label": "impact scope / affected areas",
+      "description": "不要说 influence range。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-verb-shopping",
+      "label": "购物动词搭配纠错 / Shopping verb patterns",
+      "description": "退货、换货等服务场景常见动词搭配。",
+      "tags": [
+        "intent",
+        "correction",
+        "shopping",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "corr-verb-01",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-verb-02",
+          "type": "Condition",
+          "label": "替换"
+        }
+      ]
+    },
+    {
+      "id": "corr-verb-01",
+      "label": "return this item / not refund this good",
+      "description": "退货说 return this item。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-verb-02",
+      "label": "exchange it for a new one",
+      "description": "换成新的要用 exchange it for。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-direct-translation",
+      "label": "中文直译纠错 / Direct translation corrections",
+      "description": "otherwise、估算耗时、午饭和吃辣等中式直译替换。",
+      "tags": [
+        "intent",
+        "correction",
+        "english-expression"
+      ],
+      "links": [
+        {
+          "target": "corr-word-01",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-translation-01",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-translation-02",
+          "type": "Condition",
+          "label": "替换"
+        },
+        {
+          "target": "corr-translation-03",
+          "type": "Condition",
+          "label": "替换"
+        }
+      ]
+    },
+    {
+      "id": "corr-word-01",
+      "label": "otherwise ≠ also",
+      "description": "otherwise 是“否则”，不是“另外”。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-translation-01",
+      "label": "How long do you think this will take?",
+      "description": "不要说 How long can you finish this task。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-translation-02",
+      "label": "What are you having for lunch?",
+      "description": "不要说 What do you plan to eat this noon。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    },
+    {
+      "id": "corr-translation-03",
+      "label": "I'm not really into spicy food.",
+      "description": "不要说 I cannot eat too spicy。",
+      "tags": [
+        "correction",
+        "english"
+      ]
+    }
+  ]
+}
+
