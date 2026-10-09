@@ -1,423 +1,421 @@
 "use client";
 
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Core } from "cytoscape";
+import { GithubOutlined, MoonOutlined, PlusOutlined, SunOutlined } from "@ant-design/icons";
 import {
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  GitBranch,
-  Network,
-  Plus,
-  Search,
-  Sparkles,
-} from "lucide-react";
-import { toast } from "sonner";
-import type {
-  CategorySummary,
-  GraphDetail,
-  GraphEdge,
-  GraphNode,
-  GraphSummary,
-  WorkspaceSnapshot,
-} from "@/app/lib/types";
+  App as AntdApp,
+  Button,
+  ConfigProvider,
+  Flex,
+  Grid,
+  Layout,
+  Switch,
+  Tooltip,
+  message,
+  theme as antdTheme,
+} from "antd";
+import GraphCanvas from "@/original-ui/components/GraphCanvas";
+import GraphSelector from "@/original-ui/components/GraphSelector";
+import SearchBar from "@/original-ui/components/SearchBar";
+import TagLegend from "@/original-ui/components/TagLegend";
+import EdgeTypeLegend from "@/original-ui/components/EdgeTypeLegend";
+import TagColorEditor from "@/original-ui/components/TagColorEditor";
+import Overview3DCanvas from "@/original-ui/components/Overview3DCanvas";
+import { loadTagColors, saveTagColors } from "@/original-ui/data/tagStorage";
+import type { KnowledgeNode, TagColorAssignment } from "@/original-ui/domain/types";
 import type { SignedInUser } from "@/app/lib/auth";
-import { useWebMcp } from "@/app/lib/use-webmcp";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
+import type { GraphDetail, WorkspaceSnapshot } from "@/app/lib/types";
 import { CategoryGraphDialog } from "./category-graph-dialog";
 import { DeleteDialog } from "./delete-dialog";
-import { EdgeDialog, type EdgeFormValue } from "./edge-dialog";
-import { GraphCanvas } from "./graph-canvas";
-import { GraphSidebar } from "./graph-sidebar";
-import { NodeDialog, type NodeFormValue } from "./node-dialog";
-import { NodeInspector } from "./node-inspector";
-import { UserMenu } from "./user-menu";
+import { EdgeDialog } from "./edge-dialog";
+import { NodeDialog } from "./node-dialog";
+import { findOwningDetail, toKnowledgeGraph } from "./original-workspace/graph-adapter";
+import { SiteNodeDrawer } from "./original-workspace/site-node-drawer";
+import { OriginalUserMenu, WorkspaceActions } from "./original-workspace/workspace-actions";
+import { useOriginalWorkspace } from "./original-workspace/use-original-workspace";
+import "@/original-ui/styles.css";
+import "./original-workspace/site-workspace.css";
 
-type EntityDialogState =
-  | { kind: "category"; mode: "create" | "edit"; item?: CategorySummary }
-  | {
-      kind: "graph";
-      mode: "create" | "edit";
-      item?: GraphSummary;
-      categoryId?: string;
-    }
-  | null;
+type Theme = "light" | "dark";
+type ViewMode = "category" | "overview3d";
+type LegendState = { tagsOpen: boolean; relationsOpen: boolean };
 
-type DeleteTarget =
-  | { kind: "category"; item: CategorySummary }
-  | { kind: "graph"; item: GraphSummary }
-  | { kind: "node"; item: GraphNode }
-  | { kind: "edge"; item: GraphEdge }
-  | null;
+const THEME_STORAGE_KEY = "mygraph-theme";
+const LEGEND_STATE_STORAGE_KEY = "mygraph-legend-state";
+const OVERLAY_Z_INDEX = { legends: 30, detailDrawer: 40 } as const;
 
-async function request<T>(url: string, method = "GET", body?: unknown): Promise<T> {
-  const response = await fetch(url, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const result = (await response.json()) as T & { error?: string };
-  if (!response.ok) throw new Error(result.error ?? "操作失败");
-  return result;
-}
+const getInitialTheme = (): Theme => {
+  if (typeof window === "undefined") return "light";
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function WorkspaceShell({
   user,
   initialWorkspace,
-  initialDetail,
+  initialDetails,
 }: {
   user: SignedInUser;
   initialWorkspace: WorkspaceSnapshot;
-  initialDetail: GraphDetail | null;
+  initialDetails: GraphDetail[];
 }) {
-  const [workspace, setWorkspace] = useState(initialWorkspace);
-  const [detail, setDetail] = useState(initialDetail);
-  const [selectedNodeId, setSelectedNodeId] = useState<string>();
-  const [search, setSearch] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [entityDialog, setEntityDialog] = useState<EntityDialogState>(null);
-  const [nodeDialog, setNodeDialog] = useState<GraphNode | null | undefined>();
-  const [edgeDialog, setEdgeDialog] = useState<{
-    edge?: GraphEdge;
-    preferredSourceId?: string;
-  } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  const selectedNode = useMemo(
-    () => detail?.nodes.find((node) => node.id === selectedNodeId) ?? null,
-    [detail?.nodes, selectedNodeId],
+  return (
+    <AntdApp>
+      <OriginalWorkspace
+        user={user}
+        initialWorkspace={initialWorkspace}
+        initialDetails={initialDetails}
+      />
+    </AntdApp>
   );
-  const selectedCategory = workspace.categories.find(
-    (category) => category.id === detail?.graph.categoryId,
+}
+
+function OriginalWorkspace({
+  user,
+  initialWorkspace,
+  initialDetails,
+}: {
+  user: SignedInUser;
+  initialWorkspace: WorkspaceSnapshot;
+  initialDetails: GraphDetail[];
+}) {
+  const screens = Grid.useBreakpoint();
+  const controller = useOriginalWorkspace(initialWorkspace, initialDetails);
+  // Match server markup during hydration; restore browser preferences before mounting the canvas.
+  const [theme, setTheme] = useState<Theme>("light");
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("category");
+  const [overviewDetails, setOverviewDetails] = useState<GraphDetail[]>([]);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [tagColors, setTagColors] = useState<TagColorAssignment>({});
+  const [legendState, setLegendState] = useState<LegendState>({ tagsOpen: true, relationsOpen: true });
+  useEffect(() => {
+    setTheme(getInitialTheme());
+    setTagColors(loadTagColors());
+    try {
+      const stored = window.localStorage.getItem(LEGEND_STATE_STORAGE_KEY);
+      if (stored) setLegendState({ tagsOpen: true, relationsOpen: true, ...JSON.parse(stored) });
+    } catch {
+      // Keep the default legends if browser storage is unavailable or invalid.
+    }
+    setPreferencesLoaded(true);
+  }, []);
+  const cyRef = useRef<Core | null>(null);
+
+  const graph = useMemo(
+    () => toKnowledgeGraph(controller.visibleDetails),
+    [controller.visibleDetails],
   );
-
-  const refreshWorkspace = useCallback(async () => {
-    const next = await request<WorkspaceSnapshot>("/api/categories");
-    setWorkspace(next);
-  }, []);
-
-  const loadGraph = useCallback(async (id: string) => {
-    const next = await request<GraphDetail>(
-      `/api/graphs/${encodeURIComponent(id)}`,
-    );
-    setDetail(next);
-    setSearch("");
-    setSelectedNodeId(undefined);
-  }, []);
-
-  const refreshGraph = useCallback(async () => {
-    if (!detail?.graph.id) return;
-    const next = await request<GraphDetail>(
-      `/api/graphs/${encodeURIComponent(detail.graph.id)}`,
-    );
-    setDetail(next);
-  }, [detail?.graph.id]);
-
-  useWebMcp(detail, refreshGraph, refreshWorkspace);
+  const overviewGraph = useMemo(
+    () => toKnowledgeGraph(overviewDetails.length ? overviewDetails : controller.visibleDetails),
+    [controller.visibleDetails, overviewDetails],
+  );
+  const currentCategory = controller.workspace.categories.find(
+    (category) => category.id === controller.categoryId,
+  );
+  const currentGraph = controller.workspace.graphs.find(
+    (item) => item.id === controller.focusedGraphId,
+  );
+  const selectedDetail = controller.selectedNode
+    ? findOwningDetail(controller.allDetails, controller.selectedNode.id)
+    : undefined;
+  const dialogDetail = controller.edgeDialog?.edge
+    ? controller.allDetails.find((detail) =>
+        detail.edges.some((edge) => edge.id === controller.edgeDialog?.edge?.id),
+      )
+    : selectedDetail ?? controller.visibleDetails[0];
 
   useEffect(() => {
-    const handleShortcut = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
-        event.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
+    if (!preferencesLoaded) return;
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [preferencesLoaded, theme]);
+
+  useEffect(() => {
+    if (!preferencesLoaded) return;
+    window.localStorage.setItem(LEGEND_STATE_STORAGE_KEY, JSON.stringify(legendState));
+  }, [legendState, preferencesLoaded]);
+
+  const report = useCallback((action: Promise<unknown>) => {
+    void action.catch((error) =>
+      message.error(error instanceof Error ? error.message : "加载失败"),
+    );
   }, []);
 
-  const mutate = async (
-    action: () => Promise<void>,
-    successMessage: string,
-  ) => {
-    setBusy(true);
-    try {
-      await action();
-      toast.success(successMessage);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "操作失败");
-    } finally {
-      setBusy(false);
+  const handleViewModeToggle = useCallback(() => {
+    if (viewMode === "overview3d") {
+      setViewMode("category");
+      controller.setSelectedNodeId(undefined);
+      return;
     }
-  };
+    report(
+      controller.loadOverview().then((details) => {
+        setOverviewDetails(details);
+        setViewMode("overview3d");
+        controller.setSelectedNodeId(undefined);
+      }),
+    );
+  }, [controller, report, viewMode]);
 
-  const saveEntity = (value: { id?: string; label: string; slug?: string }) => {
-    const dialog = entityDialog;
-    if (!dialog) return;
-    void mutate(async () => {
-      if (dialog.kind === "category") {
-        if (dialog.mode === "create") {
-          await request("/api/categories", "POST", value);
-        } else {
-          await request(
-            `/api/categories/${encodeURIComponent(dialog.item!.id)}`,
-            "PATCH",
-            { label: value.label },
-          );
-        }
-        await refreshWorkspace();
-      } else if (dialog.mode === "create") {
-        const created = await request<{ id: string }>("/api/graphs", "POST", {
-          categoryId: dialog.categoryId,
-          slug: value.slug,
-          label: value.label,
-        });
-        await refreshWorkspace();
-        await loadGraph(created.id);
-      } else {
-        await request(
-          `/api/graphs/${encodeURIComponent(dialog.item!.id)}`,
-          "PATCH",
-          { slug: value.slug, label: value.label },
-        );
-        await Promise.all([refreshWorkspace(), refreshGraph()]);
-      }
-      setEntityDialog(null);
-    }, dialog.mode === "create" ? "已创建" : "已保存");
-  };
+  const handleResetView = useCallback(() => {
+    controller.setFocusedGraphId("");
+    cyRef.current?.animate({
+      fit: { eles: cyRef.current.elements(), padding: 40 },
+      duration: prefersReducedMotion() ? 0 : 400,
+    });
+  }, [controller]);
 
-  const saveNode = (value: NodeFormValue) => {
-    if (!detail) return;
-    const editing = nodeDialog ?? null;
-    void mutate(async () => {
-      const payload = {
-        ...value,
-        graphId: detail.graph.id,
-        tags: value.tags,
-      };
-      const result = editing
-        ? await request<{ id: string }>(
-            `/api/nodes/${encodeURIComponent(editing.id)}`,
-            "PATCH",
-            payload,
-          )
-        : await request<{ id: string }>("/api/nodes", "POST", payload);
-      await Promise.all([refreshGraph(), refreshWorkspace()]);
-      setSelectedNodeId(result.id);
-      setNodeDialog(undefined);
-    }, editing ? "节点已更新" : "节点已添加");
-  };
+  const handleTagColorChange = useCallback((tag: string, color: string | undefined) => {
+    setTagColors((current) => {
+      const next = { ...current };
+      if (color) next[tag] = color;
+      else delete next[tag];
+      saveTagColors(next);
+      return next;
+    });
+  }, []);
 
-  const saveEdge = (value: EdgeFormValue) => {
-    if (!detail || !edgeDialog) return;
-    const editing = edgeDialog.edge;
-    void mutate(async () => {
-      const payload = { ...value, graphId: detail.graph.id };
-      if (editing) {
-        await request(
-          `/api/edges/${encodeURIComponent(editing.id)}`,
-          "PATCH",
-          payload,
-        );
-      } else {
-        await request("/api/edges", "POST", payload);
-      }
-      await Promise.all([refreshGraph(), refreshWorkspace()]);
-      setEdgeDialog(null);
-    }, editing ? "关系已更新" : "关系已添加");
-  };
+  const handleNodeSelect = useCallback(
+    (node: KnowledgeNode | null) => controller.setSelectedNodeId(node?.id),
+    [controller.setSelectedNodeId],
+  );
 
-  const confirmDelete = () => {
-    const target = deleteTarget;
-    if (!target) return;
-    void mutate(async () => {
-      const base =
-        target.kind === "category"
-          ? "categories"
-          : target.kind === "graph"
-            ? "graphs"
-            : target.kind === "node"
-              ? "nodes"
-              : "edges";
-      await request(
-        `/api/${base}/${encodeURIComponent(target.item.id)}`,
-        "DELETE",
-      );
-
-      if (target.kind === "category" || target.kind === "graph") {
-        const remaining = workspace.graphs.filter((graph) =>
-          target.kind === "category"
-            ? graph.categoryId !== target.item.id
-            : graph.id !== target.item.id,
-        );
-        await refreshWorkspace();
-        if (
-          target.kind === "graph" ||
-          detail?.graph.categoryId === target.item.id
-        ) {
-          if (remaining[0]) await loadGraph(remaining[0].id);
-          else setDetail(null);
-        }
-      } else {
-        if (target.kind === "node") setSelectedNodeId(undefined);
-        await Promise.all([refreshGraph(), refreshWorkspace()]);
-      }
-      setDeleteTarget(null);
-    }, "已删除");
-  };
-
-  const deleteLabel = deleteTarget
-    ? "label" in deleteTarget.item
-      ? deleteTarget.item.label
+  const deleteLabel = controller.deleteTarget
+    ? "label" in controller.deleteTarget.item
+      ? controller.deleteTarget.item.label
       : "所选内容"
     : "";
-
-  const handleSearchKey = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== "Enter" || !detail) return;
-    const first = detail.nodes.find((node) =>
-      [node.label, node.nodeKey, ...node.tags]
-        .join(" ")
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
-    );
-    if (first) setSelectedNodeId(first.id);
-  };
+  const toolbarControlSize = screens.md ? "middle" : "small";
+  const canCreateNode = Boolean(controller.focusedGraphId);
 
   return (
-    <div className="workspace-shell">
-      <GraphSidebar
-        categories={workspace.categories}
-        graphs={workspace.graphs}
-        selectedGraphId={detail?.graph.id}
-        onSelectGraph={(graph) => void loadGraph(graph.id)}
-        onCreateCategory={() =>
-          setEntityDialog({ kind: "category", mode: "create" })
-        }
-        onEditCategory={(item) =>
-          setEntityDialog({ kind: "category", mode: "edit", item })
-        }
-        onDeleteCategory={(item) =>
-          setDeleteTarget({ kind: "category", item })
-        }
-        onCreateGraph={(category) =>
-          setEntityDialog({
-            kind: "graph",
-            mode: "create",
-            categoryId: category.id,
-          })
-        }
-        onEditGraph={(item) =>
-          setEntityDialog({ kind: "graph", mode: "edit", item })
-        }
-        onDeleteGraph={(item) => setDeleteTarget({ kind: "graph", item })}
-      />
-
-      <main className="graph-workspace">
-        <header className="command-bar">
-          <div className="graph-context">
-            <span>{selectedCategory?.label ?? "知识图谱"}</span>
-            <strong>{detail?.graph.label ?? "选择图谱"}</strong>
-          </div>
-          <div className="search-box">
-            <Search />
-            <Input
-              ref={searchRef}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              onKeyDown={handleSearchKey}
-              placeholder="搜索节点、描述或标签"
-              aria-label="搜索当前图谱"
+    <ConfigProvider
+      theme={{
+        algorithm: theme === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: "#5a67d8",
+          borderRadius: 8,
+          colorBorder: theme === "dark" ? "#4b5563" : "#d9dce3",
+          colorText: theme === "dark" ? "#e5e7eb" : "#2d3748",
+          colorTextSecondary: theme === "dark" ? "#9ca3af" : "#667085",
+          colorBgContainer: theme === "dark" ? "#1f2937" : "#ffffff",
+        },
+      }}
+    >
+      <Layout className="app-layout original-site-workspace">
+        <Flex className="top-toolbar" align="center" gap={12} wrap>
+          <Flex className="toolbar-group toolbar-group--data" align="center" gap={8}>
+            <GraphSelector
+              categories={controller.workspace.categories.map((category) => ({
+                id: category.id,
+                label: category.label,
+                graphs: [],
+              }))}
+              graphs={controller.categoryGraphs.map((item) => ({
+                id: item.id,
+                label: item.label,
+              }))}
+              categoryId={controller.categoryId}
+              graphId={controller.focusedGraphId}
+              onCategoryChange={(id) => report(controller.loadCategory(id))}
+              onGraphChange={(id) => report(controller.focusGraph(id))}
+              size={toolbarControlSize}
+              showGraphSelect={viewMode === "category"}
             />
-            <kbd>/</kbd>
-          </div>
-          <Button
-            onClick={() => setNodeDialog(null)}
-            disabled={!detail}
-            className="new-node-button"
-          >
-            <Plus /> 新建节点
-          </Button>
-          <UserMenu user={user} />
-        </header>
+          </Flex>
 
-        <section className="canvas-panel">
-          <div className="canvas-heading">
-            <div>
-              <span className="eyebrow">ACTIVE GRAPH</span>
-              <h1>{detail?.graph.label ?? "MyGraph"}</h1>
-            </div>
-            <div className="graph-stats">
-              <span><Network /> {detail?.nodes.length ?? 0} 节点</span>
-              <span><GitBranch /> {detail?.edges.length ?? 0} 关系</span>
-            </div>
+          {viewMode === "category" ? (
+            <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
+              <SearchBar
+                value={controller.search}
+                onChange={controller.setSearch}
+                size={toolbarControlSize}
+              />
+            </Flex>
+          ) : null}
+
+          {viewMode === "category" ? (
+            <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
+              <WorkspaceActions
+                category={currentCategory}
+                graph={currentGraph}
+                onOpenEntity={controller.setEntityDialog}
+                onDelete={controller.setDeleteTarget}
+              />
+              <Tooltip title={canCreateNode ? "新建节点" : "请先选择具体图谱"}>
+                <Button
+                  size={toolbarControlSize}
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  disabled={!canCreateNode}
+                  onClick={() => controller.setNodeDialog(null)}
+                >
+                  新建节点
+                </Button>
+              </Tooltip>
+              <Button size={toolbarControlSize} onClick={handleResetView}>
+                显示全部
+              </Button>
+              <Button size={toolbarControlSize} onClick={() => setEditorOpen(true)}>
+                Edit tag colors
+              </Button>
+            </Flex>
+          ) : null}
+
+          <Flex className="toolbar-group toolbar-group--global" align="center" gap={8}>
+            <Button size={toolbarControlSize} onClick={handleViewModeToggle}>
+              {viewMode === "category" ? "3D 总览" : "返回分类图"}
+            </Button>
+            <Switch
+              size="small"
+              checkedChildren={<MoonOutlined />}
+              unCheckedChildren={<SunOutlined />}
+              checked={theme === "dark"}
+              onChange={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
+              title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
+            />
+            <Button
+              size={toolbarControlSize}
+              icon={<GithubOutlined />}
+              href="https://github.com/AlphaDog97/MyGraph-core"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open GitHub repository"
+              title="Open GitHub repository"
+            />
+            <OriginalUserMenu user={user} />
+          </Flex>
+        </Flex>
+
+        <Layout.Content
+          className="app-content"
+          style={
+            {
+              "--overlay-z-legends": OVERLAY_Z_INDEX.legends,
+              "--overlay-z-detail": OVERLAY_Z_INDEX.detailDrawer,
+            } as CSSProperties
+          }
+        >
+          {viewMode === "category" ? (
+            <>
+              <div className="graph-canvas-layer">
+                {preferencesLoaded ? <GraphCanvas
+                  graph={graph}
+                  focusedGraphId={controller.focusedGraphId || null}
+                  tagColors={tagColors}
+                  searchQuery={controller.search}
+                  theme={theme}
+                  cyRef={cyRef}
+                  onNodeSelect={handleNodeSelect}
+                /> : null}
+              </div>
+              <div className="legend-container">
+                <TagLegend
+                  tags={graph.tags}
+                  tagColors={tagColors}
+                  collapsed={!legendState.tagsOpen}
+                  onToggle={() =>
+                    setLegendState((current) => ({
+                      ...current,
+                      tagsOpen: !current.tagsOpen,
+                    }))
+                  }
+                />
+                <EdgeTypeLegend
+                  collapsed={!legendState.relationsOpen}
+                  onToggle={() =>
+                    setLegendState((current) => ({
+                      ...current,
+                      relationsOpen: !current.relationsOpen,
+                    }))
+                  }
+                />
+              </div>
+            </>
+          ) : (
+            <Overview3DCanvas graph={overviewGraph} theme={theme} onNodeSelect={handleNodeSelect} />
+          )}
+
+          {controller.selectedNode && selectedDetail ? (
+            <SiteNodeDrawer
+              node={controller.selectedNode}
+              detail={selectedDetail}
+              onClose={() => controller.setSelectedNodeId(undefined)}
+              onEditNode={controller.setNodeDialog}
+              onDeleteNode={(item) => controller.setDeleteTarget({ kind: "node", item })}
+              onCreateEdge={(preferredSourceId) => controller.setEdgeDialog({ preferredSourceId })}
+              onEditEdge={(edge) => controller.setEdgeDialog({ edge })}
+              onDeleteEdge={(item) => controller.setDeleteTarget({ kind: "edge", item })}
+              onSelectNode={(node) => controller.setSelectedNodeId(node.id)}
+            />
+          ) : null}
+        </Layout.Content>
+
+        {graph.warnings.length ? (
+          <div className="warnings-bar">
+            {graph.warnings.map((warning) => (
+              <span key={warning} className="warning-item">⚠ {warning}</span>
+            ))}
           </div>
-          <GraphCanvas
-            detail={detail}
-            selectedNodeId={selectedNodeId}
-            search={search}
-            onSelectNode={(node) => setSelectedNodeId(node.id)}
-            onCreateNode={() => setNodeDialog(null)}
+        ) : null}
+
+        {editorOpen ? (
+          <TagColorEditor
+            tags={graph.tags}
+            tagColors={tagColors}
+            onChange={handleTagColorChange}
+            onClose={() => setEditorOpen(false)}
           />
-          <div className="canvas-footnote">
-            <Sparkles />
-            <span>点击节点查看详情；输入关键词即可聚焦相关概念。</span>
-          </div>
-        </section>
-      </main>
+        ) : null}
 
-      <NodeInspector
-        node={selectedNode}
-        nodes={detail?.nodes ?? []}
-        edges={detail?.edges ?? []}
-        onClose={() => setSelectedNodeId(undefined)}
-        onEditNode={(node) => setNodeDialog(node)}
-        onDeleteNode={(item) => setDeleteTarget({ kind: "node", item })}
-        onCreateEdge={(preferredSourceId) =>
-          setEdgeDialog({ preferredSourceId })
-        }
-        onEditEdge={(edge) => setEdgeDialog({ edge })}
-        onDeleteEdge={(item) => setDeleteTarget({ kind: "edge", item })}
-        onSelectNode={(node) => setSelectedNodeId(node.id)}
-      />
-
-      <CategoryGraphDialog
-        open={Boolean(entityDialog)}
-        kind={entityDialog?.kind ?? "category"}
-        mode={entityDialog?.mode ?? "create"}
-        initial={entityDialog?.item}
-        busy={busy}
-        onOpenChange={(open) => !open && setEntityDialog(null)}
-        onSubmit={saveEntity}
-      />
-      <NodeDialog
-        open={nodeDialog !== undefined}
-        node={nodeDialog}
-        busy={busy}
-        onOpenChange={(open) => !open && setNodeDialog(undefined)}
-        onSubmit={saveNode}
-      />
-      <EdgeDialog
-        open={Boolean(edgeDialog)}
-        edge={edgeDialog?.edge}
-        preferredSourceId={edgeDialog?.preferredSourceId}
-        nodes={detail?.nodes ?? []}
-        busy={busy}
-        onOpenChange={(open) => !open && setEdgeDialog(null)}
-        onSubmit={saveEdge}
-      />
-      <DeleteDialog
-        open={Boolean(deleteTarget)}
-        title={`删除“${deleteLabel}”？`}
-        description={
-          deleteTarget?.kind === "category"
-            ? "该分类下的图谱、节点和关系都会一并删除，此操作无法撤销。"
-            : deleteTarget?.kind === "graph"
-              ? "图谱中的全部节点和关系都会一并删除，此操作无法撤销。"
-              : deleteTarget?.kind === "node"
-                ? "与该节点连接的关系也会被删除，此操作无法撤销。"
-                : "这条关系将被永久删除。"
-        }
-        busy={busy}
-        onOpenChange={(open) => !open && setDeleteTarget(null)}
-        onConfirm={confirmDelete}
-      />
-      <Toaster position="bottom-center" richColors />
-    </div>
+        <CategoryGraphDialog
+          open={Boolean(controller.entityDialog)}
+          kind={controller.entityDialog?.kind ?? "category"}
+          mode={controller.entityDialog?.mode ?? "create"}
+          initial={controller.entityDialog?.item}
+          busy={controller.busy}
+          onOpenChange={(open) => !open && controller.setEntityDialog(null)}
+          onSubmit={controller.saveEntity}
+        />
+        <NodeDialog
+          open={controller.nodeDialog !== undefined}
+          node={controller.nodeDialog}
+          busy={controller.busy}
+          onOpenChange={(open) => !open && controller.setNodeDialog(undefined)}
+          onSubmit={controller.saveNode}
+        />
+        <EdgeDialog
+          open={Boolean(controller.edgeDialog)}
+          edge={controller.edgeDialog?.edge}
+          preferredSourceId={controller.edgeDialog?.preferredSourceId}
+          nodes={dialogDetail?.nodes ?? []}
+          busy={controller.busy}
+          onOpenChange={(open) => !open && controller.setEdgeDialog(null)}
+          onSubmit={controller.saveEdge}
+        />
+        <DeleteDialog
+          open={Boolean(controller.deleteTarget)}
+          title={`删除“${deleteLabel}”？`}
+          description={
+            controller.deleteTarget?.kind === "category"
+              ? "该分类下的图谱、节点和关系都会一并删除，此操作无法撤销。"
+              : controller.deleteTarget?.kind === "graph"
+                ? "图谱中的全部节点和关系都会一并删除，此操作无法撤销。"
+                : controller.deleteTarget?.kind === "node"
+                  ? "与该节点连接的关系也会被删除，此操作无法撤销。"
+                  : "这条关系将被永久删除。"
+          }
+          busy={controller.busy}
+          onOpenChange={(open) => !open && controller.setDeleteTarget(null)}
+          onConfirm={controller.confirmDelete}
+        />
+      </Layout>
+    </ConfigProvider>
   );
 }
