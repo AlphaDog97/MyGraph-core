@@ -34,6 +34,7 @@ import { findOwningDetail, toKnowledgeGraph } from "./original-workspace/graph-a
 import { SiteNodeDrawer } from "./original-workspace/site-node-drawer";
 import { OriginalUserMenu, WorkspaceActions } from "./original-workspace/workspace-actions";
 import { useOriginalWorkspace } from "./original-workspace/use-original-workspace";
+import { GraphImportDialog } from "./original-workspace/graph-import-dialog";
 import "@/original-ui/styles.css";
 import "./original-workspace/site-workspace.css";
 
@@ -93,6 +94,7 @@ function OriginalWorkspace({
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   const [overviewDetails, setOverviewDetails] = useState<GraphDetail[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [tagColors, setTagColors] = useState<TagColorAssignment>({});
   const [legendState, setLegendState] = useState<LegendState>({ tagsOpen: true, relationsOpen: true });
   useEffect(() => {
@@ -265,6 +267,9 @@ function OriginalWorkspace({
               <Button size={toolbarControlSize} onClick={() => setEditorOpen(true)}>
                 Edit tag colors
               </Button>
+              <Button size={toolbarControlSize} onClick={() => setImportOpen(true)}>
+                导入图谱
+              </Button>
             </Flex>
           ) : null}
 
@@ -374,6 +379,12 @@ function OriginalWorkspace({
           />
         ) : null}
 
+        {importOpen ? <GraphImportDialog
+          categoryId={controller.categoryId}
+          categories={controller.workspace.categories}
+          onClose={() => setImportOpen(false)}
+          onImported={controller.showImportedGraphs}
+        /> : null}
         <CategoryGraphDialog
           open={Boolean(controller.entityDialog)}
           kind={controller.entityDialog?.kind ?? "category"}

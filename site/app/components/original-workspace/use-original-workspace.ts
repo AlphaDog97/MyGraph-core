@@ -335,6 +335,15 @@ export function useOriginalWorkspace(
     refreshWorkspace,
   ]);
 
+  const showImportedGraphs = useCallback(async (id: string, graphIds: string[]) => {
+    const next = await refreshWorkspace();
+    await fetchDetails(next.graphs.filter((graph) => graph.categoryId === id));
+    setCategoryId(id);
+    setFocusedGraphId(graphIds.length === 1 ? graphIds[0] : "");
+    setSearch("");
+    setSelectedNodeId(undefined);
+  }, [fetchDetails, refreshWorkspace]);
+
   return {
     workspace,
     categoryId,
@@ -364,5 +373,6 @@ export function useOriginalWorkspace(
     saveNode,
     saveEdge,
     confirmDelete,
+    showImportedGraphs,
   };
 }
