@@ -14,6 +14,7 @@ import {
   runLayoutWithAdaptiveFit,
 } from "./graphCanvasLayout";
 import { buildGraphCanvasStyles, type GraphTheme } from "./graphCanvasStyles";
+import { focusGraph } from "./graphCanvasViewport";
 import "./GraphCanvas.css";
 
 interface Props {
@@ -36,7 +37,6 @@ interface NodeTooltipState {
 }
 
 const MIN_ZOOM = 0.1;
-const VIEW_PADDING = 64;
 const TOOLTIP_MAX_WIDTH = 360;
 const TOOLTIP_EDGE_GAP = 16;
 const TOOLTIP_TOP_THRESHOLD = 120;
@@ -44,47 +44,6 @@ const TOOLTIP_TOP_THRESHOLD = 120;
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-function focusGraph(
-  cy: Core,
-  graphId: string | null | undefined,
-  nodeById: Map<string, KnowledgeNode>,
-  animate = true
-): void {
-  const duration = animate && !prefersReducedMotion() ? 420 : 0;
-  const fitElements = (
-    elements: cytoscape.CollectionReturnValue,
-    padding: number
-  ) => {
-    if (duration === 0) {
-      cy.stop();
-      cy.fit(elements, padding);
-      cy.center(elements);
-      cy.style().update();
-      cy.forceRender();
-      return;
-    }
-
-    cy.animate({ fit: { eles: elements, padding }, duration });
-  };
-
-  if (!graphId) {
-    fitElements(cy.elements(), 40);
-    return;
-  }
-
-  const matchedNodes = cy.nodes().filter((node) =>
-    nodeById
-      .get(node.id())
-      ?.provenance.some((source) => source.graphId === graphId) ?? false
-  );
-  if (matchedNodes.length === 0) return;
-
-  const internalEdges = matchedNodes.connectedEdges().filter((edge) =>
-    matchedNodes.contains(edge.source()) && matchedNodes.contains(edge.target())
-  );
-  fitElements(matchedNodes.union(internalEdges), VIEW_PADDING);
-}
 
 function createTooltipState(
   container: HTMLDivElement,
@@ -164,7 +123,7 @@ export default function GraphCanvas({
       cyRef.current = instance;
 
       runLayoutWithAdaptiveFit(instance, true, positions, () => {
-        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeById, false);
+        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeById, 0);
       });
 
       const updateNodeTooltip = (event: EventObject) => {
@@ -233,7 +192,8 @@ export default function GraphCanvas({
     if (!cy) return;
     if (previousFocusCyRef.current === cy && previousFocusedGraphIdRef.current === focusedGraphId) return;
     setNodeTooltip(null);
-    focusGraph(cy, focusedGraphId, nodeById, previousFocusCyRef.current === cy);
+    focusGraph(cy, focusedGraphId, nodeById,
+      previousFocusCyRef.current === cy && !prefersReducedMotion() ? 420 : 0);
     previousFocusCyRef.current = cy;
     previousFocusedGraphIdRef.current = focusedGraphId;
   }, [canvasVersion, cyRef, focusedGraphId, nodeById]);

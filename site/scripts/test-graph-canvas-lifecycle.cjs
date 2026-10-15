@@ -67,6 +67,7 @@ function mount({ width = 900, height = 600 } = {}) {
       if (name === 'cytoscape') return cyFactory;
       if (name.endsWith('/loader')) return { toCytoscapeElements: () => [] };
       if (name.endsWith('/graphCanvasStyles')) return { buildGraphCanvasStyles: () => [] };
+      if (name.endsWith('/graphCanvasViewport')) return { focusGraph: cy => { cy.fit(); } };
       if (name.endsWith('/graphCanvasLayout')) return {
         createGraphLayoutPlan: () => ({ positions: {} }), initialGraphLayout: () => ({}),
         runLayoutWithAdaptiveFit: (_cy, _motion, _positions, ready) => ready(),
