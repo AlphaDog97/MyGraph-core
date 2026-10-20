@@ -1,0 +1,89 @@
+.workspace-toolbar.top-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 340px) minmax(160px, 1fr) auto;
+  grid-template-areas: "brand location search tools";
+  gap: 12px;
+}
+
+.workspace-toolbar.top-toolbar::before { grid-area: brand; }
+
+.workspace-toolbar__location {
+  grid-area: location;
+  min-width: 0;
+  padding: 3px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--radius-md);
+  background: var(--control-bg);
+}
+
+.workspace-toolbar .graph-selector { width: 100%; }
+.workspace-toolbar .graph-selector__segment { flex: 1 1 0; min-width: 0; }
+.workspace-toolbar .graph-selector-item { width: 100%; min-width: 0; max-width: none; }
+
+.workspace-toolbar__search { grid-area: search; min-width: 0; }
+.workspace-toolbar .toolbar-search,
+.workspace-toolbar .toolbar-search:focus-within { width: 100%; }
+.workspace-toolbar .toolbar-search input { font-size: 14px; }
+
+.workspace-toolbar__tools {
+  grid-area: tools;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.workspace-toolbar__view.ant-segmented {
+  padding: 3px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--control-bg);
+  color: var(--text-secondary);
+}
+
+.workspace-toolbar__view .ant-segmented-item { border-radius: 8px; }
+.workspace-toolbar__view .ant-segmented-item-label { min-width: 38px; line-height: 30px; padding: 0 8px; }
+.workspace-toolbar__view .ant-segmented-item-selected {
+  background: var(--glass-bg-strong);
+  color: var(--accent-strong);
+  box-shadow: 0 1px 4px var(--accent-soft);
+}
+
+.workspace-toolbar__reset.ant-btn { width: 38px; padding-inline: 0; }
+.workspace-toolbar-menu .ant-dropdown-menu { min-width: 200px; }
+.workspace-toolbar.workspace-toolbar--overview {
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  grid-template-areas: "brand location tools";
+}
+
+@media (max-width: 1199px) {
+  .workspace-toolbar.top-toolbar { grid-template-columns: 38px minmax(220px, 300px) minmax(140px, 1fr) auto; gap: 8px; }
+  .workspace-toolbar.workspace-toolbar--overview { grid-template-columns: 38px minmax(220px, 1fr) auto; }
+}
+
+@media (max-width: 991px) {
+  .workspace-toolbar.top-toolbar {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-areas: "brand location tools" "search search search";
+  }
+  .workspace-toolbar.workspace-toolbar--overview { grid-template-areas: "brand location tools"; }
+}
+
+@media (max-width: 767px) {
+  .workspace-toolbar.top-toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand tools" "location location" "search search";
+    gap: 8px;
+  }
+  .workspace-toolbar.workspace-toolbar--overview { grid-template-areas: "brand tools" "location location"; }
+  .workspace-toolbar.top-toolbar::before { width: 32px; height: 34px; }
+  .workspace-toolbar__tools { gap: 6px; }
+  .workspace-toolbar.top-toolbar .ant-btn { height: 34px; }
+  .workspace-toolbar__reset.ant-btn,
+  .workspace-toolbar__menu-button.ant-btn,
+  .workspace-toolbar .toolbar-user-button.ant-btn { width: 32px; padding-inline: 0; }
+  .workspace-toolbar__menu-label { display: none; }
+  .workspace-toolbar__view .ant-segmented-item-label { min-width: 32px; line-height: 26px; padding: 0 6px; }
+  .workspace-toolbar.top-toolbar .ant-switch { min-width: 38px; }
+}

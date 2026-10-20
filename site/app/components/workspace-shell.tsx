@@ -2,22 +2,14 @@
 
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Core } from "cytoscape";
-import { GithubOutlined, MoonOutlined, PlusOutlined, SunOutlined } from "@ant-design/icons";
 import {
   App as AntdApp,
-  Button,
   ConfigProvider,
-  Flex,
-  Grid,
   Layout,
-  Switch,
-  Tooltip,
   message,
   theme as antdTheme,
 } from "antd";
 import GraphCanvas from "@/original-ui/components/GraphCanvas";
-import GraphSelector from "@/original-ui/components/GraphSelector";
-import SearchBar from "@/original-ui/components/SearchBar";
 import TagLegend from "@/original-ui/components/TagLegend";
 import EdgeTypeLegend from "@/original-ui/components/EdgeTypeLegend";
 import TagColorEditor from "@/original-ui/components/TagColorEditor";
@@ -32,7 +24,7 @@ import { EdgeDialog } from "./edge-dialog";
 import { NodeDialog } from "./node-dialog";
 import { findOwningDetail, toKnowledgeGraph } from "./original-workspace/graph-adapter";
 import { SiteNodeDrawer } from "./original-workspace/site-node-drawer";
-import { OriginalUserMenu, WorkspaceActions } from "./original-workspace/workspace-actions";
+import { WorkspaceToolbar } from "./original-workspace/workspace-toolbar";
 import { useOriginalWorkspace } from "./original-workspace/use-original-workspace";
 import { GraphImportDialog } from "./original-workspace/graph-import-dialog";
 import "@/original-ui/styles.css";
@@ -86,7 +78,6 @@ function OriginalWorkspace({
   initialWorkspace: WorkspaceSnapshot;
   initialDetails: GraphDetail[];
 }) {
-  const screens = Grid.useBreakpoint();
   const controller = useOriginalWorkspace(initialWorkspace, initialDetails);
   // Match server markup during hydration; restore browser preferences before mounting the canvas.
   const [theme, setTheme] = useState<Theme>("light");
@@ -117,12 +108,6 @@ function OriginalWorkspace({
   const overviewGraph = useMemo(
     () => toKnowledgeGraph(overviewDetails.length ? overviewDetails : controller.visibleDetails),
     [controller.visibleDetails, overviewDetails],
-  );
-  const currentCategory = controller.workspace.categories.find(
-    (category) => category.id === controller.categoryId,
-  );
-  const currentGraph = controller.workspace.graphs.find(
-    (item) => item.id === controller.focusedGraphId,
   );
   const selectedDetail = controller.selectedNode
     ? findOwningDetail(controller.allDetails, controller.selectedNode.id)
@@ -193,8 +178,6 @@ function OriginalWorkspace({
       ? controller.deleteTarget.item.label
       : "所选内容"
     : "";
-  const toolbarControlSize = screens.md ? "middle" : "small";
-  const canCreateNode = Boolean(controller.focusedGraphId);
 
   return (
     <ConfigProvider
@@ -211,92 +194,13 @@ function OriginalWorkspace({
       }}
     >
       <Layout className="app-layout original-site-workspace">
-        <Flex className="top-toolbar" align="center" gap={12} wrap>
-          <Flex className="toolbar-group toolbar-group--data" align="center" gap={8}>
-            <GraphSelector
-              categories={controller.workspace.categories.map((category) => ({
-                id: category.id,
-                label: category.label,
-                graphs: [],
-              }))}
-              graphs={controller.categoryGraphs.map((item) => ({
-                id: item.id,
-                label: item.label,
-              }))}
-              categoryId={controller.categoryId}
-              graphId={controller.focusedGraphId}
-              onCategoryChange={(id) => report(controller.loadCategory(id))}
-              onGraphChange={(id) => report(controller.focusGraph(id))}
-              size={toolbarControlSize}
-              showGraphSelect={viewMode === "category"}
-            />
-          </Flex>
-
-          {viewMode === "category" ? (
-            <Flex className="toolbar-group toolbar-group--search" align="center" gap={8}>
-              <SearchBar
-                value={controller.search}
-                onChange={controller.setSearch}
-                size={toolbarControlSize}
-              />
-            </Flex>
-          ) : null}
-
-          {viewMode === "category" ? (
-            <Flex className="toolbar-group toolbar-group--graph-actions" align="center" gap={8}>
-              <WorkspaceActions
-                category={currentCategory}
-                graph={currentGraph}
-                onOpenEntity={controller.setEntityDialog}
-                onDelete={controller.setDeleteTarget}
-              />
-              <Tooltip title={canCreateNode ? "新建节点" : "请先选择具体图谱"}>
-                <Button
-                  size={toolbarControlSize}
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  disabled={!canCreateNode}
-                  onClick={() => controller.setNodeDialog(null)}
-                >
-                  新建节点
-                </Button>
-              </Tooltip>
-              <Button size={toolbarControlSize} onClick={handleResetView}>
-                显示全部
-              </Button>
-              <Button size={toolbarControlSize} onClick={() => setEditorOpen(true)}>
-                Edit tag colors
-              </Button>
-              <Button size={toolbarControlSize} onClick={() => setImportOpen(true)}>
-                导入图谱
-              </Button>
-            </Flex>
-          ) : null}
-
-          <Flex className="toolbar-group toolbar-group--global" align="center" gap={8}>
-            <Button size={toolbarControlSize} onClick={handleViewModeToggle}>
-              {viewMode === "category" ? "3D 总览" : "返回分类图"}
-            </Button>
-            <Switch
-              size="small"
-              checkedChildren={<MoonOutlined />}
-              unCheckedChildren={<SunOutlined />}
-              checked={theme === "dark"}
-              onChange={() => setTheme((current) => (current === "light" ? "dark" : "light"))}
-              title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}
-            />
-            <Button
-              size={toolbarControlSize}
-              icon={<GithubOutlined />}
-              href="https://github.com/AlphaDog97/MyGraph-core"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open GitHub repository"
-              title="Open GitHub repository"
-            />
-            <OriginalUserMenu user={user} />
-          </Flex>
-        </Flex>
+        <WorkspaceToolbar
+          user={user} controller={controller} theme={theme} viewMode={viewMode}
+          onToggleTheme={() => setTheme((current) => current === "light" ? "dark" : "light")}
+          onToggleView={handleViewModeToggle} onResetView={handleResetView}
+          onImport={() => { setViewMode("category"); setImportOpen(true); }}
+          onEditColors={() => setEditorOpen(true)} report={report}
+        />
 
         <Layout.Content
           className="app-content"
