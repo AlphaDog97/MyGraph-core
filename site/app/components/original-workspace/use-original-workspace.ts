@@ -63,6 +63,7 @@ export function useOriginalWorkspace(
   const [edgeDialog, setEdgeDialog] = useState<{
     edge?: GraphEdge;
     preferredSourceId?: string;
+    preferredTargetId?: string;
   } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
 

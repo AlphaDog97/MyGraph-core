@@ -73,6 +73,8 @@ function mount({ width = 900, height = 600 } = {}) {
       if (name.endsWith('/graphCanvasStyles')) return { buildGraphCanvasStyles: () => [] };
       if (name.endsWith('/graphCanvasViewport')) return { focusGraph: (cy, id) => { cy.focusTargets.push(id); cy.fit(); } };
       if (name.endsWith('/graphCanvasSelection')) return selectionExports;
+      if (name.endsWith('/graphCanvasTooltip')) return { createTooltipState: () => null };
+      if (name.endsWith('/GraphConnectionOverlay')) return () => null;
       if (name.endsWith('/graphCanvasLayout')) return {
         createGraphLayoutPlan: () => ({ positions: {} }), initialGraphLayout: () => ({}),
         runLayoutWithAdaptiveFit: (_cy, _motion, _positions, ready) => ready(),
@@ -126,6 +128,13 @@ const cases = [
     app.instances[0].handlers['tap:edge']({ target: { source: () => ({ id: () => 'n1' }) } });
     assert.deepEqual(focused, ['graph-two']); assert.equal(app.instances.length, 1);
     app.unmount();
+  }],
+  ['edge in the focused graph opens the independent edge editor', () => {
+    const app = mount(), edited = [];
+    app.props.graph.nodes[0].provenance = [{ graphId: 'graph-one' }];
+    app.render({ focusedGraphId: 'graph-one', onGraphFocus() {}, onEdgeSelect: id => edited.push(id) });
+    app.instances[0].handlers['tap:edge']({ target: { id: () => 'edge-one', source: () => ({ id: () => 'n1' }) } });
+    assert.deepEqual(edited, ['edge-one']); assert.equal(app.instances.length, 1); app.unmount();
   }],
   ['overview cluster background click selects the graph but ordinary background does not', () => {
     const app = mount(), focused = [];

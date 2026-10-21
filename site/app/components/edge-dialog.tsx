@@ -33,9 +33,11 @@ interface EdgeDialogProps {
   edge?: GraphEdge | null;
   nodes: GraphNode[];
   preferredSourceId?: string;
+  preferredTargetId?: string;
   busy?: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (value: EdgeFormValue) => void;
+  onDelete?: () => void;
 }
 
 export function EdgeDialog({
@@ -43,9 +45,11 @@ export function EdgeDialog({
   edge,
   nodes,
   preferredSourceId,
+  preferredTargetId,
   busy,
   onOpenChange,
   onSubmit,
+  onDelete,
 }: EdgeDialogProps) {
   const [value, setValue] = useState<EdgeFormValue>({
     sourceNodeId: "",
@@ -58,11 +62,11 @@ export function EdgeDialog({
     if (!open) return;
     setValue({
       sourceNodeId: edge?.sourceNodeId ?? preferredSourceId ?? nodes[0]?.id ?? "",
-      targetNodeId: edge?.targetNodeId ?? nodes[1]?.id ?? nodes[0]?.id ?? "",
+      targetNodeId: edge?.targetNodeId ?? preferredTargetId ?? nodes.find((node) => node.id !== preferredSourceId)?.id ?? nodes[0]?.id ?? "",
       type: edge?.type ?? "Concept",
       label: edge?.label ?? "",
     });
-  }, [edge, nodes, open, preferredSourceId]);
+  }, [edge, nodes, open, preferredSourceId, preferredTargetId]);
 
   const update = (field: keyof EdgeFormValue, next: string) =>
     setValue((current) => ({ ...current, [field]: next }));
@@ -133,6 +137,8 @@ export function EdgeDialog({
             </div>
           </div>
           <DialogFooter>
+            {edge && onDelete && <Button type="button" variant="destructive" disabled={busy}
+              onClick={onDelete}>删除连线</Button>}
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               取消
             </Button>

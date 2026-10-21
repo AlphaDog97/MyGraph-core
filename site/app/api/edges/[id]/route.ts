@@ -19,6 +19,15 @@ export async function PATCH(request: Request, context: Context) {
     const type = asRequiredString(payload.type, "type");
     const label = asOptionalString(payload.label);
 
+    const existing = await getD1().prepare("SELECT graph_id FROM edges WHERE id = ?").bind(id).first();
+    if (!existing) throw new RequestError("Relation not found", 404);
+    const verification = await getD1()
+      .prepare("SELECT COUNT(*) AS count FROM nodes WHERE graph_id = ? AND id IN (?, ?)")
+      .bind(existing.graph_id, sourceNodeId, targetNodeId).first();
+    if (Number(verification?.count) !== (sourceNodeId === targetNodeId ? 1 : 2)) {
+      throw new RequestError("Both nodes must belong to the selected graph", 409);
+    }
+
     const result = await getD1()
       .prepare(
         `UPDATE edges

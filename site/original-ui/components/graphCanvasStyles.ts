@@ -54,6 +54,8 @@ export function buildGraphCanvasStyles(
       selector: "edge",
       style: {
         width: 2,
+        "text-events": "yes",
+        "overlay-padding": 8,
         opacity: 0.9,
         "line-color": "data(edgeColor)",
         "target-arrow-color": "data(edgeColor)",
@@ -75,6 +77,7 @@ export function buildGraphCanvasStyles(
     },
     { selector: "node.dimmed", style: { opacity: 0.1 } },
     { selector: "edge.dimmed", style: { opacity: 0.035 } },
+    { selector: "node.connection-target", style: { "border-width": 4, "border-color": "#5a67d8" } },
     {
       selector: "node.highlighted",
       style: {

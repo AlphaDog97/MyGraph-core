@@ -86,6 +86,7 @@ function OriginalWorkspace({
   const [overviewDetails, setOverviewDetails] = useState<GraphDetail[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [nodeDetailsOpen, setNodeDetailsOpen] = useState(false);
   const [tagColors, setTagColors] = useState<TagColorAssignment>({});
   const [legendState, setLegendState] = useState<LegendState>({ tagsOpen: true, relationsOpen: true });
   useEffect(() => {
@@ -127,7 +128,9 @@ function OriginalWorkspace({
     ? controller.allDetails.find((detail) =>
         detail.edges.some((edge) => edge.id === controller.edgeDialog?.edge?.id),
       )
-    : selectedDetail ?? controller.visibleDetails[0];
+    : (controller.edgeDialog?.preferredSourceId
+        ? findOwningDetail(controller.allDetails, controller.edgeDialog.preferredSourceId)
+        : selectedDetail) ?? controller.visibleDetails[0];
 
   useEffect(() => {
     if (!preferencesLoaded) return;
@@ -180,9 +183,27 @@ function OriginalWorkspace({
   }, []);
 
   const handleNodeSelect = useCallback(
-    (node: KnowledgeNode | null) => controller.setSelectedNodeId(node?.id),
+    (node: KnowledgeNode | null) => {
+      controller.setSelectedNodeId(node?.id);
+      setNodeDetailsOpen(false);
+    },
     [controller.setSelectedNodeId],
   );
+  const handleInspectNode = useCallback((nodeId: string) => {
+    controller.setSelectedNodeId(nodeId);
+    setNodeDetailsOpen(true);
+  }, [controller.setSelectedNodeId]);
+  const handleCreateEdge = useCallback((sourceId: string, targetId: string) => {
+    setNodeDetailsOpen(false);
+    controller.setEdgeDialog({ preferredSourceId: sourceId, preferredTargetId: targetId });
+  }, [controller.setEdgeDialog]);
+  const handleEdgeSelect = useCallback((edgeId: string) => {
+    const edge = controller.allDetails.flatMap((detail) => detail.edges).find((item) => item.id === edgeId);
+    if (!edge) return;
+    controller.setSelectedNodeId(undefined);
+    setNodeDetailsOpen(false);
+    controller.setEdgeDialog({ edge });
+  }, [controller.allDetails, controller.setEdgeDialog, controller.setSelectedNodeId]);
   const handleGraphFocus = useCallback(
     (graphId: string) => report(controller.focusGraph(graphId)),
     [controller.focusGraph, report],
@@ -238,6 +259,10 @@ function OriginalWorkspace({
                   cyRef={cyRef}
                   onNodeSelect={handleNodeSelect}
                   onGraphFocus={handleGraphFocus}
+                  selectedNodeId={controller.selectedNodeId}
+                  onCreateEdge={handleCreateEdge}
+                  onEdgeSelect={handleEdgeSelect}
+                  onInspectNode={handleInspectNode}
                 /> : null}
               </div>
               <div className="legend-container">
@@ -264,14 +289,17 @@ function OriginalWorkspace({
               </div>
             </>
           ) : (
-            <Overview3DCanvas graph={overviewGraph} theme={theme} onNodeSelect={handleNodeSelect} />
+            <Overview3DCanvas graph={overviewGraph} theme={theme} onNodeSelect={(node) => {
+              if (node) handleInspectNode(node.id);
+              else handleNodeSelect(null);
+            }} />
           )}
 
-          {controller.selectedNode && selectedDetail ? (
+          {nodeDetailsOpen && controller.selectedNode && selectedDetail ? (
             <SiteNodeDrawer
               node={controller.selectedNode}
               detail={selectedDetail}
-              onClose={() => controller.setSelectedNodeId(undefined)}
+              onClose={() => setNodeDetailsOpen(false)}
               onEditNode={controller.setNodeDialog}
               onDeleteNode={(item) => controller.setDeleteTarget({ kind: "node", item })}
               onCreateEdge={(preferredSourceId) => controller.setEdgeDialog({ preferredSourceId })}
@@ -326,10 +354,15 @@ function OriginalWorkspace({
           open={Boolean(controller.edgeDialog)}
           edge={controller.edgeDialog?.edge}
           preferredSourceId={controller.edgeDialog?.preferredSourceId}
+          preferredTargetId={controller.edgeDialog?.preferredTargetId}
           nodes={dialogDetail?.nodes ?? []}
           busy={controller.busy}
           onOpenChange={(open) => !open && controller.setEdgeDialog(null)}
           onSubmit={controller.saveEdge}
+          onDelete={controller.edgeDialog?.edge ? () => {
+            controller.setDeleteTarget({ kind: "edge", item: controller.edgeDialog!.edge! });
+            controller.setEdgeDialog(null);
+          } : undefined}
         />
         <DeleteDialog
           open={Boolean(controller.deleteTarget)}
