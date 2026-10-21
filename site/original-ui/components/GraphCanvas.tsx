@@ -6,7 +6,7 @@ import {
 } from "react";
 import type { MutableRefObject } from "react";
 import cytoscape, { type Core, type EventObject } from "cytoscape";
-import type { KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
+import type { ConnectionAnchors, KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
 import {
   createGraphLayoutPlan,
@@ -16,6 +16,11 @@ import {
 import { buildGraphCanvasStyles, type GraphTheme } from "./graphCanvasStyles";
 import { focusGraph } from "./graphCanvasViewport";
 import { graphAtPosition, nodeGraphId } from "./graphCanvasSelection";
+import { createTooltipState, type NodeTooltipState } from "./graphCanvasTooltip";
+import GraphConnectionOverlay from "./GraphConnectionOverlay";
+import type { GraphConnectionBridge } from "./useGraphConnections";
+import { syncGraphElements } from "./graphCanvasData";
+import { useEdgeRouting } from "./useEdgeRouting";
 import "./GraphCanvas.css";
 
 interface Props {
@@ -27,51 +32,16 @@ interface Props {
   cyRef: MutableRefObject<Core | null>;
   onNodeSelect: (node: KnowledgeNode | null) => void;
   onGraphFocus?: (graphId: string) => void;
-}
-
-type TooltipPlacement = "above" | "below";
-
-interface NodeTooltipState {
-  description: string;
-  x: number;
-  y: number;
-  placement: TooltipPlacement;
+  selectedNodeId?: string | null;
+  onEdgeSelect?: (edgeId: string) => void;
+  onCreateEdge?: (sourceId: string, targetId: string, anchors: ConnectionAnchors) => void;
+  onInspectNode?: (nodeId: string) => void;
 }
 
 const MIN_ZOOM = 0.1;
-const TOOLTIP_MAX_WIDTH = 360;
-const TOOLTIP_EDGE_GAP = 16;
-const TOOLTIP_TOP_THRESHOLD = 120;
-
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-function createTooltipState(
-  container: HTMLDivElement,
-  description: string,
-  renderedPosition: cytoscape.Position
-): NodeTooltipState | null {
-  const text = description.trim();
-  if (!text) return null;
-
-  const availableWidth = Math.max(0, container.clientWidth - TOOLTIP_EDGE_GAP * 2);
-  const tooltipWidth = Math.min(TOOLTIP_MAX_WIDTH, availableWidth);
-  const horizontalInset = tooltipWidth / 2 + TOOLTIP_EDGE_GAP;
-  const maxX = Math.max(horizontalInset, container.clientWidth - horizontalInset);
-  const x = Math.min(Math.max(renderedPosition.x, horizontalInset), maxX);
-  const y = Math.min(
-    Math.max(renderedPosition.y, TOOLTIP_EDGE_GAP),
-    Math.max(TOOLTIP_EDGE_GAP, container.clientHeight - TOOLTIP_EDGE_GAP)
-  );
-
-  return {
-    description: text,
-    x,
-    y,
-    placement: y < TOOLTIP_TOP_THRESHOLD ? "below" : "above",
-  };
-}
 
 export default function GraphCanvas({
   graph,
@@ -81,7 +51,7 @@ export default function GraphCanvas({
   theme,
   cyRef,
   onNodeSelect,
-  onGraphFocus,
+  onGraphFocus, selectedNodeId, onEdgeSelect, onCreateEdge, onInspectNode,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tagColorsRef = useRef(tagColors);
@@ -89,6 +59,8 @@ export default function GraphCanvas({
   const focusedGraphIdRef = useRef(focusedGraphId);
   const onNodeSelectRef = useRef(onNodeSelect);
   const onGraphFocusRef = useRef(onGraphFocus);
+  const onEdgeSelectRef = useRef(onEdgeSelect);
+  const connectionRef = useRef<GraphConnectionBridge | null>(null);
   const previousFocusCyRef = useRef<Core | null>(null);
   const previousFocusedGraphIdRef = useRef<string | null | undefined>(undefined);
   const [canvasVersion, setCanvasVersion] = useState(0);
@@ -98,11 +70,21 @@ export default function GraphCanvas({
   focusedGraphIdRef.current = focusedGraphId;
   onNodeSelectRef.current = onNodeSelect;
   onGraphFocusRef.current = onGraphFocus;
+  onEdgeSelectRef.current = onEdgeSelect;
 
   const nodeById = useMemo(
     () => new Map(graph.nodes.map((node) => [node.id, node])),
     [graph.nodes]
   );
+
+  // Only a different node set needs a fresh layout. Edge changes stay on this renderer.
+  const nodeSetKey = JSON.stringify(graph.nodes.map((node) => node.id).sort());
+  const graphRef = useRef(graph);
+  const nodeByIdRef = useRef(nodeById);
+  graphRef.current = graph;
+  nodeByIdRef.current = nodeById;
+  const previousSearchRef = useRef<{ cy: Core; query: string } | null>(null);
+  useEdgeRouting(cyRef, canvasVersion);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -115,10 +97,10 @@ export default function GraphCanvas({
     const initialize = () => {
       if (disposed || cy || container.clientWidth <= 0 || container.clientHeight <= 0) return;
       const reduceMotion = prefersReducedMotion();
-      const { positions } = createGraphLayoutPlan(graph);
+      const { positions } = createGraphLayoutPlan(graphRef.current);
       const instance = cytoscape({
         container,
-        elements: toCytoscapeElements(graph, tagColorsRef.current),
+        elements: toCytoscapeElements(graphRef.current, tagColorsRef.current),
         style: buildGraphCanvasStyles(reduceMotion, themeRef.current),
         layout: initialGraphLayout(true, positions),
         minZoom: MIN_ZOOM,
@@ -128,11 +110,11 @@ export default function GraphCanvas({
       cyRef.current = instance;
 
       runLayoutWithAdaptiveFit(instance, true, positions, () => {
-        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeById, 0);
+        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeByIdRef.current, 0);
       });
 
       const updateNodeTooltip = (event: EventObject) => {
-        const hoveredNode = nodeById.get(event.target.id());
+        const hoveredNode = nodeByIdRef.current.get(event.target.id());
         if (!hoveredNode) {
           setNodeTooltip(null);
           return;
@@ -157,23 +139,27 @@ export default function GraphCanvas({
         return true;
       };
       instance.on("tap", "node", (event) => {
-        const selected = nodeById.get(event.target.id());
+        const selected = nodeByIdRef.current.get(event.target.id());
         if (!selected) return;
+        if (connectionRef.current?.tryComplete(selected.id, event.renderedPosition)) return;
         if (focusOwningGraph(selected)) return;
         instance.nodes().removeClass("selected-node");
         event.target.addClass("selected-node");
         onNodeSelectRef.current(selected);
       });
       instance.on("tap", "edge", (event) => {
-        const source = nodeById.get(event.target.source().id());
-        if (source) focusOwningGraph(source);
+        if (connectionRef.current?.cancel()) return;
+        const source = nodeByIdRef.current.get(event.target.source().id());
+        if (source && focusOwningGraph(source)) return;
+        onEdgeSelectRef.current?.(event.target.id());
       });
       instance.on("tap", (event) => {
         if (event.target !== instance) return;
+        if (connectionRef.current?.cancel()) return;
         instance.nodes().removeClass("selected-node");
         onNodeSelectRef.current(null);
         if (!focusedGraphIdRef.current && onGraphFocusRef.current) {
-          const graphId = graphAtPosition(instance, nodeById, event.position);
+          const graphId = graphAtPosition(instance, nodeByIdRef.current, event.position);
           if (graphId) onGraphFocusRef.current(graphId);
         }
       });
@@ -207,7 +193,7 @@ export default function GraphCanvas({
       cy?.destroy();
       if (cyRef.current === cy) cyRef.current = null;
     };
-  }, [cyRef, graph, nodeById]);
+  }, [cyRef, nodeSetKey]);
 
   useEffect(() => {
     const cy = cyRef.current;
@@ -230,17 +216,8 @@ export default function GraphCanvas({
 
   useEffect(() => {
     const cy = cyRef.current;
-    if (!cy) return;
-    cy.batch(() => {
-      cy.nodes().forEach((node) => {
-        const knowledgeNode = nodeById.get(node.id());
-        if (knowledgeNode) {
-          node.data("borderColor", knowledgeNode.resolveBorderColor(tagColors));
-        }
-      });
-    });
-    cy.style().update();
-  }, [canvasVersion, cyRef, nodeById, tagColors]);
+    if (cy) syncGraphElements(cy, graph, tagColors);
+  }, [canvasVersion, cyRef, graph, tagColors]);
 
   useEffect(() => {
     const cy = cyRef.current;
@@ -261,7 +238,9 @@ export default function GraphCanvas({
       matched.connectedEdges().connectedNodes().removeClass("dimmed");
     });
 
-    if (query) {
+    const previous = previousSearchRef.current;
+    previousSearchRef.current = { cy, query };
+    if (query && (previous?.cy !== cy || previous.query !== query)) {
       setNodeTooltip(null);
       const matched = cy.nodes(".highlighted");
       if (matched.length > 0) {
@@ -273,9 +252,19 @@ export default function GraphCanvas({
     }
   }, [canvasVersion, cyRef, nodeById, searchQuery]);
 
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy || !onCreateEdge) return;
+    cy.nodes().removeClass("selected-node");
+    if (selectedNodeId) cy.getElementById(selectedNodeId).addClass("selected-node");
+  }, [canvasVersion, cyRef, selectedNodeId, onCreateEdge]);
+
   return (
     <div className="graph-canvas-root">
       <div ref={containerRef} className="graph-canvas-surface" />
+      {onCreateEdge && <GraphConnectionOverlay cy={cyRef.current} selectedNodeId={selectedNodeId}
+        focusedGraphId={focusedGraphId} nodeById={nodeById} onCreateEdge={onCreateEdge}
+        onInspectNode={onInspectNode} bridgeRef={connectionRef} />}
       {nodeTooltip && (
         <div
           className={`graph-node-tooltip graph-node-tooltip--${nodeTooltip.placement}`}

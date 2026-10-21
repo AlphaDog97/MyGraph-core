@@ -54,6 +54,8 @@ export function buildGraphCanvasStyles(
       selector: "edge",
       style: {
         width: 2,
+        "text-events": "yes",
+        "overlay-padding": 8,
         opacity: 0.9,
         "line-color": "data(edgeColor)",
         "target-arrow-color": "data(edgeColor)",
@@ -74,7 +76,21 @@ export function buildGraphCanvasStyles(
       } as unknown as cytoscape.Css.Edge,
     },
     { selector: "node.dimmed", style: { opacity: 0.1 } },
+    { selector: "edge[anchored = 1]", style: {
+      "curve-style": "straight",
+      "source-endpoint": "data(sourceEndpoint)",
+      "target-endpoint": "data(targetEndpoint)",
+    } },
+    { selector: "edge[routed = 1]", style: {
+      "curve-style": "unbundled-bezier",
+      "source-endpoint": "data(sourceEndpoint)",
+      "target-endpoint": "data(targetEndpoint)",
+      "edge-distances": "node-position",
+      "control-point-weights": "data(controlWeights)",
+      "control-point-distances": "data(controlDistances)",
+    } },
     { selector: "edge.dimmed", style: { opacity: 0.035 } },
+    { selector: "node.connection-target", style: { "border-width": 4, "border-color": "#5a67d8" } },
     {
       selector: "node.highlighted",
       style: {

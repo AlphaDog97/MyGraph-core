@@ -87,6 +87,8 @@ export const edges = sqliteTable(
       .references(() => nodes.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     label: text("label").notNull().default(""),
+    sourcePort: text("source_port"),
+    targetPort: text("target_port"),
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   },
