@@ -8,9 +8,10 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   size?: SizeType;
+  placeholder?: string;
 }
 
-export default function SearchBar({ value, onChange, size = "middle" }: Props) {
+export default function SearchBar({ value, onChange, size = "middle", placeholder = "Search this graph" }: Props) {
   const inputRef = useRef<InputRef>(null);
 
   useEffect(() => {
@@ -35,7 +36,8 @@ export default function SearchBar({ value, onChange, size = "middle" }: Props) {
   return (
     <Input
       ref={inputRef}
-      placeholder="Search this graph"
+      placeholder={placeholder}
+      aria-label={placeholder}
       value={value}
       onChange={(event) => onChange(event.target.value)}
       size={size}

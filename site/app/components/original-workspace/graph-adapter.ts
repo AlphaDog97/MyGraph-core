@@ -79,3 +79,11 @@ export function findOwningDetail(
     detail.nodes.some((node) => node.id === nodeId),
   );
 }
+
+export function graphPaletteTags(graph: KnowledgeGraph, focusedGraphId?: string | null): string[] {
+  if (!focusedGraphId) return graph.tags;
+  const nodes = graph.nodes.filter((node) =>
+    node.provenance.some((source) => source.graphId === focusedGraphId),
+  );
+  return [...new Set(nodes.flatMap((node) => node.tags))].sort((a, b) => a.localeCompare(b));
+}

@@ -7,6 +7,7 @@ interface Props {
   tagColors: TagColorAssignment;
   onChange: (tag: string, color: string | undefined) => void;
   onClose: () => void;
+  scopeLabel?: string;
 }
 
 const PRESET_COLORS = [
@@ -27,22 +28,24 @@ export default function TagColorEditor({
   tagColors,
   onChange,
   onClose,
+  scopeLabel,
 }: Props) {
   return (
     <Modal
       open
       onCancel={onClose}
       footer={null}
-      title="Tag palette"
+      title={scopeLabel ? "标签配色" : "Tag palette"}
       width={720}
       centered
       rootClassName="tag-color-editor-modal"
     >
       <Typography.Paragraph type="secondary" className="tag-color-editor-copy">
-        Use a restrained palette to make important clusters easier to scan without
-        overpowering the graph.
+        {scopeLabel ? `${scopeLabel} · ${tags.length} 个标签` :
+          "Use a restrained palette to make important clusters easier to scan without overpowering the graph."}
       </Typography.Paragraph>
       <Space direction="vertical" size={10} className="full-width">
+        {scopeLabel && !tags.length ? <Typography.Text type="secondary">当前范围没有标签</Typography.Text> : null}
         {tags.map((tag) => {
           const current = tagColors[tag];
           return (
@@ -66,7 +69,7 @@ export default function TagColorEditor({
                   type={!current ? "primary" : "default"}
                   onClick={() => onChange(tag, undefined)}
                 >
-                  Default
+                  {scopeLabel ? "默认" : "Default"}
                 </Button>
               </Space>
             </div>
