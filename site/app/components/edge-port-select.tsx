@@ -1,21 +1,16 @@
+import { Select } from "antd";
 import type { ConnectionSide } from "@/original-ui/domain/types";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const options = [
+  { value: "auto", label: "自动" }, { value: "top", label: "上侧" },
+  { value: "right", label: "右侧" }, { value: "bottom", label: "下侧" }, { value: "left", label: "左侧" },
+];
 export function EdgePortSelect({ label, value, onChange }: {
   label: string; value?: ConnectionSide | null; onChange: (value: ConnectionSide | null) => void;
 }) {
-  return <div className="grid gap-2">
-    <Label>{label}</Label>
-    <Select value={value ?? "auto"} onValueChange={(next) => onChange(next === "auto" ? null : next as ConnectionSide)}>
-      <SelectTrigger aria-label={label} className="w-full"><SelectValue /></SelectTrigger>
-      <SelectContent>
-        <SelectItem value="auto">自动</SelectItem>
-        <SelectItem value="top">上侧</SelectItem>
-        <SelectItem value="right">右侧</SelectItem>
-        <SelectItem value="bottom">下侧</SelectItem>
-        <SelectItem value="left">左侧</SelectItem>
-      </SelectContent>
-    </Select>
+  return <div className="edge-editor-port-field">
+    <span>{label}</span>
+    <Select aria-label={label} value={value ?? "auto"} options={options}
+      onChange={next => onChange(next === "auto" ? null : next as ConnectionSide)} />
   </div>;
 }

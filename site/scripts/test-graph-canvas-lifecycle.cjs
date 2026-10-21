@@ -73,6 +73,7 @@ function mount({ width = 900, height = 600 } = {}) {
       if (name.endsWith('/graphCanvasStyles')) return { buildGraphCanvasStyles: () => [] };
       if (name.endsWith('/graphCanvasViewport')) return { focusGraph: (cy, id) => { cy.focusTargets.push(id); cy.fit(); } };
       if (name.endsWith('/graphCanvasSelection')) return selectionExports;
+      if (name.endsWith('/useEdgeRouting')) return { useEdgeRouting() {} };
       if (name.endsWith('/graphCanvasData')) return { syncGraphElements: cy => { cy.patches = (cy.patches ?? 0) + 1; } };
       if (name.endsWith('/graphCanvasTooltip')) return { createTooltipState: () => null };
       if (name.endsWith('/GraphConnectionOverlay')) return () => null;

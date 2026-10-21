@@ -81,6 +81,14 @@ export function buildGraphCanvasStyles(
       "source-endpoint": "data(sourceEndpoint)",
       "target-endpoint": "data(targetEndpoint)",
     } },
+    { selector: "edge[routed = 1]", style: {
+      "curve-style": "data(routeCurve)",
+      "source-endpoint": "data(sourceEndpoint)",
+      "target-endpoint": "data(targetEndpoint)",
+      "edge-distances": "node-position",
+      "segment-weights": "data(segmentWeights)",
+      "segment-distances": "data(segmentDistances)",
+    } },
     { selector: "edge.dimmed", style: { opacity: 0.035 } },
     { selector: "node.connection-target", style: { "border-width": 4, "border-color": "#5a67d8" } },
     {

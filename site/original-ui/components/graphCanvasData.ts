@@ -1,6 +1,7 @@
 import type { Core } from "cytoscape";
 import type { KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
+import { routeGraphEdges } from "./graphCanvasRouting";
 
 /** Patch live elements without touching layout, node positions, classes or viewport. */
 export function syncGraphElements(cy: Core, graph: KnowledgeGraph, colors: TagColorAssignment) {
@@ -17,5 +18,6 @@ export function syncGraphElements(cy: Core, graph: KnowledgeGraph, colors: TagCo
       }
       existing.data(data);
     }
+    routeGraphEdges(cy);
   });
 }

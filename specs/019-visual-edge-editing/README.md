@@ -18,7 +18,7 @@ Create relationships visually in the existing 2D Site canvas and edit a relation
 
 Selected nodes expose four connection handles. Support handle-click then target-click and pointer drag to a target, with a point-to-point preview, target highlight and Escape/background cancellation. Handles follow node movement and canvas transforms. Open the existing relationship dialog with both endpoints prefilled; save only after confirmation. Node details move behind a nearby Details button to keep the canvas usable on mobile.
 
-Keep connection state in a separate hook and overlay; forward current callbacks through refs without rebuilding Cytoscape. Preserve category graph focus and selector behavior. Connections stay within a graph; PATCH validates endpoints against the stored graph like POST. Persist source/target port sides on new edges and expose target handles while connecting. Anchored edges use straight point-to-point routing; legacy edges retain automatic routing. Reconcile edge changes in the live Cytoscape instance when the node set is unchanged, preserving positions, selection, pan and zoom. Append nullable D1 columns with generated migration metadata. 3D retains its existing details interaction.
+Keep connection state in a separate hook and overlay; forward current callbacks through refs without rebuilding Cytoscape. Preserve category graph focus and selector behavior. Connections stay within a graph; PATCH validates endpoints against the stored graph like POST. Persist source/target port sides on new edges and expose target handles while connecting. Anchored edges retain their chosen connection points. Orthogonal routing avoids node bounds and penalizes crossings and overlaps; legacy edges infer suitable connection sides automatically. Reconcile edge changes in the live Cytoscape instance when the node set is unchanged, preserving positions, selection, pan and zoom. Append nullable D1 columns with generated migration metadata. 3D retains its existing details interaction.
 
 ## Plan
 
@@ -44,3 +44,14 @@ Keep connection state in a separate hook and overlay; forward current callbacks 
 - [x] Verify migration compatibility, CRUD persistence, viewport stability and browser interaction; publish Site version 17.
 
 Refinement verification: 46 checks passed across lifecycle, connection interaction, real Cytoscape data patches, SQLite migration/CRUD/readback, focus and JSON import. TypeScript, production build and LeanSpec validation passed. Browser QA confirmed right-to-left and bottom-to-top connection points and unchanged positions/pan/zoom on repeated saves. The temporary synthetic QA route is removed; authenticated production CRUD was not browser-tested. Local D1 migrations and hosted publication succeeded.
+
+## Routing and Sidebar Refinement
+
+- [x] Route fixed ports with orthogonal bends, node clearance and crossing/overlap costs against previously routed edges. Preserve existing routes when adding an edge; reroute after node movement without relayout. Crossing avoidance is best effort for nonplanar or crowded graphs.
+- [x] Replace the relation modal with a nonmodal right sidebar using the current theme; keep the canvas usable.
+- [x] Offer exactly Concept, Description, Condition and Action in a dropdown; require an explicit selection for legacy unsupported types.
+- [x] Verify routing fixtures, viewport stability, sidebar interactions, four options, TypeScript, regressions and build; publish Site version 18.
+
+Routing/sidebar verification: seven routing checks cover node clearance, crossing detours, long connection endpoint obstacles, parallel lanes, coordinate conversion, preserved existing routes/viewport and a bounded dense fixture. All 53 regression checks and TypeScript passed. Browser QA verified a new connection detours around both a node and an existing line; creation and line editing open a right sidebar with aria-modal=false, four type options, saved Action selection, dark theme, background canvas panning and unchanged viewport on save. The temporary QA route was removed before production build.
+
+Site version 18 deployed successfully. Routing uses bounded coordinate tracks and clearance/crossing/overlap costs; it does not promise a crossing-free embedding for nonplanar, overlapping or very dense graphs. Sidebar is contained within the canvas area so the toolbar stays available.

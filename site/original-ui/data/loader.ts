@@ -436,6 +436,8 @@ export function toCytoscapeElements(
       label: edge.label,
       edgeColor: resolveEdgeTypeColor(edge.type),
       anchored: edge.sourcePort || edge.targetPort ? 1 : 0,
+      sourcePort: edge.sourcePort ?? null,
+      targetPort: edge.targetPort ?? null,
       sourceEndpoint: portEndpoint(edge.sourcePort),
       targetEndpoint: portEndpoint(edge.targetPort),
     },

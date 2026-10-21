@@ -20,6 +20,7 @@ import { createTooltipState, type NodeTooltipState } from "./graphCanvasTooltip"
 import GraphConnectionOverlay from "./GraphConnectionOverlay";
 import type { GraphConnectionBridge } from "./useGraphConnections";
 import { syncGraphElements } from "./graphCanvasData";
+import { useEdgeRouting } from "./useEdgeRouting";
 import "./GraphCanvas.css";
 
 interface Props {
@@ -83,6 +84,7 @@ export default function GraphCanvas({
   graphRef.current = graph;
   nodeByIdRef.current = nodeById;
   const previousSearchRef = useRef<{ cy: Core; query: string } | null>(null);
+  useEdgeRouting(cyRef, canvasVersion);
 
   useEffect(() => {
     const container = containerRef.current;

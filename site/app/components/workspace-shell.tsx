@@ -192,7 +192,8 @@ function OriginalWorkspace({
   const handleInspectNode = useCallback((nodeId: string) => {
     controller.setSelectedNodeId(nodeId);
     setNodeDetailsOpen(true);
-  }, [controller.setSelectedNodeId]);
+    controller.setEdgeDialog(null);
+  }, [controller.setSelectedNodeId, controller.setEdgeDialog]);
   const handleCreateEdge = useCallback((sourceId: string, targetId: string, anchors: ConnectionAnchors) => {
     setNodeDetailsOpen(false);
     controller.setEdgeDialog({ preferredSourceId: sourceId, preferredTargetId: targetId, ...anchors });
@@ -302,12 +303,28 @@ function OriginalWorkspace({
               onClose={() => setNodeDetailsOpen(false)}
               onEditNode={controller.setNodeDialog}
               onDeleteNode={(item) => controller.setDeleteTarget({ kind: "node", item })}
-              onCreateEdge={(preferredSourceId) => controller.setEdgeDialog({ preferredSourceId })}
-              onEditEdge={(edge) => controller.setEdgeDialog({ edge })}
+              onCreateEdge={(preferredSourceId) => { setNodeDetailsOpen(false); controller.setEdgeDialog({ preferredSourceId }); }}
+              onEditEdge={(edge) => { setNodeDetailsOpen(false); controller.setEdgeDialog({ edge }); }}
               onDeleteEdge={(item) => controller.setDeleteTarget({ kind: "edge", item })}
               onSelectNode={(node) => controller.setSelectedNodeId(node.id)}
             />
           ) : null}
+        <EdgeDialog
+          open={Boolean(controller.edgeDialog)}
+          edge={controller.edgeDialog?.edge}
+          preferredSourceId={controller.edgeDialog?.preferredSourceId}
+          preferredTargetId={controller.edgeDialog?.preferredTargetId}
+          sourcePort={controller.edgeDialog?.sourcePort}
+          targetPort={controller.edgeDialog?.targetPort}
+          nodes={dialogDetail?.nodes ?? []}
+          busy={controller.busy}
+          onOpenChange={(open) => !open && controller.setEdgeDialog(null)}
+          onSubmit={controller.saveEdge}
+          onDelete={controller.edgeDialog?.edge ? () => {
+            controller.setDeleteTarget({ kind: "edge", item: controller.edgeDialog!.edge! });
+            controller.setEdgeDialog(null);
+          } : undefined}
+        />
         </Layout.Content>
 
         {graph.warnings.length ? (
@@ -349,22 +366,6 @@ function OriginalWorkspace({
           busy={controller.busy}
           onOpenChange={(open) => !open && controller.setNodeDialog(undefined)}
           onSubmit={controller.saveNode}
-        />
-        <EdgeDialog
-          open={Boolean(controller.edgeDialog)}
-          edge={controller.edgeDialog?.edge}
-          preferredSourceId={controller.edgeDialog?.preferredSourceId}
-          preferredTargetId={controller.edgeDialog?.preferredTargetId}
-          sourcePort={controller.edgeDialog?.sourcePort}
-          targetPort={controller.edgeDialog?.targetPort}
-          nodes={dialogDetail?.nodes ?? []}
-          busy={controller.busy}
-          onOpenChange={(open) => !open && controller.setEdgeDialog(null)}
-          onSubmit={controller.saveEdge}
-          onDelete={controller.edgeDialog?.edge ? () => {
-            controller.setDeleteTarget({ kind: "edge", item: controller.edgeDialog!.edge! });
-            controller.setEdgeDialog(null);
-          } : undefined}
         />
         <DeleteDialog
           open={Boolean(controller.deleteTarget)}

@@ -27,7 +27,8 @@ const unchanged=()=>{assert.equal(cy.$id('a')[0],original);assert.deepEqual(cy.n
 try {
   const edge={id:'e1',source:'a',target:'b',type:'Concept',label:'包含',sourcePort:'right',targetPort:'left'};
   syncGraphElements(cy,{...graph,edges:[edge]},{});unchanged();
-  assert.equal(cy.$id('e1').style('curve-style'),'straight');
+  assert.ok(['straight','segments'].includes(cy.$id('e1').style('curve-style')));
+  assert.equal(cy.$id('e1').data('routed'),1);
   assert.equal(cy.$id('e1').data('sourceEndpoint'),'50% 0%');assert.equal(cy.$id('e1').data('targetEndpoint'),'-50% 0%');
   console.log('PASS adding an anchored edge retains renderer geometry, selection and viewport');
   syncGraphElements(cy,{...graph,edges:[{...edge,target:'c',sourcePort:'bottom',targetPort:'top',label:'修改'}]},{});unchanged();
@@ -36,8 +37,8 @@ try {
   syncGraphElements(cy,graph,{});unchanged();assert.equal(cy.edges().length,0);
   console.log('PASS deleting a relation leaves all nodes and viewport unchanged');
   syncGraphElements(cy,{...graph,edges:[{...edge,sourcePort:null,targetPort:null}]},{});
-  assert.equal(cy.$id('e1').style('curve-style'),'bezier');unchanged();
-  console.log('PASS legacy relations retain automatic routing');
+  assert.equal(cy.$id('e1').data('routed'),1);unchanged();
+  console.log('PASS legacy relations receive automatic obstacle-aware routing');
   const adapted=toKnowledgeGraph([{graph:{id:'g',categoryId:'c',label:'G'},nodes:graph.nodes.map(n=>({...n,nodeKey:n.id,graphId:'g'})),edges:[{id:'saved',sourceNodeId:'a',targetNodeId:'b',sourcePort:'bottom',targetPort:'left',type:'Concept',label:''}]}]);
   assert.equal(adapted.edges[0].sourcePort,'bottom');assert.equal(adapted.edges[0].targetPort,'left');
   console.log('PASS stored connection points survive the workspace graph adapter');
