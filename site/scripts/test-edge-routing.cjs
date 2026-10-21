@@ -6,6 +6,7 @@ function load(file){file=path.resolve(file);if(cache.has(file))return cache.get(
  new Function('require','module','exports',code)(name=>name.startsWith('.')?load(path.resolve(path.dirname(file),name)+'.ts'):require(name),module,module.exports);return module.exports;}
 const {routeConnection,segmentCoordinates}=load('original-ui/components/edgeRouting.ts');
 const {segments,hitsBox,expandBox,linePenalty}=load('original-ui/components/edgeRoutingGeometry.ts');
+const {smoothRoute,sampleCurve,curveCollisions}=load('original-ui/components/edgeRoutingCurves.ts');
 const {routeGraphEdges}=load('original-ui/components/graphCanvasRouting.ts');
 const source={x:80,y:40,side:'right'},target={x:400,y:40,side:'left'};
 const boxes=[{x1:0,y1:0,x2:80,y2:80},{x1:400,y1:0,x2:480,y2:80}];
@@ -31,6 +32,16 @@ test('separates parallel edges after their shared port stubs',()=>{
  const occupied=[{a:source,b:target}],points=routeConnection(source,target,boxes,occupied);valid(points);
  assert.ok(points.some(p=>p.y!==40));assert.ok(segments(points).filter(({a,b})=>a.y===40&&b.y===40).every(({a,b})=>Math.abs(a.x-b.x)<=26));
 });
+test('renders broad smooth curves without cutting through intervening nodes',()=>{
+ const obstacle={x1:180,y1:-20,x2:240,y2:100},all=[...boxes,obstacle];
+ const points=routeConnection(source,target,all),controls=smoothRoute(points,all),sampled=sampleCurve(source,target,controls);
+ assert.equal(curveCollisions(sampled,all),0);assert.ok(segments(sampled).some(({a,b})=>Math.abs(a.x-b.x)>.01&&Math.abs(a.y-b.y)>.01));
+});
+test('tightens a broad curve only when it would cut a node corner',()=>{
+ const points=[{x:0,y:100},{x:0,y:0},{x:200,y:0},{x:200,y:100}],obstacles=[{x1:20,y1:20,x2:80,y2:80}];
+ assert.ok(curveCollisions(sampleCurve(points[0],points.at(-1),points.slice(1,-1)),obstacles)>0);
+ assert.equal(curveCollisions(sampleCurve(points[0],points.at(-1),smoothRoute(points,obstacles)),obstacles),0);
+});
 test('segment coordinates reconstruct the intended absolute bends',()=>{
  const points=routeConnection(source,target,[...boxes,{x1:180,y1:-20,x2:240,y2:100}]);
  const a={x:40,y:40},b={x:440,y:40},coordinates=segmentCoordinates(points,a,b);
@@ -41,9 +52,9 @@ test('new routes preserve existing paths, node positions, selection and viewport
  const cy=cytoscape({headless:true,styleEnabled:true,layout:{name:'preset'},style:[{selector:'node',style:{width:80,height:60}}],elements:[
   {data:{id:'a'},position:{x:0,y:0}},{data:{id:'b'},position:{x:400,y:0}},{data:{id:'c'},position:{x:200,y:200}},
   {data:{id:'e1',source:'a',target:'b',sourcePort:'right',targetPort:'left'}}]});
- try{cy.zoom(1.7);cy.pan({x:30,y:90});cy.$id('a').select();routeGraphEdges(cy);const first=JSON.stringify(cy.$id('e1').data('routePoints'));
+ try{cy.zoom(1.7);cy.pan({x:30,y:90});cy.$id('a').select();routeGraphEdges(cy);const first=JSON.stringify(cy.$id('e1').data('routePoints')),curves=JSON.stringify(cy.$id('e1').data('curveControls'));
  const positions=cy.nodes().map(n=>n.position());cy.add({data:{id:'e2',source:'c',target:'b',sourcePort:'top',targetPort:'bottom'}});routeGraphEdges(cy);
- assert.equal(JSON.stringify(cy.$id('e1').data('routePoints')),first);assert.deepEqual(cy.nodes().map(n=>n.position()),positions);assert.equal(cy.zoom(),1.7);assert.deepEqual(cy.pan(),{x:30,y:90});assert.ok(cy.$id('a').selected());
+ assert.equal(JSON.stringify(cy.$id('e1').data('routePoints')),first);assert.equal(JSON.stringify(cy.$id('e1').data('curveControls')),curves);assert.deepEqual(cy.nodes().map(n=>n.position()),positions);assert.equal(cy.zoom(),1.7);assert.deepEqual(cy.pan(),{x:30,y:90});assert.ok(cy.$id('a').selected());
  cy.$id('c').position({x:200,y:0});routeGraphEdges(cy);assert.notEqual(JSON.stringify(cy.$id('e1').data('routePoints')),first);
  }finally{cy.destroy();}
 });

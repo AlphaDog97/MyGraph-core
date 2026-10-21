@@ -27,7 +27,7 @@ const unchanged=()=>{assert.equal(cy.$id('a')[0],original);assert.deepEqual(cy.n
 try {
   const edge={id:'e1',source:'a',target:'b',type:'Concept',label:'包含',sourcePort:'right',targetPort:'left'};
   syncGraphElements(cy,{...graph,edges:[edge]},{});unchanged();
-  assert.ok(['straight','segments'].includes(cy.$id('e1').style('curve-style')));
+  assert.equal(cy.$id('e1').style('curve-style'),'unbundled-bezier');
   assert.equal(cy.$id('e1').data('routed'),1);
   assert.equal(cy.$id('e1').data('sourceEndpoint'),'50% 0%');assert.equal(cy.$id('e1').data('targetEndpoint'),'-50% 0%');
   console.log('PASS adding an anchored edge retains renderer geometry, selection and viewport');

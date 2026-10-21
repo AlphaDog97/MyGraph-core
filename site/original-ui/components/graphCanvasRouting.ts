@@ -2,8 +2,9 @@ import type { Core, Position } from "cytoscape";
 import { connectionPorts, nearestPort, portEndpoint, type ConnectionPort } from "./graphConnectionGeometry";
 import { routeConnection, segmentCoordinates } from "./edgeRouting";
 import { segments, type Segment } from "./edgeRoutingGeometry";
+import { smoothRoute } from "./edgeRoutingCurves";
 
-type SavedRoute = { signature: string; points: Position[]; source: ConnectionPort; target: ConnectionPort };
+type SavedRoute = { signature: string; points: Position[]; controls: Position[]; source: ConnectionPort; target: ConnectionPort };
 const cache = new WeakMap<Core, { nodeStamp: string; routes: Map<string, SavedRoute> }>();
 
 export function routeGraphEdges(cy: Core) {
@@ -29,19 +30,19 @@ export function routeGraphEdges(cy: Core) {
     const target = connectionPorts(targetBox).find(port => port.side === edge.data("targetPort")) ??
       nearestPort(targetBox, edge.source().position());
     const points = routeConnection(source, target, [...boxes.values()], occupied);
-    routes.set(edge.id(), { signature, points, source, target });
+    const controls = smoothRoute(points, [...boxes.values()]);
+    routes.set(edge.id(), { signature, points, controls, source, target });
     occupied.push(...segments(points));
   }
   cy.batch(() => {
     for (const edge of cy.edges()) {
       const route = routes.get(edge.id());
-      const coordinates = route && segmentCoordinates(route.points, edge.source().position(), edge.target().position());
+      const coordinates = route && segmentCoordinates([route.source, ...route.controls, route.target], edge.source().position(), edge.target().position());
       if (!route || !coordinates) { edge.data("routed", 0); continue; }
-      edge.data({ routed: 1, routeCurve: coordinates.weights.length ? "segments" : "straight",
-        segmentWeights: coordinates.weights.length ? coordinates.weights.join(" ") : "0.5",
-        segmentDistances: coordinates.distances.length ? coordinates.distances.join(" ") : "0",
+      edge.data({ routed: 1,
+        controlWeights: coordinates.weights.join(" "), controlDistances: coordinates.distances.join(" "),
         sourceEndpoint: portEndpoint(route.source.side), targetEndpoint: portEndpoint(route.target.side),
-        routePoints: route.points });
+        routePoints: route.points, curveControls: route.controls });
     }
   });
   cache.set(cy, { nodeStamp, routes });

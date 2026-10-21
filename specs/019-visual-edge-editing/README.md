@@ -55,3 +55,11 @@ Refinement verification: 46 checks passed across lifecycle, connection interacti
 Routing/sidebar verification: seven routing checks cover node clearance, crossing detours, long connection endpoint obstacles, parallel lanes, coordinate conversion, preserved existing routes/viewport and a bounded dense fixture. All 53 regression checks and TypeScript passed. Browser QA verified a new connection detours around both a node and an existing line; creation and line editing open a right sidebar with aria-modal=false, four type options, saved Action selection, dark theme, background canvas panning and unchanged viewport on save. The temporary QA route was removed before production build.
 
 Site version 18 deployed successfully. Routing uses bounded coordinate tracks and clearance/crossing/overlap costs; it does not promise a crossing-free embedding for nonplanar, overlapping or very dense graphs. Sidebar is contained within the canvas area so the toolbar stays available.
+
+## Smooth Curve Refinement
+
+- [x] Restore the original Bezier appearance while retaining automatic detours and fixed ports. Render smooth quadratic chains instead of visible orthogonal segments.
+- [x] Sample smoothed routes against node bodies and tighten curves only when needed for clearance. Preserve existing color, width, arrows, sidebar, type dropdown and viewport stability.
+- [x] Verify smooth routing, collision clearance, browser appearance, TypeScript and production build; publish Site version 19.
+
+Smooth-curve verification: 31 targeted checks passed (nine routing/curve, five live data, ten lifecycle and seven focus); TypeScript, build and LeanSpec validation passed. The browser showed smooth Bezier detours around nodes and an existing connection with the original colors/width/arrows. Temporary QA route removed; version 19 deployed successfully.
