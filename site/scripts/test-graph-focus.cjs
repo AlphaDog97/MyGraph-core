@@ -6,13 +6,14 @@ const cytoscape = require("cytoscape");
 function load(file) {
   const module = { exports: {} };
   const code = ts.transpileModule(fs.readFileSync(file, "utf8"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, esModuleInterop: true },
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, esModuleInterop: true },
   }).outputText;
   new Function("require", "module", "exports", code)(require, module, module.exports);
   return module.exports;
 }
 const { focusGraph, READABLE_GRAPH_ZOOM, readableGraphViewport } = load("original-ui/components/graphCanvasViewport.ts");
 const { buildGraphCanvasStyles } = load("original-ui/components/graphCanvasStyles.ts");
+const { graphAtPosition, nodeGraphId } = load("original-ui/components/graphCanvasSelection.ts");
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 0.001, `${actual} != ${expected}`);
 function setup(width = 1200, height = 800) {
   const cy = cytoscape({ headless: true, styleEnabled: true, minZoom: 0.1, maxZoom: 4,
@@ -34,6 +35,19 @@ function setup(width = 1200, height = 800) {
   return { cy, nodeById };
 }
 const tests = [
+  ["cluster bounds select only an unambiguous graph and preserve shared-node ownership", () => {
+    const { cy, nodeById } = setup();
+    try {
+      for (const node of cy.nodes()) nodeById.get(node.id()).id = node.id();
+      assert.equal(graphAtPosition(cy, nodeById, { x: 2000, y: 1000 }), "a");
+      assert.equal(graphAtPosition(cy, nodeById, { x: 20000, y: 10000 }), "b");
+      assert.equal(graphAtPosition(cy, nodeById, { x: 10000, y: 5000 }), undefined);
+      assert.equal(graphAtPosition(cy, nodeById), undefined);
+      nodeById.get("root").provenance.push({ graphId: "shared" });
+      assert.equal(graphAtPosition(cy, nodeById, { x: 2000, y: 1000 }), undefined);
+      assert.equal(nodeGraphId(nodeById.get("root"), "shared"), "shared");
+    } finally { cy.destroy(); }
+  }],
   ["large graph reaches readable node and edge label sizes", () => {
     const { cy, nodeById } = setup();
     try {

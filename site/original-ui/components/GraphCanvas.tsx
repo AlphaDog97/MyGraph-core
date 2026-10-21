@@ -15,6 +15,7 @@ import {
 } from "./graphCanvasLayout";
 import { buildGraphCanvasStyles, type GraphTheme } from "./graphCanvasStyles";
 import { focusGraph } from "./graphCanvasViewport";
+import { graphAtPosition, nodeGraphId } from "./graphCanvasSelection";
 import "./GraphCanvas.css";
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
   theme: GraphTheme;
   cyRef: MutableRefObject<Core | null>;
   onNodeSelect: (node: KnowledgeNode | null) => void;
+  onGraphFocus?: (graphId: string) => void;
 }
 
 type TooltipPlacement = "above" | "below";
@@ -79,12 +81,14 @@ export default function GraphCanvas({
   theme,
   cyRef,
   onNodeSelect,
+  onGraphFocus,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const tagColorsRef = useRef(tagColors);
   const themeRef = useRef(theme);
   const focusedGraphIdRef = useRef(focusedGraphId);
   const onNodeSelectRef = useRef(onNodeSelect);
+  const onGraphFocusRef = useRef(onGraphFocus);
   const previousFocusCyRef = useRef<Core | null>(null);
   const previousFocusedGraphIdRef = useRef<string | null | undefined>(undefined);
   const [canvasVersion, setCanvasVersion] = useState(0);
@@ -93,6 +97,7 @@ export default function GraphCanvas({
   themeRef.current = theme;
   focusedGraphIdRef.current = focusedGraphId;
   onNodeSelectRef.current = onNodeSelect;
+  onGraphFocusRef.current = onGraphFocus;
 
   const nodeById = useMemo(
     () => new Map(graph.nodes.map((node) => [node.id, node])),
@@ -143,17 +148,34 @@ export default function GraphCanvas({
       instance.on("mouseout", "node", hideNodeTooltip);
       instance.on("grab pan zoom", hideNodeTooltip);
 
+      const focusOwningGraph = (node: KnowledgeNode): boolean => {
+        const graphId = nodeGraphId(node, focusedGraphIdRef.current);
+        if (!onGraphFocusRef.current || !graphId || graphId === focusedGraphIdRef.current) return false;
+        instance.nodes().removeClass("selected-node");
+        onNodeSelectRef.current(null);
+        onGraphFocusRef.current(graphId);
+        return true;
+      };
       instance.on("tap", "node", (event) => {
         const selected = nodeById.get(event.target.id());
         if (!selected) return;
+        if (focusOwningGraph(selected)) return;
         instance.nodes().removeClass("selected-node");
         event.target.addClass("selected-node");
         onNodeSelectRef.current(selected);
+      });
+      instance.on("tap", "edge", (event) => {
+        const source = nodeById.get(event.target.source().id());
+        if (source) focusOwningGraph(source);
       });
       instance.on("tap", (event) => {
         if (event.target !== instance) return;
         instance.nodes().removeClass("selected-node");
         onNodeSelectRef.current(null);
+        if (!focusedGraphIdRef.current && onGraphFocusRef.current) {
+          const graphId = graphAtPosition(instance, nodeById, event.position);
+          if (graphId) onGraphFocusRef.current(graphId);
+        }
       });
 
       // Preferences/search effects must also run when size readiness delayed creation.

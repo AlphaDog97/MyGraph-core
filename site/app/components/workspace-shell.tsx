@@ -183,6 +183,10 @@ function OriginalWorkspace({
     (node: KnowledgeNode | null) => controller.setSelectedNodeId(node?.id),
     [controller.setSelectedNodeId],
   );
+  const handleGraphFocus = useCallback(
+    (graphId: string) => report(controller.focusGraph(graphId)),
+    [controller.focusGraph, report],
+  );
 
   const deleteLabel = controller.deleteTarget
     ? "label" in controller.deleteTarget.item
@@ -233,11 +237,12 @@ function OriginalWorkspace({
                   theme={theme}
                   cyRef={cyRef}
                   onNodeSelect={handleNodeSelect}
+                  onGraphFocus={handleGraphFocus}
                 /> : null}
               </div>
               <div className="legend-container">
-                <TagLegend
-                  tags={graph.tags}
+                {controller.focusedGraphId ? <TagLegend
+                  tags={paletteTags}
                   tagColors={tagColors}
                   collapsed={!legendState.tagsOpen}
                   onToggle={() =>
@@ -246,7 +251,7 @@ function OriginalWorkspace({
                       tagsOpen: !current.tagsOpen,
                     }))
                   }
-                />
+                /> : null}
                 <EdgeTypeLegend
                   collapsed={!legendState.relationsOpen}
                   onToggle={() =>
