@@ -3,6 +3,10 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
+const selectionExports = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('original-ui/components/graphCanvasSelection.ts', 'utf8'), {
+  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+}).outputText, { exports: selectionExports });
 
 function mount({ width = 900, height = 600 } = {}) {
   const slots = [], pending = [], observers = [], instances = [];
@@ -40,13 +44,13 @@ function mount({ width = 900, height = 600 } = {}) {
   const cyFactory = options => {
     const c = collection();
     const cy = {
-      options, dead: false, renders: 0, fits: 0, styles: 0, handlers: {},
+      options, dead: false, renders: 0, fits: 0, styles: 0, handlers: {}, focusTargets: [],
       destroy() { this.dead = true; }, destroyed() { return this.dead; },
       elements: () => c, nodes: () => c,
       resize() { assert.equal(this.dead, false, 'resize must target the live canvas'); },
       fit() { this.fits++; }, center() {}, stop() {}, animate() {},
       forceRender() { this.renders++; }, batch(fn) { fn(); },
-      on(events, selector, handler) { this.handlers[events] = handler ?? selector; },
+      on(events, selector, handler) { this.handlers[handler ? `${events}:${selector}` : events] = handler ?? selector; },
       style() { const s = { fromJson: () => s, update: () => { cy.styles++; } }; return s; },
     };
     instances.push(cy);
@@ -67,7 +71,8 @@ function mount({ width = 900, height = 600 } = {}) {
       if (name === 'cytoscape') return cyFactory;
       if (name.endsWith('/loader')) return { toCytoscapeElements: () => [] };
       if (name.endsWith('/graphCanvasStyles')) return { buildGraphCanvasStyles: () => [] };
-      if (name.endsWith('/graphCanvasViewport')) return { focusGraph: cy => { cy.fit(); } };
+      if (name.endsWith('/graphCanvasViewport')) return { focusGraph: (cy, id) => { cy.focusTargets.push(id); cy.fit(); } };
+      if (name.endsWith('/graphCanvasSelection')) return selectionExports;
       if (name.endsWith('/graphCanvasLayout')) return {
         createGraphLayoutPlan: () => ({ positions: {} }), initialGraphLayout: () => ({}),
         runLayoutWithAdaptiveFit: (_cy, _motion, _positions, ready) => ready(),
@@ -101,6 +106,46 @@ function mount({ width = 900, height = 600 } = {}) {
 }
 
 const cases = [
+  ['canvas node selection focuses its graph before opening node details', () => {
+    const app = mount(), focused = [], selected = [];
+    const node = app.props.graph.nodes[0]; node.provenance = [{ graphId: 'graph-one' }];
+    app.render({ onGraphFocus: id => focused.push(id), onNodeSelect: value => selected.push(value) });
+    const cy = app.instances[0], event = { target: { id: () => node.id, addClass() {} } };
+    cy.handlers['tap:node'](event);
+    assert.deepEqual(focused, ['graph-one']); assert.equal(selected.at(-1), null);
+    app.render({ focusedGraphId: focused.at(-1) });
+    assert.equal(cy.focusTargets.at(-1), 'graph-one'); assert.equal(app.instances.length, 1);
+    cy.handlers['tap:node'](event); assert.equal(selected.at(-1), node);
+    app.unmount();
+  }],
+  ['edge selection switches graphs using the latest focus callback without rebuilding', () => {
+    const app = mount(), focused = [];
+    app.props.graph.nodes[0].provenance = [{ graphId: 'graph-two' }];
+    app.render({ focusedGraphId: 'graph-one', onGraphFocus: () => { throw new Error('stale callback'); } });
+    app.render({ onGraphFocus: id => focused.push(id) });
+    app.instances[0].handlers['tap:edge']({ target: { source: () => ({ id: () => 'n1' }) } });
+    assert.deepEqual(focused, ['graph-two']); assert.equal(app.instances.length, 1);
+    app.unmount();
+  }],
+  ['overview cluster background click selects the graph but ordinary background does not', () => {
+    const app = mount(), focused = [];
+    app.props.graph.nodes[0].provenance = [{ graphId: 'graph-one' }];
+    app.render({ onGraphFocus: id => focused.push(id) });
+    const cy = app.instances[0];
+    cy.getElementById = id => ({ id });
+    cy.collection = () => ({ length: 0, union() { this.length++; return this; },
+      boundingBox: () => ({ x1: 0, y1: 0, x2: 100, y2: 100 }) });
+    cy.handlers.tap({ target: cy, position: { x: 50, y: 50 } });
+    cy.handlers.tap({ target: cy, position: { x: 500, y: 500 } });
+    assert.deepEqual(focused, ['graph-one']); app.unmount();
+  }],
+  ['callers without graph-focus support retain direct node selection', () => {
+    const app = mount(), selected = [];
+    app.props.graph.nodes[0].provenance = [{ graphId: 'graph-one' }];
+    app.render({ onNodeSelect: node => selected.push(node) });
+    app.instances[0].handlers['tap:node']({ target: { id: () => 'n1', addClass() {} } });
+    assert.equal(selected.at(-1), app.props.graph.nodes[0]); app.unmount();
+  }],
   ['ordinary parent renders retain the live renderer and resize observer', () => {
     const app = mount(); app.render({ onNodeSelect() {} });
     assert.equal(app.instances.length, 1, 'callback changes must not rebuild Cytoscape');
