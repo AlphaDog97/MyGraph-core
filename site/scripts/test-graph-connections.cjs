@@ -27,7 +27,7 @@ function mount(){
     require:name=>name==='react'?hooks:geometry});
   const props={cy,selectedNodeId:'a',focusedGraphId:'g1',bridgeRef:{current:null},
     nodeById:new Map(['a','b','foreign'].map(id=>[id,{provenance:[{graphId:id==='foreign'?'g2':'g1'}]}])),
-    onCreateEdge:(...args)=>created.push(args)};
+    onCreateEdge:(...args)=>created.push(JSON.parse(JSON.stringify(args)))};
   let result;
   const render=next=>{Object.assign(props,next);cursor=0;result=exports.useGraphConnections(props);pending.splice(0).forEach(fn=>fn());return result;};
   render();render();
@@ -39,18 +39,22 @@ function mount(){
 const tests=[];const test=(name,run)=>tests.push([name,run]);
 test('four handles match node bounds and path preserves selected side',()=>{
   const ports=geometry.connectionPorts({x1:0,y1:0,x2:100,y2:60});
-  assert.equal(ports.length,4);assert.equal(ports[1].x,108);assert.equal(ports[0].y,-8);
-  assert.match(geometry.connectionPath(ports[1],{x:300,y:30}),/^M 108 30 C/);
+  assert.equal(ports.length,4);assert.equal(ports[1].x,100);assert.equal(ports[0].y,0);
+  assert.match(geometry.connectionPath(ports[1],{x:300,y:30}),/^M 100 30 L/);
 });
 test('clicking a handle then a target creates exactly one connection',()=>{
   const app=mount();app.down();app.fire('pointerup',{pointerId:1,clientX:138,clientY:80});
   assert.equal(app.props.bridgeRef.current.tryComplete('b'),true);
-  assert.deepEqual(app.created,[['a','b']]);assert.equal(app.props.bridgeRef.current.tryComplete('b'),false);app.unmount();
+  assert.deepEqual(app.created,[['a','b',{sourcePort:'right',targetPort:'left'}]]);assert.equal(app.props.bridgeRef.current.tryComplete('b'),false);app.unmount();
 });
 test('dragging a handle resolves the node under the released pointer',()=>{
-  const app=mount();app.down();app.fire('pointermove',{pointerId:1,clientX:270,clientY:80});
+  const app=mount();app.down();app.fire('pointermove',{pointerId:1,clientX:230,clientY:80});
   app.render();assert.equal(app.result.draft.targetId,'b');
-  app.fire('pointerup',{pointerId:1,clientX:270,clientY:80});assert.deepEqual(app.created,[['a','b']]);app.unmount();
+  app.fire('pointerup',{pointerId:1,clientX:230,clientY:80});assert.deepEqual(app.created,[['a','b',{sourcePort:'right',targetPort:'left'}]]);app.unmount();
+});
+test('explicit target handle is retained instead of inferred from the node center',()=>{
+  const app=mount();app.down();app.result.complete('b',{x:270,y:90},'bottom');
+  assert.deepEqual(app.created,[['a','b',{sourcePort:'right',targetPort:'bottom'}]]);app.unmount();
 });
 test('self and cross-graph targets keep a cancellable draft without saving',()=>{
   const app=mount();app.down();

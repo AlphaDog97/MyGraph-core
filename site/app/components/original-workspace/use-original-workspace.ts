@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { message } from "antd";
+import type { ConnectionSide } from "@/original-ui/domain/types";
 import type {
   CategorySummary,
   GraphDetail,
@@ -64,6 +65,8 @@ export function useOriginalWorkspace(
     edge?: GraphEdge;
     preferredSourceId?: string;
     preferredTargetId?: string;
+    sourcePort?: ConnectionSide;
+    targetPort?: ConnectionSide;
   } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
 

@@ -1,6 +1,7 @@
 import { getD1 } from "@/db";
 import { newId } from "@/app/lib/graph-store";
 import { requireApiUser } from "@/app/lib/auth";
+import { asConnectionSide } from "@/app/lib/edge-ports";
 import {
   asOptionalString,
   asRequiredString,
@@ -17,6 +18,8 @@ export async function POST(request: Request) {
     const targetNodeId = asRequiredString(payload.targetNodeId, "targetNodeId");
     const type = asRequiredString(payload.type, "type");
     const label = asOptionalString(payload.label);
+    const sourcePort = asConnectionSide(payload.sourcePort);
+    const targetPort = asConnectionSide(payload.targetPort);
 
     const verification = await getD1()
       .prepare(
@@ -32,9 +35,9 @@ export async function POST(request: Request) {
     const id = newId("edge");
     await getD1()
       .prepare(
-        "INSERT INTO edges (id, graph_id, source_node_id, target_node_id, type, label) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO edges (id, graph_id, source_node_id, target_node_id, type, label, source_port, target_port) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       )
-      .bind(id, graphId, sourceNodeId, targetNodeId, type, label)
+      .bind(id, graphId, sourceNodeId, targetNodeId, type, label, sourcePort, targetPort)
       .run();
 
     return Response.json({ id }, { status: 201 });

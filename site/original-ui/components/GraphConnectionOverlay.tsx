@@ -4,7 +4,7 @@ import { useGraphConnections, type ConnectionProps } from "./useGraphConnections
 import "./GraphConnectionOverlay.css";
 
 export default function GraphConnectionOverlay(props: ConnectionProps & { onInspectNode?: (id: string) => void }) {
-  const { bounds, draft, start, pointerDown, cancel } = useGraphConnections(props);
+  const { bounds, targetBounds, draft, start, pointerDown, complete, cancel } = useGraphConnections(props);
   const markerId = `connection-arrow-${useId().replace(/:/g, "")}`;
   if (!bounds || !props.selectedNodeId) return null;
   const labels = { top: "上", right: "右", bottom: "下", left: "左" };
@@ -24,11 +24,17 @@ export default function GraphConnectionOverlay(props: ConnectionProps & { onInsp
       onPointerDown={(event) => pointerDown(event, port)}
       onClick={(event) => { event.stopPropagation(); if (event.detail === 0) start(port); }}
     ><span /></button>)}
+    {targetBounds && draft?.targetId && connectionPorts(targetBounds).map((port) => <button key={`target-${port.side}`}
+      type="button" className={`graph-connection-port graph-connection-port--target${draft.targetPort?.side === port.side ? " is-snapped" : ""}`}
+      style={{ left: port.x, top: port.y }} aria-label={`连接到${labels[port.side]}侧连接点`}
+      onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); }}
+      onClick={(event) => { event.stopPropagation(); complete(draft.targetId!, port, port.side); }}
+    ><span /></button>)}
     {!draft && props.onInspectNode && <button type="button" className="graph-node-inspect"
       style={{ left: (bounds.x1 + bounds.x2) / 2, top: bounds.y1 - 46 }}
       onClick={() => props.onInspectNode?.(props.selectedNodeId!)}>详情</button>}
     {draft && <div className="graph-connection-hint" role="status">
-      <span>{draft.error ?? "点击目标节点，或拖动连接点到目标"}</span>
+      <span>{draft.error ?? "选择目标连接点，或拖到节点边缘吸附"}</span>
       <button type="button" onClick={cancel}>取消 <kbd>Esc</kbd></button>
     </div>}
   </div>;

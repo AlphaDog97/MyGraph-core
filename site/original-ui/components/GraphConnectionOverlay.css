@@ -5,6 +5,7 @@
 .graph-connection-port { position: absolute; width: 28px; height: 28px; transform: translate(-50%, -50%); border: 0; background: transparent; padding: 8px; pointer-events: auto; cursor: crosshair; touch-action: none; }
 .graph-connection-port span { display: block; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #5a67d8; background: #fff; box-sizing: border-box; }
 .graph-connection-port:hover span, .graph-connection-port:focus-visible span { background: #5a67d8; box-shadow: 0 0 0 4px #5a67d830; }
+.graph-connection-port--target.is-snapped span { background: #5a67d8; box-shadow: 0 0 0 4px #5a67d830; }
 .graph-node-inspect, .graph-connection-hint { border: 1px solid var(--panel-border, #d9dce3); background: var(--panel-bg, #fff); color: var(--text-primary, #2d3748); box-shadow: 0 3px 12px #0001; border-radius: 8px; pointer-events: auto; font-size: 13px; }
 .graph-node-inspect { position: absolute; transform: translateX(-50%); padding: 5px 12px; cursor: pointer; }
 .graph-connection-hint { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 32px); display: flex; gap: 16px; align-items: center; padding: 10px 14px; }

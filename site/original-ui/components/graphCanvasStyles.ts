@@ -76,6 +76,11 @@ export function buildGraphCanvasStyles(
       } as unknown as cytoscape.Css.Edge,
     },
     { selector: "node.dimmed", style: { opacity: 0.1 } },
+    { selector: "edge[anchored = 1]", style: {
+      "curve-style": "straight",
+      "source-endpoint": "data(sourceEndpoint)",
+      "target-endpoint": "data(targetEndpoint)",
+    } },
     { selector: "edge.dimmed", style: { opacity: 0.035 } },
     { selector: "node.connection-target", style: { "border-width": 4, "border-color": "#5a67d8" } },
     {

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { MutableRefObject, PointerEvent as ReactPointerEvent } from "react";
 import type { Core, Position } from "cytoscape";
-import type { KnowledgeNode } from "../domain/types";
-import { connectionPorts, nodeAtPoint, renderedPoint, type ConnectionPort, type NodeBounds } from "./graphConnectionGeometry";
+import type { ConnectionAnchors, KnowledgeNode } from "../domain/types";
+import { connectionPorts, nearestPort, nodeAtPoint, renderedPoint, type ConnectionPort, type NodeBounds, type PortSide } from "./graphConnectionGeometry";
 
 export interface GraphConnectionBridge {
-  tryComplete: (targetId: string) => boolean;
+  tryComplete: (targetId: string, point?: Position, side?: PortSide) => boolean;
   cancel: () => boolean;
 }
 export interface ConnectionProps {
@@ -13,10 +13,10 @@ export interface ConnectionProps {
   selectedNodeId?: string | null;
   focusedGraphId?: string | null;
   nodeById: Map<string, KnowledgeNode>;
-  onCreateEdge: (sourceId: string, targetId: string) => void;
+  onCreateEdge: (sourceId: string, targetId: string, anchors: ConnectionAnchors) => void;
   bridgeRef: MutableRefObject<GraphConnectionBridge | null>;
 }
-type Draft = { sourceId: string; start: ConnectionPort; end: Position; targetId?: string; error?: string };
+type Draft = { sourceId: string; start: ConnectionPort; end: Position; targetId?: string; targetPort?: ConnectionPort; error?: string };
 
 export function useGraphConnections(props: ConnectionProps) {
   const { cy, selectedNodeId, focusedGraphId, bridgeRef } = props;
@@ -32,7 +32,7 @@ export function useGraphConnections(props: ConnectionProps) {
     update(null); gesture.current = null;
     return active;
   };
-  const complete = (targetId: string): boolean => {
+  const complete = (targetId: string, point?: Position, side?: PortSide): boolean => {
     const current = draftRef.current;
     if (!current) return false;
     const { nodeById, onCreateEdge } = latest.current;
@@ -43,8 +43,12 @@ export function useGraphConnections(props: ConnectionProps) {
       update({ ...current, error: current.sourceId === targetId ? "请选择另一个节点" : "请选择同一图谱中的节点" });
       return true;
     }
+    if (!cy || cy.destroyed()) { cancel(); return true; }
+    const box = cy.getElementById(targetId).renderedBoundingBox({ includeLabels: false, includeOverlays: false });
+    const targetPort = side ? connectionPorts(box).find((port) => port.side === side)!
+      : nearestPort(box, point ?? current.end);
     cancel();
-    onCreateEdge(current.sourceId, targetId);
+    onCreateEdge(current.sourceId, targetId, { sourcePort: current.start.side, targetPort: targetPort.side });
     return true;
   };
   bridgeRef.current = { tryComplete: complete, cancel };
@@ -67,13 +71,17 @@ export function useGraphConnections(props: ConnectionProps) {
       const current = draftRef.current;
       if (current) {
         const start = connectionPorts(box).find((port) => port.side === current.start.side)!;
-        handlers.current.update({ ...current, start });
+        const target = current.targetId ? cy.getElementById(current.targetId) : null;
+        const end = target?.length && current.targetPort
+          ? connectionPorts(target.renderedBoundingBox({ includeLabels: false, includeOverlays: false }))
+            .find((port) => port.side === current.targetPort!.side)! : current.end;
+        handlers.current.update({ ...current, start, end });
       }
     };
     const schedule = () => { if (!frame) frame = window.requestAnimationFrame(sync); };
     sync();
-    cy.on("pan zoom resize position", schedule);
-    return () => { window.cancelAnimationFrame(frame); cy.off("pan zoom resize position", schedule); };
+    cy.on("pan zoom resize position data style", schedule);
+    return () => { window.cancelAnimationFrame(frame); cy.off("pan zoom resize position data style", schedule); };
   }, [cy, selectedNodeId, focusedGraphId]);
 
   useEffect(() => {
@@ -91,16 +99,20 @@ export function useGraphConnections(props: ConnectionProps) {
       const drag = gesture.current;
       if (drag && event.pointerId !== drag.pointerId) return;
       if (drag && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 5) drag.moved = true;
-      const end = renderedPoint(cy, event.clientX, event.clientY);
-      handlers.current.update({ ...current, end, targetId: nodeAtPoint(cy, end), error: undefined });
+      const point = renderedPoint(cy, event.clientX, event.clientY);
+      const targetId = nodeAtPoint(cy, point);
+      const target = targetId && targetId !== current.sourceId ? cy.getElementById(targetId) : null;
+      const targetPort = target?.length ? nearestPort(target.renderedBoundingBox({ includeLabels: false, includeOverlays: false }), point) : undefined;
+      handlers.current.update({ ...current, end: targetPort ?? point, targetId, targetPort, error: undefined });
     };
     const up = (event: PointerEvent) => {
       const drag = gesture.current;
       if (!drag || drag.pointerId !== event.pointerId) return;
       gesture.current = null;
       if (!drag.moved) return;
-      const target = nodeAtPoint(cy, renderedPoint(cy, event.clientX, event.clientY));
-      if (target) handlers.current.complete(target);
+      const point = renderedPoint(cy, event.clientX, event.clientY);
+      const target = nodeAtPoint(cy, point);
+      if (target) handlers.current.complete(target, point);
       else handlers.current.cancel();
     };
     const escape = (event: KeyboardEvent) => {
@@ -132,5 +144,7 @@ export function useGraphConnections(props: ConnectionProps) {
     gesture.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
     start(port);
   };
-  return { bounds, draft, start, pointerDown, cancel };
+  const targetBounds = cy && !cy.destroyed() && draft?.targetId && draft.targetId !== selectedNodeId
+    ? cy.getElementById(draft.targetId).renderedBoundingBox({ includeLabels: false, includeOverlays: false }) : null;
+  return { bounds, targetBounds, draft, start, pointerDown, complete, cancel };
 }

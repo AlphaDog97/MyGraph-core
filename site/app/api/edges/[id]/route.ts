@@ -1,5 +1,6 @@
 import { getD1 } from "@/db";
 import { requireApiUser } from "@/app/lib/auth";
+import { asConnectionSide } from "@/app/lib/edge-ports";
 import {
   asOptionalString,
   asRequiredString,
@@ -19,8 +20,10 @@ export async function PATCH(request: Request, context: Context) {
     const type = asRequiredString(payload.type, "type");
     const label = asOptionalString(payload.label);
 
-    const existing = await getD1().prepare("SELECT graph_id FROM edges WHERE id = ?").bind(id).first();
+    const existing = await getD1().prepare("SELECT graph_id, source_port, target_port FROM edges WHERE id = ?").bind(id).first();
     if (!existing) throw new RequestError("Relation not found", 404);
+    const sourcePort = asConnectionSide(payload.sourcePort === undefined ? existing.source_port : payload.sourcePort);
+    const targetPort = asConnectionSide(payload.targetPort === undefined ? existing.target_port : payload.targetPort);
     const verification = await getD1()
       .prepare("SELECT COUNT(*) AS count FROM nodes WHERE graph_id = ? AND id IN (?, ?)")
       .bind(existing.graph_id, sourceNodeId, targetNodeId).first();
@@ -31,11 +34,11 @@ export async function PATCH(request: Request, context: Context) {
     const result = await getD1()
       .prepare(
         `UPDATE edges
-         SET source_node_id = ?, target_node_id = ?, type = ?, label = ?,
+         SET source_node_id = ?, target_node_id = ?, type = ?, label = ?, source_port = ?, target_port = ?,
              updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
       )
-      .bind(sourceNodeId, targetNodeId, type, label, id)
+      .bind(sourceNodeId, targetNodeId, type, label, sourcePort, targetPort, id)
       .run();
 
     if (!result.meta.changes) throw new RequestError("Relation not found", 404);

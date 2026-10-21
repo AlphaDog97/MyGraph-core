@@ -16,9 +16,9 @@ Create relationships visually in the existing 2D Site canvas and edit a relation
 
 ## Design
 
-Selected nodes expose four connection handles. Support handle-click then target-click and pointer drag to a target, with a curved preview, target highlight and Escape/background cancellation. Handles follow node movement and canvas transforms. Open the existing relationship dialog with both endpoints prefilled; save only after confirmation. Node details move behind a nearby Details button to keep the canvas usable on mobile.
+Selected nodes expose four connection handles. Support handle-click then target-click and pointer drag to a target, with a point-to-point preview, target highlight and Escape/background cancellation. Handles follow node movement and canvas transforms. Open the existing relationship dialog with both endpoints prefilled; save only after confirmation. Node details move behind a nearby Details button to keep the canvas usable on mobile.
 
-Keep connection state in a separate hook and overlay; forward current callbacks through refs without rebuilding Cytoscape. Preserve category graph focus and selector behavior. Connections stay within a graph; PATCH validates endpoints against the stored graph like POST. Existing lines retain automatic routing; handles do not store fixed anchors or bend points. 3D retains its existing details interaction.
+Keep connection state in a separate hook and overlay; forward current callbacks through refs without rebuilding Cytoscape. Preserve category graph focus and selector behavior. Connections stay within a graph; PATCH validates endpoints against the stored graph like POST. Persist source/target port sides on new edges and expose target handles while connecting. Anchored edges use straight point-to-point routing; legacy edges retain automatic routing. Reconcile edge changes in the live Cytoscape instance when the node set is unchanged, preserving positions, selection, pan and zoom. Append nullable D1 columns with generated migration metadata. 3D retains its existing details interaction.
 
 ## Plan
 
@@ -35,3 +35,12 @@ Keep connection state in a separate hook and overlay; forward current callbacks 
 - [x] 38 regression checks passed across canvas lifecycle, connections, SQLite edges, graph focus and JSON import; TypeScript and production build passed.
 - [x] LeanSpec validation passed; version 16 deployed successfully. Temporary QA route is absent from the final source and production route list.
 
+
+## Connection Refinement
+
+- [x] Persist explicit endpoint sides through API, storage and graph adapters.
+- [x] Snap previews and connections to target handles.
+- [x] Update relations without rebuilding or rerunning layout for unchanged node sets.
+- [x] Verify migration compatibility, CRUD persistence, viewport stability and browser interaction; publish Site version 17.
+
+Refinement verification: 46 checks passed across lifecycle, connection interaction, real Cytoscape data patches, SQLite migration/CRUD/readback, focus and JSON import. TypeScript, production build and LeanSpec validation passed. Browser QA confirmed right-to-left and bottom-to-top connection points and unchanged positions/pan/zoom on repeated saves. The temporary synthetic QA route is removed; authenticated production CRUD was not browser-tested. Local D1 migrations and hosted publication succeeded.

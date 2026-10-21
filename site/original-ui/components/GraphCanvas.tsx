@@ -6,7 +6,7 @@ import {
 } from "react";
 import type { MutableRefObject } from "react";
 import cytoscape, { type Core, type EventObject } from "cytoscape";
-import type { KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
+import type { ConnectionAnchors, KnowledgeNode, KnowledgeGraph, TagColorAssignment } from "../domain/types";
 import { toCytoscapeElements } from "../data/loader";
 import {
   createGraphLayoutPlan,
@@ -19,6 +19,7 @@ import { graphAtPosition, nodeGraphId } from "./graphCanvasSelection";
 import { createTooltipState, type NodeTooltipState } from "./graphCanvasTooltip";
 import GraphConnectionOverlay from "./GraphConnectionOverlay";
 import type { GraphConnectionBridge } from "./useGraphConnections";
+import { syncGraphElements } from "./graphCanvasData";
 import "./GraphCanvas.css";
 
 interface Props {
@@ -32,7 +33,7 @@ interface Props {
   onGraphFocus?: (graphId: string) => void;
   selectedNodeId?: string | null;
   onEdgeSelect?: (edgeId: string) => void;
-  onCreateEdge?: (sourceId: string, targetId: string) => void;
+  onCreateEdge?: (sourceId: string, targetId: string, anchors: ConnectionAnchors) => void;
   onInspectNode?: (nodeId: string) => void;
 }
 
@@ -75,6 +76,14 @@ export default function GraphCanvas({
     [graph.nodes]
   );
 
+  // Only a different node set needs a fresh layout. Edge changes stay on this renderer.
+  const nodeSetKey = JSON.stringify(graph.nodes.map((node) => node.id).sort());
+  const graphRef = useRef(graph);
+  const nodeByIdRef = useRef(nodeById);
+  graphRef.current = graph;
+  nodeByIdRef.current = nodeById;
+  const previousSearchRef = useRef<{ cy: Core; query: string } | null>(null);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -86,10 +95,10 @@ export default function GraphCanvas({
     const initialize = () => {
       if (disposed || cy || container.clientWidth <= 0 || container.clientHeight <= 0) return;
       const reduceMotion = prefersReducedMotion();
-      const { positions } = createGraphLayoutPlan(graph);
+      const { positions } = createGraphLayoutPlan(graphRef.current);
       const instance = cytoscape({
         container,
-        elements: toCytoscapeElements(graph, tagColorsRef.current),
+        elements: toCytoscapeElements(graphRef.current, tagColorsRef.current),
         style: buildGraphCanvasStyles(reduceMotion, themeRef.current),
         layout: initialGraphLayout(true, positions),
         minZoom: MIN_ZOOM,
@@ -99,11 +108,11 @@ export default function GraphCanvas({
       cyRef.current = instance;
 
       runLayoutWithAdaptiveFit(instance, true, positions, () => {
-        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeById, 0);
+        if (!disposed) focusGraph(instance, focusedGraphIdRef.current, nodeByIdRef.current, 0);
       });
 
       const updateNodeTooltip = (event: EventObject) => {
-        const hoveredNode = nodeById.get(event.target.id());
+        const hoveredNode = nodeByIdRef.current.get(event.target.id());
         if (!hoveredNode) {
           setNodeTooltip(null);
           return;
@@ -128,9 +137,9 @@ export default function GraphCanvas({
         return true;
       };
       instance.on("tap", "node", (event) => {
-        const selected = nodeById.get(event.target.id());
+        const selected = nodeByIdRef.current.get(event.target.id());
         if (!selected) return;
-        if (connectionRef.current?.tryComplete(selected.id)) return;
+        if (connectionRef.current?.tryComplete(selected.id, event.renderedPosition)) return;
         if (focusOwningGraph(selected)) return;
         instance.nodes().removeClass("selected-node");
         event.target.addClass("selected-node");
@@ -138,7 +147,7 @@ export default function GraphCanvas({
       });
       instance.on("tap", "edge", (event) => {
         if (connectionRef.current?.cancel()) return;
-        const source = nodeById.get(event.target.source().id());
+        const source = nodeByIdRef.current.get(event.target.source().id());
         if (source && focusOwningGraph(source)) return;
         onEdgeSelectRef.current?.(event.target.id());
       });
@@ -148,7 +157,7 @@ export default function GraphCanvas({
         instance.nodes().removeClass("selected-node");
         onNodeSelectRef.current(null);
         if (!focusedGraphIdRef.current && onGraphFocusRef.current) {
-          const graphId = graphAtPosition(instance, nodeById, event.position);
+          const graphId = graphAtPosition(instance, nodeByIdRef.current, event.position);
           if (graphId) onGraphFocusRef.current(graphId);
         }
       });
@@ -182,7 +191,7 @@ export default function GraphCanvas({
       cy?.destroy();
       if (cyRef.current === cy) cyRef.current = null;
     };
-  }, [cyRef, graph, nodeById]);
+  }, [cyRef, nodeSetKey]);
 
   useEffect(() => {
     const cy = cyRef.current;
@@ -205,17 +214,8 @@ export default function GraphCanvas({
 
   useEffect(() => {
     const cy = cyRef.current;
-    if (!cy) return;
-    cy.batch(() => {
-      cy.nodes().forEach((node) => {
-        const knowledgeNode = nodeById.get(node.id());
-        if (knowledgeNode) {
-          node.data("borderColor", knowledgeNode.resolveBorderColor(tagColors));
-        }
-      });
-    });
-    cy.style().update();
-  }, [canvasVersion, cyRef, nodeById, tagColors]);
+    if (cy) syncGraphElements(cy, graph, tagColors);
+  }, [canvasVersion, cyRef, graph, tagColors]);
 
   useEffect(() => {
     const cy = cyRef.current;
@@ -236,7 +236,9 @@ export default function GraphCanvas({
       matched.connectedEdges().connectedNodes().removeClass("dimmed");
     });
 
-    if (query) {
+    const previous = previousSearchRef.current;
+    previousSearchRef.current = { cy, query };
+    if (query && (previous?.cy !== cy || previous.query !== query)) {
       setNodeTooltip(null);
       const matched = cy.nodes(".highlighted");
       if (matched.length > 0) {

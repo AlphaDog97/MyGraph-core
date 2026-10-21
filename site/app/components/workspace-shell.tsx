@@ -15,7 +15,7 @@ import EdgeTypeLegend from "@/original-ui/components/EdgeTypeLegend";
 import TagColorEditor from "@/original-ui/components/TagColorEditor";
 import Overview3DCanvas from "@/original-ui/components/Overview3DCanvas";
 import { loadTagColors, saveTagColors } from "@/original-ui/data/tagStorage";
-import type { KnowledgeNode, TagColorAssignment } from "@/original-ui/domain/types";
+import type { ConnectionAnchors, KnowledgeNode, TagColorAssignment } from "@/original-ui/domain/types";
 import type { SignedInUser } from "@/app/lib/auth";
 import type { GraphDetail, WorkspaceSnapshot } from "@/app/lib/types";
 import { CategoryGraphDialog } from "./category-graph-dialog";
@@ -193,9 +193,9 @@ function OriginalWorkspace({
     controller.setSelectedNodeId(nodeId);
     setNodeDetailsOpen(true);
   }, [controller.setSelectedNodeId]);
-  const handleCreateEdge = useCallback((sourceId: string, targetId: string) => {
+  const handleCreateEdge = useCallback((sourceId: string, targetId: string, anchors: ConnectionAnchors) => {
     setNodeDetailsOpen(false);
-    controller.setEdgeDialog({ preferredSourceId: sourceId, preferredTargetId: targetId });
+    controller.setEdgeDialog({ preferredSourceId: sourceId, preferredTargetId: targetId, ...anchors });
   }, [controller.setEdgeDialog]);
   const handleEdgeSelect = useCallback((edgeId: string) => {
     const edge = controller.allDetails.flatMap((detail) => detail.edges).find((item) => item.id === edgeId);
@@ -355,6 +355,8 @@ function OriginalWorkspace({
           edge={controller.edgeDialog?.edge}
           preferredSourceId={controller.edgeDialog?.preferredSourceId}
           preferredTargetId={controller.edgeDialog?.preferredTargetId}
+          sourcePort={controller.edgeDialog?.sourcePort}
+          targetPort={controller.edgeDialog?.targetPort}
           nodes={dialogDetail?.nodes ?? []}
           busy={controller.busy}
           onOpenChange={(open) => !open && controller.setEdgeDialog(null)}

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { GraphEdge, GraphNode } from "@/app/lib/types";
+import type { ConnectionSide } from "@/original-ui/domain/types";
+import { EdgePortSelect } from "./edge-port-select";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,6 +28,8 @@ export type EdgeFormValue = {
   targetNodeId: string;
   type: string;
   label: string;
+  sourcePort?: ConnectionSide | null;
+  targetPort?: ConnectionSide | null;
 };
 
 interface EdgeDialogProps {
@@ -34,6 +38,8 @@ interface EdgeDialogProps {
   nodes: GraphNode[];
   preferredSourceId?: string;
   preferredTargetId?: string;
+  sourcePort?: ConnectionSide;
+  targetPort?: ConnectionSide;
   busy?: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (value: EdgeFormValue) => void;
@@ -46,6 +52,8 @@ export function EdgeDialog({
   nodes,
   preferredSourceId,
   preferredTargetId,
+  sourcePort,
+  targetPort,
   busy,
   onOpenChange,
   onSubmit,
@@ -65,8 +73,10 @@ export function EdgeDialog({
       targetNodeId: edge?.targetNodeId ?? preferredTargetId ?? nodes.find((node) => node.id !== preferredSourceId)?.id ?? nodes[0]?.id ?? "",
       type: edge?.type ?? "Concept",
       label: edge?.label ?? "",
+      sourcePort: edge?.sourcePort ?? sourcePort ?? null,
+      targetPort: edge?.targetPort ?? targetPort ?? null,
     });
-  }, [edge, nodes, open, preferredSourceId, preferredTargetId]);
+  }, [edge, nodes, open, preferredSourceId, preferredTargetId, sourcePort, targetPort]);
 
   const update = (field: keyof EdgeFormValue, next: string) =>
     setValue((current) => ({ ...current, [field]: next }));
@@ -114,6 +124,12 @@ export function EdgeDialog({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <EdgePortSelect label="起点连接点" value={value.sourcePort}
+              onChange={(sourcePort) => setValue((current) => ({ ...current, sourcePort }))} />
+            <EdgePortSelect label="终点连接点" value={value.targetPort}
+              onChange={(targetPort) => setValue((current) => ({ ...current, targetPort }))} />
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="grid gap-2">

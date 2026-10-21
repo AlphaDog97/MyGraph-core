@@ -43,12 +43,20 @@ export interface GraphNodeProvenance {
 }
 
 /** Normalized edge derived from a node's links. */
+export type ConnectionSide = "top" | "right" | "bottom" | "left";
+export interface ConnectionAnchors {
+  sourcePort: ConnectionSide;
+  targetPort: ConnectionSide;
+}
+
 export interface KnowledgeEdge {
   id: string;
   source: string;
   target: string;
   type: string;
   label: string;
+  sourcePort?: ConnectionSide | null;
+  targetPort?: ConnectionSide | null;
 }
 
 /** Maps tag IDs to user-chosen CSS color strings (or undefined for unassigned). */
