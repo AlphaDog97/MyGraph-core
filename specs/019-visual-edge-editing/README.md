@@ -63,3 +63,14 @@ Site version 18 deployed successfully. Routing uses bounded coordinate tracks an
 - [x] Verify smooth routing, collision clearance, browser appearance, TypeScript and production build; publish Site version 19.
 
 Smooth-curve verification: 31 targeted checks passed (nine routing/curve, five live data, ten lifecycle and seven focus); TypeScript, build and LeanSpec validation passed. The browser showed smooth Bezier detours around nodes and an existing connection with the original colors/width/arrows. Temporary QA route removed; version 19 deployed successfully.
+
+## Natural Connection Refinement
+
+Prefer a straight or shallow quadratic curve and attach automatic endpoints in the direction of the connection. Keep explicitly selected ports. Penalize crossings with a bounded cost so existing lines cannot cause large loops; use longer smooth detours only when needed to avoid node bodies. Reserve actual sampled curves and preserve cached paths on edge insertion.
+
+- [x] Verify compact paths, parallel separation, fixed ports and stable live geometry.
+- [x] Check a representative multi-relation graph in the browser, run regressions/build/LeanSpec, remove the QA fixture and publish.
+
+Natural-route verification: all 59 checks passed (13 routing/curve, five live data, ten lifecycle, seven focus, seven connection interaction, seven SQLite edge API and ten import). Browser QA used seven synthetic nodes and twelve relations with representative labels, verified compact curves in both themes and a new right-to-left anchored edge without changing positions, viewport or an existing curve. The temporary QA route is removed.
+
+TypeScript, production build and LeanSpec validation passed. MyGraph Site version 20 deployed successfully; production routes contain no QA fixture. Crossing avoidance remains best effort with bounded visual complexity.

@@ -8,6 +8,7 @@ const {routeConnection,segmentCoordinates}=load('original-ui/components/edgeRout
 const {segments,hitsBox,expandBox,linePenalty}=load('original-ui/components/edgeRoutingGeometry.ts');
 const {smoothRoute,sampleCurve,curveCollisions}=load('original-ui/components/edgeRoutingCurves.ts');
 const {routeGraphEdges}=load('original-ui/components/graphCanvasRouting.ts');
+const {naturalConnection}=load('original-ui/components/edgeRoutingNatural.ts');
 const source={x:80,y:40,side:'right'},target={x:400,y:40,side:'left'};
 const boxes=[{x1:0,y1:0,x2:80,y2:80},{x1:400,y1:0,x2:480,y2:80}];
 const tests=[];const test=(name,fn)=>tests.push([name,fn]);
@@ -47,6 +48,30 @@ test('segment coordinates reconstruct the intended absolute bends',()=>{
  const a={x:40,y:40},b={x:440,y:40},coordinates=segmentCoordinates(points,a,b);
  coordinates.weights.forEach((weight,i)=>{assert.ok(Math.abs(a.x+(b.x-a.x)*weight-points[i+1].x)<.001);assert.ok(Math.abs(a.y+coordinates.distances[i]-points[i+1].y)<.001);});
  assert.equal(segmentCoordinates(points,a,a),null);
+});
+test('automatic connections use a single compact curve instead of orthogonal corner chains',()=>{
+ const a={x1:0,y1:0,x2:100,y2:60},b={x1:300,y1:180,x2:400,y2:240};
+ const route=naturalConnection(a,b,null,null,[a,b],[]);
+ assert.equal(route.controls.length,1);assert.equal(curveCollisions(route.points,[a,b]),0);
+ assert.notEqual(route.source.y,30);assert.notEqual(route.target.y,210);
+});
+test('a long crossing line cannot force a large loop around its remote endpoints',()=>{
+ const occupied=[{a:{x:240,y:-400},b:{x:240,y:500}}];
+ const route=naturalConnection(boxes[0],boxes[1],null,null,boxes,occupied);
+ assert.equal(curveCollisions(route.points,boxes),0);
+ assert.ok(route.points.every(p=>p.y>=-100&&p.y<=180));assert.ok(route.controls.length<=3);
+});
+test('natural curves separate parallel relations and retain explicitly chosen endpoints',()=>{
+ const first=naturalConnection(boxes[0],boxes[1],null,null,boxes,[]);
+ const second=naturalConnection(boxes[0],boxes[1],null,null,boxes,segments(first.points));
+ assert.notDeepEqual(second.controls,first.controls);assert.equal(curveCollisions(second.points,boxes),0);
+ const fixed=naturalConnection(boxes[0],boxes[1],'bottom','top',boxes,[]);
+ assert.equal(fixed.source.y,80);assert.equal(fixed.target.y,0);assert.equal(curveCollisions(fixed.points,boxes),0);
+});
+test('compact curves still avoid an intervening node body',()=>{
+ const obstacle={x1:180,y1:-20,x2:240,y2:100},all=[...boxes,obstacle];
+ const route=naturalConnection(boxes[0],boxes[1],null,null,all,[]);
+ assert.equal(curveCollisions(route.points,all),0);
 });
 test('new routes preserve existing paths, node positions, selection and viewport',()=>{
  const cy=cytoscape({headless:true,styleEnabled:true,layout:{name:'preset'},style:[{selector:'node',style:{width:80,height:60}}],elements:[

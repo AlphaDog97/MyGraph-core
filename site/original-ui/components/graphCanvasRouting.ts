@@ -1,8 +1,8 @@
 import type { Core, Position } from "cytoscape";
-import { connectionPorts, nearestPort, portEndpoint, type ConnectionPort } from "./graphConnectionGeometry";
-import { routeConnection, segmentCoordinates } from "./edgeRouting";
+import { type ConnectionPort } from "./graphConnectionGeometry";
+import { segmentCoordinates } from "./edgeRouting";
 import { segments, type Segment } from "./edgeRoutingGeometry";
-import { smoothRoute } from "./edgeRoutingCurves";
+import { endpointValue, naturalConnection } from "./edgeRoutingNatural";
 
 type SavedRoute = { signature: string; points: Position[]; controls: Position[]; source: ConnectionPort; target: ConnectionPort };
 const cache = new WeakMap<Core, { nodeStamp: string; routes: Map<string, SavedRoute> }>();
@@ -25,12 +25,8 @@ export function routeGraphEdges(cy: Core) {
   for (const { edge, signature } of pending) {
     const sourceBox = boxes.get(edge.source().id()), targetBox = boxes.get(edge.target().id());
     if (!sourceBox || !targetBox || edge.source().id() === edge.target().id()) continue;
-    const source = connectionPorts(sourceBox).find(port => port.side === edge.data("sourcePort")) ??
-      nearestPort(sourceBox, edge.target().position());
-    const target = connectionPorts(targetBox).find(port => port.side === edge.data("targetPort")) ??
-      nearestPort(targetBox, edge.source().position());
-    const points = routeConnection(source, target, [...boxes.values()], occupied);
-    const controls = smoothRoute(points, [...boxes.values()]);
+    const { source, target, points, controls } = naturalConnection(sourceBox, targetBox,
+      edge.data("sourcePort"), edge.data("targetPort"), [...boxes.values()], occupied);
     routes.set(edge.id(), { signature, points, controls, source, target });
     occupied.push(...segments(points));
   }
@@ -41,7 +37,8 @@ export function routeGraphEdges(cy: Core) {
       if (!route || !coordinates) { edge.data("routed", 0); continue; }
       edge.data({ routed: 1,
         controlWeights: coordinates.weights.join(" "), controlDistances: coordinates.distances.join(" "),
-        sourceEndpoint: portEndpoint(route.source.side), targetEndpoint: portEndpoint(route.target.side),
+        sourceEndpoint: endpointValue(route.source, boxes.get(edge.source().id())!),
+        targetEndpoint: endpointValue(route.target, boxes.get(edge.target().id())!),
         routePoints: route.points, curveControls: route.controls });
     }
   });
