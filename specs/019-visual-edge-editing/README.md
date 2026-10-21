@@ -74,3 +74,12 @@ Prefer a straight or shallow quadratic curve and attach automatic endpoints in t
 Natural-route verification: all 59 checks passed (13 routing/curve, five live data, ten lifecycle, seven focus, seven connection interaction, seven SQLite edge API and ten import). Browser QA used seven synthetic nodes and twelve relations with representative labels, verified compact curves in both themes and a new right-to-left anchored edge without changing positions, viewport or an existing curve. The temporary QA route is removed.
 
 TypeScript, production build and LeanSpec validation passed. MyGraph Site version 20 deployed successfully; production routes contain no QA fixture. Crossing avoidance remains best effort with bounded visual complexity.
+
+## Connection Spacing
+
+- [x] Increase natural-curve lane steps and the preferred gap between nearby lines, while allowing shared endpoints to converge. Keep bounded curvature and preserve existing paths on insertion.
+- [x] Verify automatic and fixed-port parallel curves, obstacle clearance, live geometry and browser appearance; publish.
+
+Spacing verification: lane steps increase to 48 model units and the preferred central gap increases from eight to 24. Shared ports may converge near nodes. Four-parallel-line fixtures measured 28.8-unit midpoint gaps for automatic endpoints and 36 for fixed ports; browser QA verified four relations in each group in both themes. Thirteen routing checks passed, including obstacle clearance, compact paths and cached-route/viewport stability. Temporary QA route removed before packaging.
+
+Five live-data checks, TypeScript, production build and LeanSpec validation also passed. Site version 21 deployed successfully.

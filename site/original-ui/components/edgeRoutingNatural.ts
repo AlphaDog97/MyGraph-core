@@ -6,6 +6,8 @@ import { segments, type Segment } from "./edgeRoutingGeometry";
 
 const center = (box: NodeBounds): Position => ({ x: (box.x1 + box.x2) / 2, y: (box.y1 + box.y2) / 2 });
 const distance = (a: Position, b: Position) => Math.hypot(a.x - b.x, a.y - b.y);
+const LINE_GAP = 24;
+const LANE_STEP = 48;
 
 function endpoint(box: NodeBounds, toward: Position, side?: PortSide | null): ConnectionPort {
   if (side) return connectionPorts(box).find(port => port.side === side)!;
@@ -42,7 +44,8 @@ export function naturalConnection(sourceBox: NodeBounds, targetBox: NodeBounds,
   sourceSide: PortSide | null, targetSide: PortSide | null, boxes: NodeBounds[], occupied: Segment[]) {
   const a = center(sourceBox), b = center(targetBox), length = distance(a, b) || 1;
   const normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
-  const candidates = [0, 24, -24, 48, -48, 80, -80, 120, -120].filter(offset => Math.abs(offset) <= Math.max(24, length * 0.45));
+  const candidates = [0, 1, -1, 2, -2, 3, -3, 4, -4].map(lane => lane * LANE_STEP)
+    .filter(offset => Math.abs(offset) <= Math.max(LANE_STEP, length * 0.55));
   const build = (offset: number) => {
     const middle = { x: (a.x + b.x) / 2 + normal.x * offset, y: (a.y + b.y) / 2 + normal.y * offset };
     const source = endpoint(sourceBox, middle, sourceSide), target = endpoint(targetBox, middle, targetSide);
@@ -58,7 +61,10 @@ export function naturalConnection(sourceBox: NodeBounds, targetBox: NodeBounds,
   const score = (route: ReturnType<typeof build>) => {
     const lines = segments(route.points), collisions = curveCollisions(route.points, boxes);
     const crossings = lines.reduce((sum, line) => sum + occupied.filter(other => crossing(line, other)).length, 0);
-    const overlap = route.points.slice(3, -3).filter(point => occupied.some(line => pointDistance(point, line) < 8)).length;
+    // Shared ports converge near nodes; keep the central span and its labels separated.
+    const trim = Math.ceil(route.points.length / 3);
+    const overlap = route.points.slice(trim, -trim)
+      .filter(point => occupied.some(line => pointDistance(point, line) < LINE_GAP)).length;
     return collisions * 100000 + lines.reduce((sum, line) => sum + distance(line.a, line.b), 0) + crossings * 100 + overlap * 12;
   };
   let best = build(0), bestScore = score(best);
