@@ -27,6 +27,10 @@ search, JSON import, editing, theme controls or account access.
   and separate location/search rows on phones. Prevent search-focus width growth.
 - Hide category-specific search/reset/graph selection in 3D, keeping the mode
   control visible. Import from 3D switches back to category mode.
+- Follow-up: tag palette rows follow the selected graph. Selecting all graphs
+  uses current-category tags; 3D uses the displayed overview tags. Missing or
+  untagged graphs show an empty palette instead of falling back to unrelated tags.
+  Show the scope name and tag count; preserve existing saved colors.
 
 ## Plan
 
@@ -41,6 +45,8 @@ search, JSON import, editing, theme controls or account access.
   payloads; edit/delete targets; empty-state disabled flags; GitHub/signout access.
 - [x] Actual React/Ant Design server rendering verified 2D controls and localized
   search, plus the absence of category-only controls in 3D.
+- [x] Palette checks cover two graph selections, category fallback, deduplication,
+  missing/empty graphs, unchanged source tags and scope title/count.
 - [ ] Browser visual, submenu interaction and narrow-screen QA unavailable:
   control-browser is absent in the managed environment. No screenshots claimed.
 

@@ -22,7 +22,7 @@ import { CategoryGraphDialog } from "./category-graph-dialog";
 import { DeleteDialog } from "./delete-dialog";
 import { EdgeDialog } from "./edge-dialog";
 import { NodeDialog } from "./node-dialog";
-import { findOwningDetail, toKnowledgeGraph } from "./original-workspace/graph-adapter";
+import { findOwningDetail, graphPaletteTags, toKnowledgeGraph } from "./original-workspace/graph-adapter";
 import { SiteNodeDrawer } from "./original-workspace/site-node-drawer";
 import { WorkspaceToolbar } from "./original-workspace/workspace-toolbar";
 import { useOriginalWorkspace } from "./original-workspace/use-original-workspace";
@@ -109,6 +109,17 @@ function OriginalWorkspace({
     () => toKnowledgeGraph(overviewDetails.length ? overviewDetails : controller.visibleDetails),
     [controller.visibleDetails, overviewDetails],
   );
+  const paletteTags = useMemo(
+    () => viewMode === "overview3d"
+      ? graphPaletteTags(overviewGraph)
+      : graphPaletteTags(graph, controller.focusedGraphId),
+    [viewMode, overviewGraph, graph, controller.focusedGraphId],
+  );
+  const paletteScopeLabel = viewMode === "overview3d"
+    ? "3D 总览"
+    : controller.focusedGraphId
+      ? `图谱：${controller.workspace.graphs.find((item) => item.id === controller.focusedGraphId)?.label ?? "当前图谱"}`
+      : `分类：${controller.workspace.categories.find((item) => item.id === controller.categoryId)?.label ?? "当前分类"}（全部图谱）`;
   const selectedDetail = controller.selectedNode
     ? findOwningDetail(controller.allDetails, controller.selectedNode.id)
     : undefined;
@@ -276,7 +287,8 @@ function OriginalWorkspace({
 
         {editorOpen ? (
           <TagColorEditor
-            tags={graph.tags}
+            tags={paletteTags}
+            scopeLabel={paletteScopeLabel}
             tagColors={tagColors}
             onChange={handleTagColorChange}
             onClose={() => setEditorOpen(false)}
