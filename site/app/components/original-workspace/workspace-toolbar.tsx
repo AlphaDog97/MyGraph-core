@@ -62,7 +62,8 @@ export function WorkspaceToolbar({ user, controller, theme, viewMode,
           onImport={onImport} onEditColors={onEditColors}
         />
         <Tooltip title={theme === "light" ? "切换到深色模式" : "切换到浅色模式"}>
-          <Switch size="small" checkedChildren={<MoonOutlined />} unCheckedChildren={<SunOutlined />}
+          <Switch size="small" className="workspace-toolbar__theme"
+            checkedChildren={<MoonOutlined />} unCheckedChildren={<SunOutlined />}
             checked={theme === "dark"} onChange={onToggleTheme} aria-label="深色模式" />
         </Tooltip>
         <OriginalUserMenu user={user} />

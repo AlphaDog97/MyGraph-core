@@ -51,6 +51,26 @@
 }
 
 .workspace-toolbar__reset.ant-btn { width: 38px; padding-inline: 0; }
+
+.workspace-toolbar__theme.ant-switch {
+  --theme-switch-height: 24px;
+  height: var(--theme-switch-height);
+  line-height: var(--theme-switch-height);
+  flex-shrink: 0;
+}
+
+.workspace-toolbar__theme.ant-switch .ant-switch-handle { top: 50%; transform: translateY(-50%); }
+.workspace-toolbar__theme.ant-switch.ant-switch-small .ant-switch-inner .ant-switch-inner-checked,
+.workspace-toolbar__theme.ant-switch.ant-switch-small .ant-switch-inner .ant-switch-inner-unchecked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--theme-switch-height);
+}
+.workspace-toolbar__theme.ant-switch.ant-switch-small .ant-switch-inner .ant-switch-inner-unchecked {
+  margin-top: calc(-1 * var(--theme-switch-height));
+}
+
 .workspace-toolbar-menu .ant-dropdown-menu { min-width: 200px; }
 .workspace-toolbar.workspace-toolbar--overview {
   grid-template-columns: auto minmax(260px, 1fr) auto;
