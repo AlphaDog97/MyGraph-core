@@ -1,5 +1,6 @@
 import { getD1 } from "@/db";
 import { seedGraphs } from "@/data/seed";
+import { asConnectionSide } from "./edge-ports";
 import type {
   CategorySummary,
   GraphDetail,
@@ -201,7 +202,7 @@ export async function getGraphDetail(id: string): Promise<GraphDetail | null> {
       .all(),
     db
       .prepare(
-        "SELECT id, graph_id, source_node_id, target_node_id, type, label FROM edges WHERE graph_id = ? ORDER BY created_at, id",
+        "SELECT id, graph_id, source_node_id, target_node_id, type, label, source_port, target_port FROM edges WHERE graph_id = ? ORDER BY created_at, id",
       )
       .bind(id)
       .all(),
@@ -231,6 +232,8 @@ export async function getGraphDetail(id: string): Promise<GraphDetail | null> {
     graphId: String(row.graph_id),
     sourceNodeId: String(row.source_node_id),
     targetNodeId: String(row.target_node_id),
+    sourcePort: asConnectionSide(row.source_port),
+    targetPort: asConnectionSide(row.target_port),
     type: String(row.type),
     label: String(row.label),
   }));

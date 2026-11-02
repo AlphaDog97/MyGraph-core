@@ -54,3 +54,12 @@ search, JSON import, editing, theme controls or account access.
 
 No database, auth flow, graph data, canvas lifecycle or zoom changes. The existing
 search component gains an optional placeholder, retaining its original default.
+
+## Control Alignment Refinement
+
+- [x] Center the theme switch handle and both icons within its existing track; verify neighboring button and account-avatar centers. Keep the change scoped to the workspace toolbar.
+- [x] Verify checked/unchecked controls and shared vertical centers in desktop/mobile layouts and both themes, then build and publish.
+
+Alignment verification: the original small switch handle was four pixels above the track center. Browser measurements after the scoped CSS change show exact vertical centers for the track, handle, active moon/sun icon and neighboring controls in both states: desktop y=105 and 390px iframe y=99. Theme toggles and Operations-menu opening worked. The temporary synthetic toolbar fixture was removed before the production build.
+
+TypeScript, production build, whitespace checks and LeanSpec validation passed. Published Site version 22. No authentication, graph, viewport or data changes.

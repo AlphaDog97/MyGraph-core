@@ -73,6 +73,10 @@ function mount({ width = 900, height = 600 } = {}) {
       if (name.endsWith('/graphCanvasStyles')) return { buildGraphCanvasStyles: () => [] };
       if (name.endsWith('/graphCanvasViewport')) return { focusGraph: (cy, id) => { cy.focusTargets.push(id); cy.fit(); } };
       if (name.endsWith('/graphCanvasSelection')) return selectionExports;
+      if (name.endsWith('/useEdgeRouting')) return { useEdgeRouting() {} };
+      if (name.endsWith('/graphCanvasData')) return { syncGraphElements: cy => { cy.patches = (cy.patches ?? 0) + 1; } };
+      if (name.endsWith('/graphCanvasTooltip')) return { createTooltipState: () => null };
+      if (name.endsWith('/GraphConnectionOverlay')) return () => null;
       if (name.endsWith('/graphCanvasLayout')) return {
         createGraphLayoutPlan: () => ({ positions: {} }), initialGraphLayout: () => ({}),
         runLayoutWithAdaptiveFit: (_cy, _motion, _positions, ready) => ready(),
@@ -82,7 +86,7 @@ function mount({ width = 900, height = 600 } = {}) {
     },
   };
   vm.runInNewContext(ts.transpileModule(fs.readFileSync('original-ui/components/GraphCanvas.tsx', 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
   }).outputText, context);
   const props = {
     graph: { nodes: [{ id: 'n1', resolveBorderColor: () => '#abc', searchText: () => 'node', provenance: [] }] },
@@ -127,6 +131,13 @@ const cases = [
     assert.deepEqual(focused, ['graph-two']); assert.equal(app.instances.length, 1);
     app.unmount();
   }],
+  ['edge in the focused graph opens the independent edge editor', () => {
+    const app = mount(), edited = [];
+    app.props.graph.nodes[0].provenance = [{ graphId: 'graph-one' }];
+    app.render({ focusedGraphId: 'graph-one', onGraphFocus() {}, onEdgeSelect: id => edited.push(id) });
+    app.instances[0].handlers['tap:edge']({ target: { id: () => 'edge-one', source: () => ({ id: () => 'n1' }) } });
+    assert.deepEqual(edited, ['edge-one']); assert.equal(app.instances.length, 1); app.unmount();
+  }],
   ['overview cluster background click selects the graph but ordinary background does not', () => {
     const app = mount(), focused = [];
     app.props.graph.nodes[0].provenance = [{ graphId: 'graph-one' }];
@@ -161,8 +172,15 @@ const cases = [
     app.resize(); app.render(); assert.equal(app.instances.length, 1);
     assert.ok(app.instances[0].fits > 0); app.unmount();
   }],
-  ['graph replacement binds resize to the new renderer', () => {
-    const app = mount(); app.render({ graph: { ...app.props.graph, nodes: [...app.props.graph.nodes] } });
+  ['edge refresh retains the renderer and graph replacement rebinds resize', () => {
+    const app = mount(); const first = app.instances[0], fits = first.fits;
+    app.render({ graph: { ...app.props.graph, nodes: [...app.props.graph.nodes], edges: [{ id: 'new-edge' }] } });
+    assert.equal(app.instances.length, 1); assert.equal(first.fits, fits); assert.ok(first.patches > 0);
+    const updated = { ...app.props.graph.nodes[0], description: '最新描述' };
+    app.render({ graph: { ...app.props.graph, nodes: [updated] } });
+    let selected; app.render({ onNodeSelect: node => selected = node });
+    first.handlers['tap:node']({ target: { id: () => 'n1', addClass() {} } }); assert.equal(selected, updated);
+    app.render({ graph: { ...app.props.graph, nodes: [{ ...updated, id: 'n2' }] } });
     assert.equal(app.instances.length, 2); assert.ok(app.instances[0].dead);
     app.resize(); app.unmount(); assert.ok(app.instances[1].dead); assert.equal(app.props.cyRef.current, null);
   }],

@@ -1,3 +1,5 @@
+import type { ConnectionSide } from "@/original-ui/domain/types";
+
 export interface CategorySummary {
   id: string;
   label: string;
@@ -31,6 +33,8 @@ export interface GraphEdge {
   targetNodeId: string;
   type: string;
   label: string;
+  sourcePort?: ConnectionSide | null;
+  targetPort?: ConnectionSide | null;
 }
 
 export interface GraphDetail {

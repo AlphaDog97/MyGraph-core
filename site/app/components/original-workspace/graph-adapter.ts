@@ -54,6 +54,8 @@ export function toKnowledgeGraph(details: GraphDetail[]): KnowledgeGraph {
           id: edge.id,
           source: edge.sourceNodeId,
           target: edge.targetNodeId,
+          sourcePort: edge.sourcePort,
+          targetPort: edge.targetPort,
           type: edge.type,
           label: edge.label,
         },

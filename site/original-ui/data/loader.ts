@@ -13,6 +13,7 @@ import {
   GraphDiagnostic,
 } from "../domain/diagnostics";
 import { resolveEdgeTypeColor } from "../domain/edgeTypes";
+import { portEndpoint } from "../components/graphConnectionGeometry";
 import {
   CategoryGraphEntry,
   defaultGraphSource,
@@ -434,6 +435,11 @@ export function toCytoscapeElements(
       target: edge.target,
       label: edge.label,
       edgeColor: resolveEdgeTypeColor(edge.type),
+      anchored: edge.sourcePort || edge.targetPort ? 1 : 0,
+      sourcePort: edge.sourcePort ?? null,
+      targetPort: edge.targetPort ?? null,
+      sourceEndpoint: portEndpoint(edge.sourcePort),
+      targetEndpoint: portEndpoint(edge.targetPort),
     },
   }));
   return [...nodeElements, ...edgeElements];

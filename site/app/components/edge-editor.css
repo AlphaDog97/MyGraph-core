@@ -1,0 +1,8 @@
+.edge-editor-drawer .ant-drawer-content { background: var(--panel-bg); color: var(--text-primary); }
+.edge-editor-drawer .ant-drawer-header, .edge-editor-drawer .ant-drawer-footer { border-color: var(--panel-border); }
+.edge-editor-form { display: flex; flex-direction: column; gap: 10px; }
+.edge-editor-form > label { margin-top: 10px; font-size: 13px; font-weight: 500; }
+.edge-editor-description { color: var(--text-secondary); font-size: 13px; margin: 0 0 6px; line-height: 1.7; }
+.edge-editor-ports { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.edge-editor-port-field { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+.edge-editor-footer { display: flex; justify-content: flex-end; width: 100%; padding: 4px 0; }
